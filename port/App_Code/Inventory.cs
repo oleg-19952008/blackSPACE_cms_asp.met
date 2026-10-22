@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Web.SessionState;
 using MySql.Data.MySqlClient;
 
 namespace DarkSpace
@@ -50,8 +51,8 @@ namespace DarkSpace
         private bool _droneEquip = false;
         private object _cpuslot;
         private bool _cpuFilled = false;
-        private object _s;
-        private long SCount { get { return ParseLong(Str(_s)); } } // PHP: null → 0 при сравнении/цикле
+        private long _s;
+        private long SCount { get { return _s; } } // PHP: null → 0 при сравнении/цикле (в C# поле long, default 0)
         private object _cuCpu = null;
 
         /* Constructor does everything that needs to be done at every load */
@@ -1393,6 +1394,21 @@ namespace DarkSpace
         {
             // для both branches identical when pos == items values
             return ArrayDiffValues(items.Select(x => x.Value).ToList(), pie);
+        }
+
+        /// <summary>PHP array-коэрция: значение → List&lt;object&gt; (JSON-массив из _submitParams).</summary>
+        private static List<object> ToObjectList(object o)
+        {
+            var r = new List<object>();
+            if (o == null) return r;
+            var lst = o as List<object>;
+            if (lst != null) return lst;
+            var dict = o as IDictionary<string, object>;
+            if (dict != null) { foreach (var v in dict.Values) r.Add(v); return r; }
+            var en = o as System.Collections.IEnumerable;
+            if (en != null && !(o is string)) { foreach (var v in en) r.Add(v); return r; }
+            r.Add(o);
+            return r;
         }
 
         private static string Str(object o)
