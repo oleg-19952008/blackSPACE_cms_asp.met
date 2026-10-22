@@ -1,0 +1,308 @@
+#hangarSlotsContainer {
+    border: 1px solid #203444;
+    margin: 0 0 5px 3px;
+    margin-bottom: 5px;
+    width: 765px;
+    height: 33px;
+    font-size: 11px;
+    background-image: url(/do_img/global/hangar/slots/bg_navbar.png);
+}
+#hangarSlots {
+    float: left;
+}
+#hangarSlots .slotEquipped {
+
+}
+#hangarSlots .slotEmpty {
+    background-image: url(/do_img/global/hangar/slots/hangar_slot_status_11x11.png);
+    background-position: right -11px;
+    background-repeat: no-repeat;
+    height: 11px;
+}
+#hangarSlots .slotDestroyed {
+    background-image: url(/do_img/global/hangar/slots/hangar_slot_status_11x11.png);
+    background-position: right top;
+    background-repeat: no-repeat;
+    height: 11px;
+}
+#hangarSlots .active {
+    background-position: 0 -99px;
+    color: #000000;
+}
+#hangarSlots .selected {
+    background-position: 0 -33px;
+}
+
+.hangarSlot, .hangarSlotForBuy {
+    float: left;
+    width: 31px;
+    height: 33px;
+    background-image: url(/do_img/global/hangar/slots/hangar_slot_sprite_31x33.png);
+    background-position: 0 0;
+    cursor: pointer;
+    font-size: 15px;
+    color: #7f817e;
+    font-weight: bold;
+    line-height: 33px;
+    text-align: center;
+}
+.hangarSlot:active, .hangarSlotForBuy:active, .hangarSlot:hover, .hangarSlotForBuy:hover {
+    background-position: 0 -66px;
+}
+.hangarSlot:hover, #hangarSlots .selected {
+    color: #FFFFFF;
+}
+
+#btnActivateHangarSlot {
+    display: none;
+    background-position: 0 0;
+    float: left;
+    height: 33px;
+    cursor: pointer;
+}
+#btnActivateHangarSlot a.setImage, #btnActivateHangarSlot #btnActivateHangarSlotContent {
+    display: block;
+    float:left;
+    color: #284864;
+
+}
+#btnActivateHangarSlot:hover .setImage, #btnActivateHangarSlot:hover #btnActivateHangarSlotContent {
+    background-position: 0 -33px;
+    color: #FFFFFF;
+}
+#btnActivateHangarSlot:active .setImage, #btnActivateHangarSlot:active #tnActivateHangarSlotContent {
+    background-position: 0 -66px;
+}
+#btnActivateHangarSlot a.leftCorner {
+    background: url(/do_img/global/hangar/slots/hangar_slot_change_sprite_01_14x33.png) no-repeat;
+    width: 14px;
+    height: 33px;
+}
+#btnActivateHangarSlot a.middleContent {
+    background: url(/do_img/global/hangar/slots/hangar_slot_change_sprite_02_1x33.png) repeat-x;
+    height: 33px;
+}
+#btnActivateHangarSlotContent {
+    margin: 9px 21px auto 21px;
+    display: inline;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: smooth;
+    font-size: 11px;
+    height: 33px;
+}
+#btnActivateHangarSlot a.rightCorner {
+    background: url(/do_img/global/hangar/slots/hangar_slot_change_sprite_03_14x33.png) no-repeat;
+    width: 14px;
+    height: 33px;
+}
+#showHangarNameInUpperRightCorner {
+    margin: 3px 5px auto auto;
+    line-height: 1.5em;
+    float: right;
+    min-width: 220px;
+    height: 29px;
+    text-align:left;
+    background-image: url(/do_img/global/hangar/slots/hangar_name_220x25.png);
+    background-repeat: no-repeat;
+    background-size: 100% 29px;
+}
+#showHangarNameInUpperRightCornerText {
+    font-size: 12px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: smooth;
+    font-style: bold;
+    text-align: center;
+    color: #365364;
+    margin-top: 5px;
+    margin-right: 9px;
+}
+
+#showHangarNameInUpperRightCornerTextPremium {
+    font-size: 12px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: smooth;
+    font-style: bold;
+    text-align: center;
+    color: #356364;
+    margin-top: 5px;
+    margin-right: 9px;
+    cursor: pointer;
+}
+
+#hangarSlotsDisable {
+    position: absolute;
+    top: 27px;
+    left: 45px;
+    height: 35px;
+    width: 768px;
+    background-color: black;
+    opacity: 0.7;
+    filter: alpha(opacity=70);
+    display: none;
+}
+
+#renameHangarContainer  {
+    position: absolute;
+    top: -50px;
+    width: 775px;
+    height: 400px;
+    display: none;
+    z-index: 10;
+}
+
+#renameHangarPopup {
+    position            : absolute;
+    top                 : 200px;
+    left                : 700px;
+    width               : 359px;
+    display             : none;
+    z-index             : 12;
+}
+
+#renameHangarPopup .header {
+    width               : 359px;
+    height              : 39px;
+    text-align          : center;
+    background-image: url(/do_img/global/popups/hangar/popup_header.png);
+    color               : #ffcc04;
+    font-size           : 11px;
+}
+#renameHangarPopup .header .button-close {
+    width               : 24px;
+    height              : 24px;
+    position            : absolute;
+    top                 : 7px;
+    right               : 7px;
+    background-image: url(/do_img/global/popups/hangar/close_button_sprite.png);
+    background-repeat   : no-repeat;
+    background-position : 0 0;
+    cursor              : pointer;
+}
+#renameHangarPopup .header .button-close.mouseOver {
+    background-position : 0px -24px;
+}
+#renameHangarPopup .header .button-close.mouseDown {
+    background-position : 0px -48px;
+}
+
+#renameHangarPopup .body {
+    text-align          : center;
+    background-image: url(/do_img/global/popups/hangar/popup_middle.png);
+    padding             : 10px 10px 20px 10px;
+}
+#renameHangarPopup .body .icon {
+    background-repeat   : no-repeat;
+    width               : 57px;
+    height              : 53px;
+    margin              : auto auto 10px auto;
+    display             : none;
+}
+#renameHangarPopup .body .icon-question {
+    background-image: url(/do_img/global/popups/icon_question.png);
+}
+#renameHangarPopup .body .icon-success {
+    background-image: url(/do_img/global/popups/icon_success.png);
+}
+#renameHangarPopup .body .icon-error {
+    background-image: url(/do_img/global/popups/icon_error.png);
+}
+
+#renameHangarPopup .footer {
+    background-image: url(/do_img/global/popups/hangar/popup_footer.png);
+    background-repeat   : no-repeat;
+    height              : 49px;
+    position            : relative;
+}
+#renameHangarPopup .footer.single-button {
+    text-align          : center;
+}
+#renameHangarPopup .footer.single-button .button {
+    position            : static;
+    margin              : auto;
+}
+#renameHangarPopup .footer .button {
+    display             : none;
+    width               : 150px;
+    height              : 32px;
+    background-repeat   : no-repeat;
+    background-image: url(/do_img/global/popups/hangar/button_sprite_150x32px.png);
+    position            : absolute;
+    top                 : 0px;
+    cursor              : pointer;
+}
+#renameHangarPopup .footer .button .text {
+    width               : 100%;
+    height              : 100%;
+    background-repeat   : no-repeat;
+    background-position : center 7px;
+}
+#renameHangarPopup .footer .button-green {
+    background-position : 0 -96px;
+    left                : 25px;
+    display             : block;
+}
+#renameHangarPopup .footer .button-green.mouseOver {
+    background-position : 0 -128px;
+}
+#renameHangarPopup .footer .button-green.mouseDown {
+    background-position : 0 -160px;
+}
+#renameHangarPopup .footer .button-blue {
+    background-position : 0 0;
+    right               : 25px;
+}
+#renameHangarPopup .footer .button-blue.mouseOver {
+    background-position : 0 -32px;
+}
+#renameHangarPopup .footer .button-blue.mouseDown {
+    background-position : 0 -64px;
+}
+
+#renameHangarPopupBackground{
+    display             : block;
+    position            : absolute;
+    left                : 0px;
+    top                 : 76px;
+    width               : 772px;
+    height              : 438px;
+    background-color    : #000000;
+    opacity             : 0.7;
+    filter              : alpha(opacity=70);
+    z-index             : 10;
+}
+
+#renameHangarLoading {
+    display             : block;
+    position            : absolute;
+    z-index             : 11;
+    top                 : 290px;
+    left                : 390px;
+}
+
+#renameHangarPopup .header-name {
+    width               : 330px;
+    height              : 24px;
+    position            : absolute;
+    top                 : 7px;
+    left                : 1px;
+    font-size           : 14px;
+    font-family         : Verdana, Arial, sans-serif;
+}
+
+#renameHangarPopup .rename-title {
+    width               : 330px;
+    color               : #ABABAB;
+    font-family         : Verdana, Arial, sans-serif;
+    font-size           : 13px;
+}
+
+#renameHangarPopup #renameHangarInputField {
+    width               : 322px;
+    height              : 15px;
+    color               : #A0A0A0;
+    text-align          : center;
+    border              : none;
+    background-color    : #000000;
+    background-image: url(/do_img/global/popups/hangar/textfield_02.png);
+    background-repeat   : no-repeat;
+}

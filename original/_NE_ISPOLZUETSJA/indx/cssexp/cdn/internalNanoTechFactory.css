@@ -1,0 +1,787 @@
+#nanoTechFactory {
+    font-size: 11px;
+    color: #f2b05a;
+}
+#subnav {
+    position:absolute;
+    top:2px !important;
+    left:45px !important;
+}
+.nanoTechFactory {
+    position: relative;
+    top: 0px;
+    left: 0px;
+    width: 772px;
+    height: 401px;
+    background-image: url(/do_img/global/pilotSheet/nanoTechFactory/rework/background.jpg?__cv=fffe6d01a619fb57020285d2766a0400);
+    background-repeat:no-repeat;
+}
+
+.tabButtonActive{
+    background-image:  url(/do_img/global/pilotSheet/profilePage/tab_active.jpg?__cv=af06774e97a98879d2b4cd781b350400);
+    background-repeat: no-repeat;
+    margin-right: 5px;
+}
+
+.tabButtonInActive{
+    background-image:  url(/do_img/global/pilotSheet/profilePage/tab_inactive1.jpg?__cv=491773b46f05dd34c2ae423de5e95800);
+    background-repeat: no-repeat;
+    margin-right: 5px;
+}
+
+.tabButtonRollOver{
+    background-image:  url(/do_img/global/pilotSheet/profilePage/tab_rollover.jpg?__cv=4e701de4cf154f4df18a7b68be13dd00);
+    background-repeat: no-repeat;
+    margin-right: 5px;
+}
+
+.tabLabelActive{
+    height: 20px;
+    background-repeat: no-repeat;
+    background-position: center 6px;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #000000;
+    text-align: center;
+    position: relative;
+    /*top: 5px;*/
+}
+
+.tabLabelInActive{
+    height: 20px;
+    background-repeat: no-repeat;
+    background-position: center 6px;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #FFFFFF;
+    text-align: center;
+    position: relative;
+    /*top: 5px;*/
+}
+
+#ntf_left {
+    position: absolute;
+    top: 5px;
+    left: 0px;
+    width: 145px;
+    height: 394px;
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/bg_left.png?__cv=6b89b4099222a7f3f98b336bfa2ab800);
+}
+
+#ntf_right_tech {
+    position: absolute;
+    top: 31px;
+    right: 47px;
+    width: 150px;
+    height: 394px;
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/bg_right.png?__cv=2cc4aa247a0f6633ed8a7ebc01025d00);
+}
+
+#ntf_right_factory {
+    position: absolute;
+    top: 31px;
+    right: 47px;
+    float: left;
+    width: 150px;
+    height: 394px;
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/bg_right_progress.png?__cv=b8c8aabaf5fc8b73df223c77f3dc5e00);
+}
+
+#title_buff {
+    width: 125px;
+    height: 17px;
+    text-align:center;
+    color: white;
+    margin-top:102px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+#title_factory_left {
+    width: 144px;
+    height: 17px;
+    text-align:center;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+#title_factory_right {
+	margin-top: 3px;
+    width: 164px;
+    height: 17px;
+    text-align:center;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+#title_buff {
+    margin-left: 10px;
+}
+#title_factory {
+    margin-left: 19px;
+}
+
+/* arrow-navi */
+.scroll_top {
+    position: absolute;
+    width: 119px;
+    height: 19px;
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/arrows.png?__cv=9df11d3e5cde1e305fe1dacba68e8e00);
+    background-position: 0px 0px;
+    cursor: pointer;
+}
+.scroll_top:hover   { background-position: -130px 0px;}
+.scroll_top:active  { background-position: -260px 0px;}
+
+#scroll_top_buff { top: 18px; left: 13px;}
+#scroll_top_hall { top: 18px; left: 20px;}
+
+.scroll_bottom {
+    position: absolute;
+    width: 119px;
+    height: 19px;
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/arrows.png?__cv=9df11d3e5cde1e305fe1dacba68e8e00);
+    background-position: 0px 25px;
+    cursor: pointer;
+}
+.scroll_bottom:hover    { background-position: -130px 25px;}
+.scroll_bottom:active   { background-position: -260px 25px;}
+
+#scroll_bottom_buff { top: 372px; left: 13px;}
+#scroll_bottom_hall { top: 372px; left: 20px;}
+
+/* arrow-navi */
+
+/* buffs */
+#buff_list_main {
+    position: absolute;
+    top: 164px;
+    left: 0px;
+    width: 135px;
+    height: 330px;
+}
+
+.buff {
+    width: 56px;
+    height: 60px;
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/buffs_sprite_small.png?__cv=9cf5c3994dbaa3fdc7d084cd81fca200);
+    float: left;
+    margin: 5px 0 0 10px;
+    cursor: pointer;
+}
+
+.buff_hover {
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/buffs_sprite_small.png?__cv=9cf5c3994dbaa3fdc7d084cd81fca200);
+    background-position:  0px 0px;
+    width: 56px;
+    height: 60px;
+}
+.buff_hover:hover {
+    background-image: none;
+}
+.buff_hover:active {
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/buffs_sprite_small.png?__cv=9cf5c3994dbaa3fdc7d084cd81fca200);
+    background-position:  -56px 0px;
+}
+
+
+#buff_ECI_1 {
+    background-position: -112px 0px;
+}
+#buff_ELA_1 {
+    background-position: -168px 0px;
+}
+#buff_SBU_1 {
+    background-position: -224px 0px;
+}
+#buff_RPM_1 {
+    background-position: -280px 0px;
+}
+#buff_BRB_1 {
+    background-position: -336px 0px;
+}
+/* buffs */
+
+#factory_list_main {
+    position: absolute;
+    float: left;
+    top: 28px;
+    left: 0px;
+    width: 135px;
+    height: 70px;
+}
+
+#factory_apis {
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/factory_icons_apis_sprite.png?__cv=e7b316d553b490ec04bca5d583b68a00);
+    background-position: -160px 0;
+    background-repeat: no-repeat;
+    margin-left: 16px;
+    margin-top: 8px;
+}
+#factory_zeus {
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/factory_icons_zeus_sprite.png?__cv=ed666a0d66025ebeb3d36b6d0574b600);
+    background-position: -160px 0;
+    background-repeat: no-repeat;
+    margin-left: 75px;
+    margin-top: -60px;
+}
+
+#factory_empty {
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/factory_icons_apis_sprite.png?__cv=e7b316d553b490ec04bca5d583b68a00);
+    background-position: 0px 0;
+    background-repeat: no-repeat;
+    margin-left: 16px;
+    margin-top: 8px;
+    position:absolute;
+    left: 60px;
+}
+
+.factory_apis_hover, .factory_zeus_hover {
+    height: 51px;
+    width: 51px;
+}
+.factory_apis_hover:hover {
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/factory_icons_apis_sprite.png?__cv=e7b316d553b490ec04bca5d583b68a00);
+    background-position: -107px 0;
+    background-repeat: no-repeat;
+}
+
+.factory_zeus_hover:hover {
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/factory_icons_zeus_sprite.png?__cv=ed666a0d66025ebeb3d36b6d0574b600);
+    background-position: -107px 0;
+    background-repeat: no-repeat;
+}
+.factory_hover:hover {
+    background-position: -54px 0;
+}
+
+
+.factory_hover:active {
+    background-position: -107px 0;
+}
+
+#factory_progress_main {
+    height: 235px;
+    left: 62px;
+    position: absolute;
+    top: 75px;
+    width: 30px;
+}
+
+#factory_progress_bar {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/progressbar_bg.png?__cv=795f38e8560d38b07bc0e5dbbc402000);
+    width: 21px;
+    position: relative;
+    margin:  0 auto;
+}
+
+#ntf_center_factory {
+    position: absolute;
+    top: 5px;
+    left: 165px;
+    width: 455px;
+    height: 374px;
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/bg_apis.png?__cv=8ce453888e0b1da286f18325e6c2c800);
+    color: #bcd3e3;
+    padding-top: 10px;
+}
+#ntf_center_factory a {
+    /*color: #bcd3e3;*/
+    color: #F1C839;
+    text-decoration: none;
+}
+#ntf_center_factory a:hover {
+    color: #bcd3e3;
+}
+
+
+/* factory hall */
+#hall_list_main {
+    position: absolute;
+    top: 45px;
+    left: 32px;
+    text-align: center;
+}
+.hall_list {
+    width: 92px;
+    height: 110px;
+}
+.hall_singleView {
+    width:74px;
+    height:80px;
+    background-image: url(/do_img/global/pilotSheet/nanoTechFactory/buffs_sprite_big.png?__cv=b052eca3b3d2147cdb6a09b89fd15100);
+    margin:auto;
+}
+.hall_info {
+    color: #8a8a8a;
+    margin-top: 1px;
+}
+.hall_inactive {
+    background-position: -76px 0px;
+}
+.hall_active {
+    background-position: 0px 0px;
+}
+.hall_underConstruction {
+    background-position: 0px 0px;
+}
+.hall_buy {
+    width: 126px;
+    height: 25px;
+    background-image: url(/do_img/global/pilotSheet/nanoTechFactory/but_buy_hall.png?__cv=6e38b416020df32fcb09b6a4ebc57900);
+    line-height: 25px;
+    text-align: center;
+    margin: -3px 0 0 -14px;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+.hall_build_progress {
+    font-size: 15px;
+    color: #8a8a8a;
+    font-weight: bold;
+    text-align: center;
+    line-height: 80px;
+}
+.hall_buff_in_progress {
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/buffs_sprite_big.png?__cv=b052eca3b3d2147cdb6a09b89fd15100);
+    width: 76px;
+    height: 80px;
+    background-position: -152px 0px;
+}
+.hall_buff {
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/buffs_sprite_big.png?__cv=b052eca3b3d2147cdb6a09b89fd15100);
+    width: 76px;
+    height: 80px;
+    cursor: pointer;
+}
+
+.hall_buff_ECI_1 {
+    background-position: -228px 0px;
+}
+.hall_buff_ELA_1 {
+    background-position: -304px 0px;
+}
+.hall_buff_SBU_1 {
+    background-position: -380px 0px;
+}
+.hall_buff_RPM_1 {
+    background-position: -456px 0px;
+}
+.hall_buff_BRB_1 {
+    background-position: -532px 0px;
+}
+
+.hall_stackBuffBG {
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/bg_stack.png?__cv=1c05953f556f2904ff4158ac65c6b700);
+    width: 76px;
+    height : 80px;
+    position: absolute;
+}
+.hall_stackBuffNumber {
+    position: relative;
+    top: 54px;
+    right: -15px;
+    width: 80px;
+    height: 20px;
+    font-size: 13px;
+    font-weight: bold;
+}
+/* factory hall */
+
+/* SinlgeBuff */
+#ntf_center {
+    position: absolute;
+    top: 36px;
+    left: 187px;
+    width: 394px;
+    height: 347px;
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/bg_singleBuff.png?__cv=5ef37ca867c13a1b54c36b8c2a5a4b00);
+    color: #bcd3e3;
+    padding-top: 15px;
+}
+#ntf_center a {
+    /*color: #bcd3e3;*/
+    color: #F1C839;
+    text-decoration: none;
+}
+#ntf_center a:hover {
+    color: #bcd3e3;
+}
+
+#ntf_buff_scroll {
+    width: 383px;
+    height: 247px;
+    overflow: auto;
+}
+
+#ntf_factory_scroll {
+    height: 159px;
+    margin-left: 52px;
+    margin-top: 14px;
+    overflow: auto;
+    width: 358px;
+}
+
+.ntf_seperator {
+    width: 345px;
+    height: 2px;
+    background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/seperator.png?__cv=6e17cba788794489070db3b12924ab00);
+    margin: 5px 0 10px 21px;
+}
+#ntf_buff_name, #ntf_buff_descr, #ntf_buff_cost, #ntf_buff_info, #ntf_help_content {
+    width: 335px;
+    margin-left: 30px;
+}
+#ntf_drone_name {
+    width: 335px;
+    margin-left: 111px;
+    padding-bottom: 5px;
+}
+
+.ntf_drone_parts {
+	background-repeat: no-repeat;
+    height: 113px;
+    left: 159px;
+    position: absolute;
+    top: 186px;
+    width: 136px;
+}
+
+#ntf_drone_parts_apisPart_1 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/apis_progess1.png?__cv=76b8796707e1a7faa841b77c73139800);
+}
+#ntf_drone_parts_apisPart_2 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/apis_progess2.png?__cv=5dacdcc5b1b87c29ec777a3c10ff0200);
+}
+#ntf_drone_parts_apisPart_3 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/apis_progess3.png?__cv=7c2cdf42a4330258d55169f45e32c400);
+}
+#ntf_drone_parts_apisPart_4 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/apis_progess4.png?__cv=c9f0d31c8c3b3d8ed94be99d3a0fc300);
+}
+#ntf_drone_parts_apisPart_5 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/apis_progess5.png?__cv=20b501a0c60db20c07b33f3f2184bd00);
+}
+#ntf_drone_parts_apisPart_6 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/apis_progess6.png?__cv=5ce0d0246139bfa5939bd98f8df1d200);
+}
+#ntf_drone_parts_apisPart_7 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/apis_progess7.png?__cv=1a84d883bd03a88851b0331c4eb1a600);
+}
+#ntf_drone_parts_apisPart_8 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/apis_progess8.png?__cv=cd0a461b2013e5290da04a27737a8300);
+}
+#ntf_drone_parts_apisPart_9 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/apis_progess9.png?__cv=cc6e20c7e53b2f6e198e1fb5d417ec00);
+}
+#ntf_drone_parts_apisPart_10 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/apis_progess10.png?__cv=e3832d6593e7015e8442dc00e5645a00);
+}
+
+#ntf_drone_parts_zeusPart_1 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/zeus_progress1.png?__cv=c72b2b6b2d94c241300702aed3e88800);
+}
+#ntf_drone_parts_zeusPart_2 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/zeus_progress2.png?__cv=b07e5a8fa6945d13bf1bfa6c92b3f500);
+}
+#ntf_drone_parts_zeusPart_3 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/zeus_progress3.png?__cv=6cd4e8a1ffd6ef9fa370ddc4fb00ed00);
+}
+#ntf_drone_parts_zeusPart_4 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/zeus_progress4.png?__cv=c47fc59deb6197316bd10cd07c2a4900);
+}
+#ntf_drone_parts_zeusPart_5 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/zeus_progress5.png?__cv=d7f3167d81c5bf7578ec1f7ee020cf00);
+}
+#ntf_drone_parts_zeusPart_6 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/zeus_progress6.png?__cv=6c674e4b7471cee61ccb006b90435600);
+}
+#ntf_drone_parts_zeusPart_7 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/zeus_progress7.png?__cv=0a5d8548db14032fdba7ea2136382100);
+}
+#ntf_drone_parts_zeusPart_8 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/zeus_progress8.png?__cv=2974cb8210f5e7d8c95d5976f4730a00);
+}
+#ntf_drone_parts_zeusPart_9 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/zeus_progress9.png?__cv=e222a4353c8c99f9ff8020b1155af700);
+}
+#ntf_drone_parts_zeusPart_10 {
+	background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/zeus_progress10.png?__cv=b6d59490d78017dc402a6057e8466b00);
+}
+
+
+#ntf_table_cost, #ntf_table_info {
+    width: 100%;
+    border-collapse: collapse;
+}
+.ntf_center {
+    text-align: center;
+}
+.ntf_resource_ok{
+    color: #0e960e;
+}
+.ntf_resource_fail {
+    color: #c41212;
+    cursor: help;
+}
+#ntf_buff_build_instant {
+    position: absolute;
+    top: 262px;
+    left: 14px;
+}
+#ntf_buff_build_instant:hover {
+    background-position: -186px 0px;
+}
+#ntf_buff_build {
+    position: absolute;
+    top: 262px;
+    left: 198px;
+}
+#ntf_buff_build:hover {
+    background-position: -186px 0px;
+}
+
+#ntf_drone_build_instant {
+    left: 45px;
+    position: absolute;
+    top: 335px;
+}
+
+#ntf_drone_build_instant:hover {
+    background-position: -186px 0px;
+}
+
+#ntf_drone_build {
+    left: 230px;
+    position: absolute;
+    top: 335px;
+}
+
+#ntf_drone_build:hover {
+    background-position: -186px 0px;
+}
+
+#ntf_buff_buy {
+    position: absolute;
+    top: 307px;
+    left: 70px;
+}
+#ntf_buff_buy:hover {
+    background-position: -186px 0px;
+}
+
+#ntf_buff_build, #ntf_buff_build_instant, #ntf_buff_buy {
+    text-align: center;
+}
+#ntf_drone_build, #ntf_drone_build_instant, #ntf_drone_buy {
+    text-align: center;
+}
+
+#button_build, #button_build_instant, #button_buy {
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+#button_build, #button_build_instant {
+    height: 34px;
+    width: 182px;
+    padding-top: 10px;
+}
+#button_buy {
+    height: 34px;
+    width: 266px;
+    padding-top: 10px;
+}
+#button_build, #button_build_instant {
+    background-image:  url(../../do_img/global/pilotSheet/nanoTechFactory/but_buff_build.png?__cv=adb1a3462df5b581f2fccfdef67c2000);
+    background-position: 0px 0px;
+}
+#button_buy {
+    background-image:  url(../../do_img/global/pilotSheet/nanoTechFactory/but_buff_buy.png?__cv=2e95ffe8db43956aec790bacdfd2ab00);
+    background-position: 0px 0px;
+}
+#button_build:hover, #button_build_instant:hover {
+    background-image:  url(../../do_img/global/pilotSheet/nanoTechFactory/but_buff_build.png?__cv=adb1a3462df5b581f2fccfdef67c2000);
+    background-position: -182px 0px;
+}
+#button_buy:hover {
+    background-image:  url(../../do_img/global/pilotSheet/nanoTechFactory/but_buff_buy.png?__cv=2e95ffe8db43956aec790bacdfd2ab00);
+    background-position: -266px 0px;
+}
+
+#button_build a, #button_build_instant a, #button_buy a {
+    color: #FFFFFF;
+    text-decoration: none;
+    display: block;
+}
+
+.buildlink_inactive, .buylink_inactive {
+    color: #8e9398;
+}
+
+.but_build_instant_a {
+    display: block;
+    height: 45px;
+    margin-top: -10px;
+    padding-top: 10px;
+}
+#button_build_inactive, #button_build_instant_inactive, #button_buy_inactive {
+    font-size: 12px;
+    font-weight: bold;
+    cursor: auto;
+    text-align: center;
+}
+#button_build_inactive, #button_build_instant_inactive {
+    width: 182px;
+    height: 34px;
+    padding-top: 10px;
+    text-align: center;
+}
+#button_buy_inactive {
+    width: 266px;
+    height: 34px;
+    padding-top: 10px;
+    text-align: center;
+}
+#button_build_inactive, #button_build_instant_inactive {
+    background-image:  url(../../do_img/global/pilotSheet/nanoTechFactory/but_buff_build.png?__cv=adb1a3462df5b581f2fccfdef67c2000);
+    background-position: -364px 0px;
+}
+
+#button_buy_inactive {
+    background-image:  url(../../do_img/global/pilotSheet/nanoTechFactory/but_buff_buy.png?__cv=2e95ffe8db43956aec790bacdfd2ab00);
+    background-position: -532px 0px;
+}
+/* SinlgeBuff */
+
+/* Help */
+#ntf_help_scroll {
+    width: 383px;
+    height: 335px;
+    overflow-x:hidden;
+}
+
+#ntf_help_list li{
+    margin-bottom: 10px;
+    list-style-type: none;
+}
+#ntf_help_list ul{
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+#ntf_help_list ul li{
+    margin-left: 10px;
+    margin-bottom: 0px;
+    list-style-type: disc;
+}
+
+/* Help */
+
+.linecountSix {
+    margin-bottom : 150px;
+}
+.text_headline {
+}
+.text_subheadline {
+    color: #FFFFFF;
+}
+#ntf_help_content .text_headline, .text_info {
+    font-weight: bold;
+    color: #F1C839;
+}
+#ntf_help_content p {
+    margin-bottom: 20px;
+}
+#ntf_help_content ol {
+    margin: -10px 0 10px 25px;
+}
+#ntf_help_content ol li {
+    list-style-type: decimal;
+}
+
+.scroll-track{
+    height:10px;
+    width:16px;
+    background-image:  url(/do_img/global/pilotSheet/incentives/scrollbar/vertical/bg.png?__cv=000cfa7c72a8a047af40093042ef6600);
+}
+
+.scroll-handle{
+    border: 1px solid black;
+    height:10px;
+    width:15px;
+    left: -1px;
+    background-image:  url(/do_img/global/pilotSheet/incentives/scrollbar/vertical/bar.png?__cv=6bc46b5f6b3b91f3f76cb00831cecc00);
+    cursor:pointer;
+}
+
+.scroll-track-top{
+    background-image:  url(/do_img/global/pilotSheet/incentives/scrollbar/vertical/arrow_up.png?__cv=abcf286c198aff708ba0e922d8854100);
+    background-repeat: no-repeat;
+    height:16px;
+    width:16px;
+}
+
+.scroll-track-bot{
+    background-image:  url(/do_img/global/pilotSheet/incentives/scrollbar/vertical/arrow_down.png?__cv=04d0ed94ef193c5199b4c83e2ec38300);
+    background-repeat: no-repeat;
+    height:16px;
+    width:16px;
+}
+
+.scroll-track-top-active{
+    background-image:  url(/do_img/global/pilotSheet/incentives/scrollbar/vertical/arrow_up_active.png?__cv=486293d4de491f5ce795552b0911e100);
+    background-repeat: no-repeat;
+    height:16px;
+    width:16px;
+}
+
+.scroll-track-bot-active{
+    background-image:  url(/do_img/global/pilotSheet/incentives/scrollbar/vertical/arrow_down_active.png?__cv=ca13238fd3d58410c4735c8c8256c700);
+    background-repeat: no-repeat;
+    height:16px;
+    width:16px;
+}
+
+
+.dronePartsDisplay {
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 15px;
+    left: 45px;
+    position: absolute;
+    top: 334px;
+    width: 70px;
+}
+
+.errorMessageDroneAlreadyInUse{
+    position: absolute;
+}
+
+#errorMessageDroneAlreadyInUse {
+    background:  url(/do_img/global/bg_opacity80.png?__cv=b885e71a875650126ae5b0f287db5400) repeat scroll 0 0 transparent;
+    /*color: white;
+    display: none;
+    font-family: Verdana;
+    font-size: 12px;*/
+    position: absolute;
+    left: 144px;
+    height: 384px;
+    padding-top: 10px;
+    top: 5px;
+    width: 484px;
+    z-index: 20;
+}
+
+#errorText{
+    position: absolute;
+    top: 167px;
+    width: 300px;
+    left: 100px;
+    color: #A0A0A0;
+    font-weight: bold;
+    font-size: 12px;
+}

@@ -1,0 +1,38 @@
+Pool Object
+(
+    [size:protected] => 10
+    [class:protected] => GameInstances
+    [workers:protected] => Array
+        (
+            [0] => GameInstances Object
+                (
+                    [logger] => SafeLog Object
+                        (
+                        )
+
+                    [pack] => 
+                )
+
+            [1] => GameInstances Object
+                (
+                    [logger] => SafeLog Object
+                        (
+                        )
+
+                    [pack] => 
+                )
+
+        )
+
+    [work:protected] => Array
+ *RECURSION*
+    [ctor:protected] => Array
+        (
+            [0] => SafeLog Object
+                (
+                )
+
+        )
+
+    [last:protected] => 2
+)

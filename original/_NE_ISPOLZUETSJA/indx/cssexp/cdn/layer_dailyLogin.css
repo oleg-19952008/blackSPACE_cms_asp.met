@@ -1,0 +1,148 @@
+@charset "utf-8";
+
+#dailyLogin {
+    position:absolute;
+    top:50px;
+    width:770px;
+    height:400px;
+    background-image:  url(/do_img/global/pilotSheet/dailyLogin/layer_bg.png);
+    z-index: 10;
+    font-size: 10px;
+    color: #acf2ff;
+}
+
+#dl_headline {
+    font-size: 13px;
+    height:30px;
+    line-height: 30px;
+}
+
+#dl_infoBox {
+    position: absolute;
+    top:45px;
+    left:145px;
+    width: 500px;
+    height: 60px;
+    color: #FFFFFF;
+}
+
+#dl_infoBox_headline {
+    font-size: 13px;
+}
+#dl_infoBox_content {
+    font-size: 11px;
+}
+
+#dl_progressbar_bonus_1, #dl_progressbar_bonus_2, #dl_progressbar_bonus_3, #dl_progressbar_bonus_4, #dl_progressbar_bonus_5 {
+    position: absolute;
+    top:-11px;
+    left:31px;
+    background-image:  url(/do_img/global/pilotSheet/dailyLogin/bg_progressbar.png?__cv=377fa10e286f62d77431e594e4108b00);
+    width: 679px;
+    height: 11px;
+}
+#dl_progressbar_bonus_1 {   width: 45px;}
+#dl_progressbar_bonus_2 {   width: 195px;}
+#dl_progressbar_bonus_3 {   width: 345px;}
+#dl_progressbar_bonus_4 {   width: 495px;}
+
+
+
+#dl_boni {
+    position: absolute;
+    top: 157px;
+    left: 15px;
+    width: 750px;
+}
+
+#dl_boniBox {
+    width: 150px;
+    height: 195px;
+    float: left;
+    cursor: pointer;
+}
+
+.dl_boni_headline {
+    font-size: 13px;
+    font-weight: bold;
+}
+.dl_bonus_received_icon {
+    /*margin: 6px 0 0 60px;*/
+    margin-top: 6px;
+}
+.dl_boni_content {
+    position: absolute;
+    font-size: 11px;
+    top: 148px;
+    left: 0px;
+    width: 155px;
+}
+.dl_boni_content_1 {    left: 0px;}
+.dl_boni_content_2 {    left: 150px;}
+.dl_boni_content_3 {    left: 300px;}
+.dl_boni_content_4 {    left: 450px;}
+.dl_boni_content_5 {    left: 600px;}
+
+.dl_boni_1, .dl_boni_2, .dl_boni_3, .dl_boni_4, .dl_boni_5 {
+    background-position: 20px 45px;
+    background-repeat: no-repeat;
+    width: 150px;
+    height: 150px;
+}
+
+.dl_boni_1 {
+    background-image:  url(/do_img/global/pilotSheet/dailyLogin/bonus_1.png?__cv=0ca385e949676343012da195adb28100);
+}
+.dl_boni_2 {
+    background-image:  url(/do_img/global/pilotSheet/dailyLogin/bonus_2.png?__cv=4debbf321db981c93e0db635e59ba900);
+}
+.dl_boni_3 {
+    background-image:  url(/do_img/global/pilotSheet/dailyLogin/bonus_3.png?__cv=c984b75454a1a19fb046617325134400);
+}
+.dl_boni_4 {
+    background-image:  url(/do_img/global/pilotSheet/dailyLogin/bonus_4.png?__cv=914b6bcdc6091d240c7381564811f900);
+}
+.dl_boni_5 {
+    background-image:  url(/do_img/global/pilotSheet/dailyLogin/bonus_5.png?__cv=89fc37c64592f4a01aa4879e54306600);
+}
+
+.dl_boniState_active, .dl_boniState_received, .dl_boniState_comming {
+    width: 150px;
+    height: 150px;
+}
+.dl_boniState_active {
+    background-image:  url(/do_img/global/pilotSheet/dailyLogin/bg_active.png?__cv=a5da85546fe77898c73e9aac0c5bf800);
+    background-position: 19px 29px;
+    background-repeat: no-repeat;
+    color: #FFFFFF;
+}
+.dl_boniState_received {
+
+}
+.dl_boniState_comming {
+    color: #999999;
+}
+#dl_accept {
+    text-align: center;
+}
+#dl_bt_accept {
+    position: absolute;
+    top: 193px;
+    left: 285px;
+    width: 179px;
+    height: 37px;
+    background-image:  url(/do_img/global/layer/main_button_sprite.png?__cv=dc9bd5131fc051db82eb47a7f97c9500);
+    background-position: 0px 0px;
+    line-height: 37px;
+}
+#dl_bt_accept:hover {
+    background-position: 0 37px;
+}
+
+#dl_bt_accept a {
+    display: block;
+    text-decoration: none;
+    font-size: 12px;
+    color: #FFFFFF;
+    font-weight: bold;
+}

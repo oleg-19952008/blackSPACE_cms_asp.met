@@ -1,0 +1,70 @@
+/**
+ * scrollbar_dark.css
+ * 
+ * Styles for the themed jScrollPane.
+ * @author  Wolfgang Timme <w.timme@bigpoint.net>
+ */
+
+/* Horizontal bar */
+.jspHorizontalBar .jspTrack {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/horizontal-track.png);
+}
+.jspHorizontalBar .jspArrowLeft {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/horizontal-arrowLeft.png);
+}
+.jspHorizontalBar .jspArrowRight {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/horizontal-arrowRight.png);
+}
+.jspHorizontalBar .jspDrag {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/horizontal-drag.png);
+}
+.jspHorizontalBar .jspDragLeft {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/horizontal-dragLeft.png);
+}
+.jspHorizontalBar .jspDragRight {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/horizontal-dragRight.png);
+    position            : absolute;
+    right               : 0;
+    top                 : 0;
+}
+.jspHorizontalBar .jspDragLeft,
+.jspHorizontalBar .jspDragRight {
+    width               : 5px;
+    height              : 16px;
+}
+
+/* Vertical bar */
+.jspVerticalBar .jspTrack {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/vertical-track.png);
+}
+.jspVerticalBar .jspArrowUp,
+.jspVerticalBar .jspArrowUp.jspDisabled  {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/vertical-arrowUp.png);
+}
+.jspVerticalBar .jspArrowDown,
+.jspVerticalBar .jspArrowDown.jspDisabled  {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/vertical-arrowDown.png);
+}
+.jspVerticalBar .jspDrag {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/vertical-drag.png);
+    background-position : bottom;
+}
+.jspVerticalBar .jspDragTop {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/vertical-dragTop.png);
+}
+.jspVerticalBar .jspDragBottom {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/vertical-dragBottom.png);
+    position            : absolute;
+    left                : 0;
+    bottom              : 0;
+}
+.jspVerticalBar .jspDragTop,
+.jspVerticalBar .jspDragBottom {
+    width               : 16px;
+    height              : 5px;
+}
+
+/* Corner between the two scrollbars */
+.jspCorner {
+    background-image    : url(/do_img/global/misc/scrollbar/dark/corner.jpg);
+}

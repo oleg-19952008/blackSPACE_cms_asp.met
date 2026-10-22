@@ -1,0 +1,775 @@
+#itemUpgradeSystem {
+    font-size: 11px;
+    color: #f2b05a;
+}
+#subnav {
+    position:absolute;
+    top:2px !important;
+    left:45px !important;
+}
+#itemUpgradeSystem .highlight {
+    color: #99d5ff;
+}
+
+.itemUpgradeSystem {
+    position: relative;
+    left: 0px;
+    top: 0px;
+    width: 772px;
+    height: 400px;
+    background:  url(/do_img/global/itemUpgrade/bg.jpg?__cv=484c6208061f3727ee777a3503830d00) no-repeat;
+    color: #1C1C1C;
+}
+
+.tabButtonActive{
+    background:  url(/do_img/global/pilotSheet/profilePage/tab_active.jpg?__cv=af06774e97a98879d2b4cd781b350400) no-repeat;
+    margin-right: 5px;
+}
+
+.tabButtonInActive{
+    background:  url(/do_img/global/pilotSheet/profilePage/tab_inactive1.jpg?__cv=491773b46f05dd34c2ae423de5e95800) no-repeat;
+    margin-right: 5px;
+}
+
+.tabButtonRollOver{
+    background:  url(/do_img/global/pilotSheet/profilePage/tab_rollover.jpg?__cv=4e701de4cf154f4df18a7b68be13dd00) no-repeat;
+    margin-right: 5px;
+}
+
+.tabLabelActive{
+    height: 20px;
+    background: no-repeat center 6px;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #000000;
+    text-align: center;
+    position: relative;
+    /*top: 5px;*/
+}
+
+.tabLabelInActive{
+    height: 20px;
+    background: no-repeat center 6px;
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #FFFFFF;
+    text-align: center;
+    position: relative;
+    /*top: 5px;*/
+}
+
+#slot1 {
+    float: left;
+    position: relative;
+    top: 12px;
+    margin-left: 4px;
+    width: 236px;
+    height: 400px;
+}
+#slot2 {
+    float: left;
+    position: relative;
+    top: 12px;
+    margin-left: 4px;
+    width: 236px;
+    height: 400px;
+}
+#slot3 {
+    float: left;
+    position: relative;
+    top: 12px;
+    margin-left: 4px;
+    width: 284px;
+    height: 400px;
+}
+#slot1_head, #slot2_head, #slot3_head {
+    width: 236px;
+    height: 37px;
+    color: #ffcc00;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 37px;
+}
+#slot1_head {
+    background-image:  url(/do_img/global/itemUpgrade/slot1_top.png?__cv=8633ffe2bb72954763102bf2e3dcf300);
+}
+#slot2_head {
+    background-image:  url(/do_img/global/itemUpgrade/slot2_top.png?__cv=6442c48270808ee312afaab954109700);
+}
+#slot3_head {
+    width: 284px;
+    background-image:  url(/do_img/global/itemUpgrade/slot3_top.png?__cv=c3bd0e691a77e5290ffcb9b59d7bc900);
+}
+#slot1_head .headline, #slot2_head .headline, #slot3_head .headline {
+    margin-left: 10px;
+}
+#slot1_content, #slot2_content {
+    width: 236px;
+    height: 330px;
+}
+#slot3_content {
+    width: 284px;
+    height: 109px;
+}
+#slot1_content {
+    background-image:  url(/do_img/global/itemUpgrade/slot1_bg.png?__cv=be9aabe07ab543a5a9db26ee843b6100);
+}
+#slot2_content {
+    background-image:  url(/do_img/global/itemUpgrade/slot2_bg.jpg?__cv=1340315214773134361f13ffcaa45c00);
+}
+#slot3_content {
+    background-image:  url(/do_img/global/itemUpgrade/slot3_bg.png?__cv=9f94585ed0e027112345a5a67cfd0e00);
+}
+
+#maxUpgradeHint {
+    color: #CCCCCC;
+    font-size: 9px;
+    position: absolute;
+    left: 40px;
+    top: -7px;
+}
+
+#slot1_footer {
+    width: 236px;
+    height: 10px;
+    position: absolute;
+    top: 367px;
+    background-image:  url(/do_img/global/itemUpgrade/slot1_bottom.png?__cv=de8efd0c1ac88d1089d3a00f3759ee00);
+}
+#slot2_footer {
+    width: 236px;
+    height: 10px;
+    position: absolute;
+    top: 367px;
+    background-image:  url(/do_img/global/itemUpgrade/slot2_bottom.png?__cv=de8efd0c1ac88d1089d3a00f3759ee00);
+}
+#slot3_footer {
+    width: 284px;
+    height: 10px;
+    /*position: absolute;*/
+    top: 146px;
+    background-image:  url(/do_img/global/itemUpgrade/slot3_bottom.png?__cv=a34e4316f7bd8a1d27187e4bc28cb200);
+}
+
+.upgrDescr_text {
+    margin-left: 10px;
+    color: #cccccc;
+    font-size: 11px;
+}
+
+#itemList {
+    position: absolute;
+}
+.itemSingleView {
+    display: none;
+}
+.itemSingleViewChoose {
+    color: #99D5FF;
+    margin: 81px auto;
+    text-align: center;
+    width: 168px;
+}
+#selectedItem {
+    position: absolute;
+	width: 100px;
+	height: 100px;
+	top: 143px;
+    left: 70px
+}
+#itemInfo {
+	display: block;
+	width: 100px;
+	text-align: center;
+	color: #FFFFFF;
+    margin: 81px auto 0 auto;
+}
+#itemUpgradePercentContainer {
+    position: absolute;
+    top:251px;
+    left: 66px;
+}
+#itemUpgradeMinus, #itemUpgradePlus {
+	width: 26px;
+    height: 22px;
+    border:  none;
+    background-color: transparent;
+}
+#itemUpgradeMinus {
+    background:  url(/do_img/global/itemUpgrade/arrows_left_26x22.png?__cv=10039baef85cd55a22f40d776be14600) 0 22px;
+}
+#itemUpgradeMinus:hover {
+    background-position: 0 44px;
+}
+#itemUpgradePlus {
+    background:  url(/do_img/global/itemUpgrade/arrows_right_26x22.png?__cv=a9e546d685f9f6fe85daed9ca8430500) 0 22px;
+}
+#itemUpgradePlus:hover {
+    background-position: 0 44px;
+}
+#itemUpgradePercent {
+	text-align: center;
+    width: 49px;
+    height: 15px;
+    background-image:  url(/do_img/global/itemUpgrade/slot2_bg_percent.jpg?__cv=8071c664bb34a3cc41b39c2f2f158700);
+    color: #ffffff;
+    border:  none;
+    font-size: 10px;
+}
+#step2_info_container {
+    position: absolute;
+    top: 295px;
+    left: 0;
+    width: 236px;
+    font-size: 10px;
+}
+.step2_info_propability, .step2_info_cost, .step2_info_bonus, .step2_info_vouchers {
+    height: 18px;
+    line-height: 18px;
+    color: #99d5ff;
+}
+.step2_info_bg {
+    background-image:  url(/do_img/global/itemUpgrade/slot2_bg_infobar.png?__cv=9ca435499fcbe7fec79d887f93b4af00);
+}
+#step2_info_container .step2_info_var {
+    float: left;
+    margin-left: 5px;
+}
+#step2_info_container .step2_info_value {
+    float: right;
+    margin-right: 5px;
+}
+
+#itemUpgradeHelp {
+    position: absolute;
+    top: 1px;
+    right: 4px;
+	width: 17px;
+    height: 18px;
+    background:  url(/do_img/global/itemUpgrade/icon_help_sprite_17x18.png?__cv=c98f2cc9cb4bb73b216a3b1b4aefa900) 0 0;
+
+    cursor: pointer;
+    z-index: 1;
+}
+#itemUpgradeHelp:hover {
+	background-position: 0 -18px;
+}
+#itemUpgradeHelp:active {
+	background-position: 0 -36px;
+}
+#itemUpgradeHelpContainer {
+    display: none;
+    position: absolute;
+    top: 35px;
+    left: 100px;
+    width: 600px;
+    height: 300px;
+    background-image:  url(/do_img/global/itemUpgrade/help_bg.png?__cv=4d1a4453114009ec59b8824d2eea3700);
+    z-index: 200;
+}
+#itemUpgradeHelpClose {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    background:  url(/do_img/global/itemUpgrade/icon_close_sprite_24x24.png?__cv=fa1f7ef0f89ab04212dbf02f3424d700) 0 0;
+    cursor: pointer;
+}
+#itemUpgradeHelpClose:hover {
+    background-position: 0 48px;
+}
+#itemUpgradeHelpClose:active {
+    background-position: 0 72px;
+}
+#itemUpgradeHelpText {
+    position: absolute;
+    top: 53px;
+    left: 42px;
+    width: 500px;
+    height: 224px;
+    padding:  10px;
+    color: #CCCCCC;
+}
+#itemUpgradeButton {
+    position: absolute;
+    top: 115px;
+    left: 40px;
+    width: 200px;
+    height: 30px;
+    background: transparent  url(/do_img/global/itemUpgrade/button_sprite_200x30px.png?__cv=03e83daae57fb8536f2f048f02ccd200) 0 0;
+    border: none;
+    cursor: pointer;
+}
+#itemUpgradeButton:hover {
+    background-position: 0 -30px;
+}
+#itemUpgradeButton:active {
+    background-position: 0 -60px;
+}
+#itemUpgradeButton div {
+    text-align: center;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 10px;
+    line-height: 28px;
+}
+#slot3_progressContainer {
+    width: 275px;
+    height: 225px;
+    background-image:  url(/do_img/global/itemUpgrade/slot3_bg_progress.png?__cv=da48678c7087584afa518da8960a0d00);
+    margin:  4px 0 0 4px;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 10px;
+}
+
+
+#upgradeProgress, #upgradeLog, #upgradeFinishAll {
+    position: absolute;
+}
+#upgradeProgress, #upgradeLog {
+    width: 131px;
+    height:14px;
+    top: 169px;
+    font-size: 10px;
+    cursor: pointer;
+    color: #000000;
+}
+#upgradeProgress {
+    left: 10px;
+    background-image:  url(/do_img/global/itemUpgrade/button_progress_sprite_131x14px.png?__cv=4cafa4999899008b8865014dc5e0a900);
+}
+#upgradeLog {
+    left: 143px;
+    background-image:  url(/do_img/global/itemUpgrade/button_upgradeLog_sprite_131x14px.png?__cv=33a639e79bb780ee4e1dfb10a019f900);
+}
+#upgradeProgress div, #upgradeLog div {
+    line-height: 14px;
+    text-align: center;
+}
+#upgradeProgress div:hover {
+    background:  url(/do_img/global/itemUpgrade/button_progress_sprite_131x14px.png?__cv=4cafa4999899008b8865014dc5e0a900) 0 -14px;
+}
+#upgradeLog div:hover {
+    background:  url(/do_img/global/itemUpgrade/button_upgradeLog_sprite_131x14px.png?__cv=33a639e79bb780ee4e1dfb10a019f900) 0 -14px;
+}
+#upgradeLog div:active, #upgradeProgress div:active {
+    background-position: 0 -28px;
+}
+.buttonDisable {
+    background-position: 0 -42px;
+}
+
+#upgradeFinishAllSeparator {
+    position: absolute;
+    top: 341px;
+    left: 11px;
+    width: 260px;
+    height: 35px;
+    background-image:  url(/do_img/global/itemUpgrade/progress_bottom_frame.png?__cv=4f27aa47b9cc91bd57f5a4059f730700);
+    z-index: 4;
+}
+
+#upgradeFinishAll {
+    width: 145px;
+    height: 21px;
+    background:  url(/do_img/global/itemUpgrade/button_finish_all.png?__cv=0749c419fb4b564a085c7092e242a500) transparent;
+    border: none;
+    left: 68px;
+    top: 359px;
+    width: 145px;
+    cursor: pointer;
+    z-index: 5;
+}
+#upgradeFinishAll div {
+    line-height: 19px;
+    color: #FFFFFF;
+    text-align: center;
+}
+
+#upgradeList, #logList {
+	width: 225px;
+    margin: 3px 0 25px 7px;
+}
+
+.upgradeListItem, .logListItem {
+	position: relative;
+	height: 34px;
+    border: 1px solid #3a3e41;
+}
+#upgradeList div {
+	margin-bottom: 3px;
+}
+
+.upgradeListItemPic, .logListItemPic {
+    position: absolute;
+	cursor: default;
+    width: 30px;
+    height: 30px;
+    margin:  2px;
+    top: 0;
+    left: 0;
+}
+
+.upgradeListItemPic:hover {
+	outline: 0;
+}
+.upgradeListInfo, .logListInfo {
+	position: relative;
+    width: 160px;
+    margin:  5px 0 0 40px;
+    color: #cccccc;
+}
+
+.logListItem .logSuccess, .logListItem .logFail, .upgradeReady {
+    width: 18px;
+    height: 18px;
+    float: right;
+    margin: 8px 3px 0 0;
+    background-image:  url(/do_img/global/itemUpgrade/icon_sprite_18x18.png?__cv=e60eec6741c91c5e77d2573c15e79600);
+}
+.logListItem .logSuccess {
+    background-position: -18px 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.logListItem .logFail {
+    background-position: 0 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.upgradeReady {
+    background-position: -36px 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.progressBarBorder {
+    position: relative;
+    width: 150px;
+    height: 4px;
+    border: 1px solid #565758;
+    margin-left: 40px;
+}
+.progressBarBorder div {
+    width: 0;
+    height: 4px;
+    background-color: #46d2fb;
+}
+
+#ius_center {
+    position: absolute;
+    top: 0;
+    left: 250px;
+    width: 262px;
+    height: 401px;
+    /*background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/bg_singleBuff.png?__cv=5ef37ca867c13a1b54c36b8c2a5a4b00);*/
+}
+
+#ius_right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    float: left;
+    width: 300px;
+    height: 401px;
+    /*background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/bg_right.png?__cv=2cc4aa247a0f6633ed8a7ebc01025d00);*/
+}
+
+.upgradeItem {
+	width: 30px;
+	height: 30px;
+	color: #FFFFFF;
+	text-decoration: none;
+	font-size: 0.65em;
+    float: left;
+    margin: 0 8px 8px 0;
+    cursor: pointer;
+}
+
+.itemLevel {
+    width: 30px;
+    height: 30px;
+    background:  url(/do_img/global/itemUpgrade/overlay_sprite_30x30.png?__cv=4f955c5be1e860f53c0ee3a60df69b00) 0 0;
+}
+.itemLevel:hover {
+    background-position: -30px 0;
+    cursor: pointer;
+}
+.itemLevel:active {
+    background-position: -60px 0;
+}
+.upgrDescr_left {
+	width: 180px;
+	margin-left: 10px;
+}
+
+.upgrDescr_center {
+    width: 242px;
+    margin-left: 10px;
+}
+
+.upgrDescr_right {
+    width: 280px;
+    margin-left: 10px;
+}
+
+
+
+#selectUpgradeItems {
+	position: absolute;
+    left: 10px;
+    top: 85px;
+
+}
+
+#lasers, #rocketLaunchers, #shieldGenerators, #drones {
+	/*width: 180px;
+	height: 180px;
+	overflow-y: scroll;
+	border: 1px solid black;
+	margin-left: 10px;*/
+}
+
+
+
+
+
+
+
+
+
+
+
+
+#internalItemUpgradeSystemOffline {
+	position: absolute;
+	left: 0;
+	top: 200px;
+	width: 100%;
+	text-align: center;
+	color: #ffffff;
+	font-size: 12px;
+}
+
+
+
+
+
+
+
+
+#ius_center {
+    position: absolute;
+    top: 0;
+    left: 250px;
+    width: 262px;
+    height: 401px;
+    /*background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/bg_singleBuff.png?__cv=5ef37ca867c13a1b54c36b8c2a5a4b00);*/
+}
+
+#ius_right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    float: left;
+    width: 300px;
+    height: 401px;
+    /*background-image:  url(/do_img/global/pilotSheet/nanoTechFactory/bg_right.png?__cv=2cc4aa247a0f6633ed8a7ebc01025d00);*/
+}
+
+.upgradeItem:hover {
+    background:  url(/do_img/global/itemUpgrade/overlay_sprite_30x30.png?__cv=4f955c5be1e860f53c0ee3a60df69b00) 0 -30px;
+}
+
+.upgradeItem {
+	width: 30px;
+	height: 30px;
+	color: #FFFFFF;
+	text-decoration: none;
+	font-size: 0.65em;
+    float: left;
+    margin: 0 8px 8px 0;
+}
+
+.upgrDescr_left {
+	width: 180px;
+	margin-left: 10px;
+}
+
+.upgrDescr_center {
+    width: 242px;
+    margin-left: 10px;
+}
+
+.upgrDescr_right {
+    width: 280px;
+    margin-left: 10px;
+}
+
+
+
+#selectUpgradeItems {
+	position: absolute;
+    left: 10px;
+    top: 85px;
+
+}
+
+#lasers, #rocketLaunchers, #shieldGenerators, #drones {
+	/*width: 180px;
+	height: 180px;
+	overflow-y: scroll;
+	border: 1px solid black;
+	margin-left: 10px;*/
+}
+
+#internalItemUpgradeSystemOffline {
+	position: absolute;
+	left: 0;
+	top: 200px;
+	width: 100%;
+	text-align: center;
+	color: #ffffff;
+	font-size: 12px;
+}
+
+
+
+
+/* Systempopup */
+#shopInfoPopup {
+    position:absolute;
+    top: 50px;
+    left: 250.5px;
+    width:359px;
+    display: none;
+    z-index:1000;
+}
+
+#shopInfoPopup .popup_shop_headcontainer {
+    width:359px;
+    height:39px;
+    text-align: center;
+    background-image: url(/do_img/global/popups/hangar/popup_header.png?__cv=57187cad6e380a0957fc186fd7b20b00);
+    color: #ffcc04;
+    font-size: 11px;
+    margin-top: 7px;
+}
+
+#shopInfoPopup .popup_shop_head_title {
+    color: #ffcc04;
+    font-size: 11px;
+    margin-top: 7px;
+}
+
+#shopInfoPopup .popup_shop_contentcontainer {
+    width:359px;
+    text-align: center;
+    background-image: url(/do_img/global/popups/hangar/popup_middle.png?__cv=56226ac40551323a9a89453ad36fc500);
+}
+
+#shopInfoPopup .popup_shop_footcontainer {
+    width:359px;
+    height:49px;
+    background-image: url(/do_img/global/popups/hangar/popup_footer.png?__cv=bda06559499f3631035304b343035900);
+    margin-top: 20px;
+}
+
+#shopInfoPopup a.popup_shop_close {
+    width:24px;
+    height:24px;
+    float: right;
+    margin-top: 7px;
+    margin-right: 7px;
+    background-image: url(/do_img/global/popups/hangar/close_button_sprite.png?__cv=fa1f7ef0f89ab04212dbf02f3424d700);
+}
+
+#shopInfoPopup a.popup_shop_close:hover {
+    background-position: 0 48px;
+}
+
+#shopInfoPopup .popup_shop_close_button {
+    width:150px;
+    height:32px;
+    background:  url(/do_img/global/popups/hangar/button_sprite_150x32px.png?__cv=221b3d144671e9354638ad5a6bd9cf00) 0 -96px;
+    margin: auto;
+}
+
+#shopInfoPopup .popup_shop_close_button:hover {
+    background-position: 0 -128px;
+    cursor: pointer;
+}
+
+#shopInfoPopup .popup_shop_confirm_button {
+    width:150px;
+    height:32px;
+    background:  url(/do_img/global/popups/hangar/button_sprite_150x32px.png?__cv=221b3d144671e9354638ad5a6bd9cf00) 0 -96px;
+    float: left;
+    margin-left: 20px;
+}
+
+#shopInfoPopup .popup_shop_confirm_button:hover {
+    background-position: 0 -128px;
+    cursor: pointer;
+}
+
+#shopInfoPopup .popup_shop_abort_button {
+    width:150px;
+    height:32px;
+    background:  url(/do_img/global/popups/hangar/button_sprite_150x32px.png?__cv=221b3d144671e9354638ad5a6bd9cf00) 0 0;
+    float: right;
+    margin-right: 20px;
+}
+
+#shopInfoPopup .popup_shop_abort_button:hover {
+    background-position: 0 -32px;
+    cursor: pointer;
+}
+
+#shopInfoPopup .popup_shop_question {
+
+}
+#shopInfoPopup .question {
+    padding-top: 60px;
+    text-align: center;
+    margin: 0 20px;
+}
+#shopInfoPopup .icon_success, #shopInfoPopup .icon_error, #shopInfoPopup .icon_question {
+    background: no-repeat center -3px;
+}
+#shopInfoPopup .icon_success    { background-image: url(/do_img/global/popups/icon_success.png?__cv=4757057e0fc2cc236801922aba846800);}
+#shopInfoPopup .icon_error      { background-image: url(/do_img/global/popups/icon_error.png?__cv=1ccb0dcd83aa2eaf8a2684885602b600);}
+#shopInfoPopup .icon_question   { background-image: url(/do_img/global/popups/icon_question.png?__cv=70c3a930d8d50265d35ae9fe4036b600);}
+
+#shopInfoPopup .popup_shop_confirm_text, #shopInfoPopup .popup_shop_abort_text, #shopInfoPopup .popup_shop_close_text {
+    background: no-repeat center 7px;
+    height: 32px;
+    cursor: pointer;
+}
+
+#upgrHappyHourInfo {
+    width: 215px;
+    height: 52px;
+    background-image:  url(/do_img/global/itemUpgrade/hh_upgrade_teaser.png?__cv=880333e12d9e39b5db468434b4a06c00);
+    margin: -15px auto;
+    color: #FFFFFF;
+    text-align:center;
+    line-height: 52px;
+    font-size: 14px;
+    font-weight: bold;
+}
+#upgrHappyHourPercent {
+    position: absolute;
+    top: 120px;
+    left: 247px;
+    width: 28px;
+    height:19px;
+    background-image:  url(/do_img/global/itemUpgrade/hh_upgrade_percent.png?__cv=25ce897eb06d33023d1ef75d2883a900);
+    cursor: default;
+}

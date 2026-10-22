@@ -1,0 +1,507 @@
+/* 
+ * CSS for Dialog when rendered in a popup window
+ */
+/* Disable textarea scrollbars in IE when they are not needed */
+textarea { 
+    overflow: auto;
+}
+
+.slayer_noMargin {
+     margin: 0;
+     padding: 0;
+}
+ 
+.slayer_popup #slayer_dialog {
+    top:    0 !important; 
+    left:   0 !important; 
+    margin: 0 !important;
+}
+
+
+.slayer_popup .slayer_closeOverlay {    
+     display: none; 
+}
+
+#slayer_content {
+    padding-top: 4px;
+}
+ 
+ /* Addressbook styling */   
+/**
+ * Contact selection
+ * Some of them need to be moved into
+ * the games css file:
+ * - .slayer_contactSelected
+ * - #slayer_contactsInviteButton
+ */
+ .slayer_contactSelected {
+     background:url("../img/dialog/default/white_40.png?__cv=d22fc499fa9c127977c99a854dc75100") transparent;
+     color:black;
+
+ }
+
+.slayer_contact {
+    min-height: 84px;
+    padding: 5px;
+    width: 105px;
+}
+
+ .slayer_contactImage {
+     width : 50px;
+     height: 50px;
+ }
+ .slayer_contacts table {
+     border: 0px;
+     border-spacing: 5px;
+     width: 560px;
+     height: 200px;
+ }
+ .slayer_contacts td {
+     text-align: center;
+ }
+ 
+#slayer_contactInviteLimit {}
+#slayer_contactSelectAll {}
+#slayer_contactUnselectAll {}
+#slayer_contactInviteButton {
+  clear: both;
+}
+
+.slayer_contactsApplyButton {
+  height : 35px;
+  width: 35px;
+  background: url("../img/dialog/default/apply.png?__cv=be594dfd096bfd45b023132eb627d000") no-repeat center transparent;
+  border: 0px;
+  float: right;
+}  
+
+.slayer_cancelButton{
+	height : 35px;
+    width: 35px;
+	background: url("../img/dialog/default/cancel.png?__cv=822cd54e0896d71cf658db8ddc029d00") no-repeat center transparent;
+	border: 0px;
+	float: left;
+}
+
+#slayer_contactButtons {
+    overflow: auto;
+    padding: 12px;
+}
+
+#slayer_contactButtons button {
+	cursor: pointer;
+}
+
+.slayer_contactsApplyButton:hover {
+	background: url("../img/dialog/default/apply_hover.png?__cv=0dae9b2493b7f53de032894bd422ec00") no-repeat center transparent;
+}
+
+.slayer_cancelButton:hover {
+	background: url("../img/dialog/default/cancel_hover.png?__cv=c653c4d4b5537806066a1790af485c00") no-repeat center transparent;
+}
+
+/* Main div in #showAdressbookTab */
+#slayer_adressbook {    
+}
+/* Tab styling */
+.slayer_tabsAdressbook {
+}
+
+#slayer_provider_google, #slayer_provider_yahoo, #slayer_provider_live {
+    width: 200px;
+    height: 150px; 
+    float:left;
+    margin: 0 10px 30px 0;
+}
+#slayer_contactProvider {    
+   /* height: 275px;*/
+    margin: 40px auto;
+    width: 440px;
+}
+
+.slayer_provider {
+    height: 32px;
+    margin: 3px 0 0 10px;
+    width: 32px;
+    float:left;
+    background: url("../img/socialmedia/mail_provider_32.png?__cv=349808e602be1e37a3ed6e3e49430900") no-repeat scroll 0 0;
+    cursor:pointer;
+}
+
+.slayer_provider_google_small {
+    background-position: 0 0;
+}
+.slayer_provider_yahoo_small {
+    background-position: 0 -32px;
+}
+
+.slayer_provider_live_small {
+    background-position: 0 -64px;
+}
+
+#slayer_contactTable {
+
+   height: 200px;
+   margin: 15px 0;
+   /*background:url("../img/dialog/default/white_20.png?__cv=03ef12e313071ae07662f179dde0b500") transparent;*/
+   border: 1px solid rgba(255, 255, 255, 0.3);
+   
+
+}
+#slayer_contactInviteInput {
+    display: none;
+}
+ 
+/*
+ * CSS Styles that are needed by jScrollPane for it to operate correctly.
+ */
+
+#slayer_dialogContainer .jspContainer
+{
+	overflow: hidden;
+	position: relative;
+}
+
+#slayer_dialogContainer .jspPane
+{
+	position: absolute;
+}
+
+#slayer_dialogContainer .jspVerticalBar
+{
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 10px;
+	height: 100%;
+	background: transparent;
+}
+
+#slayer_dialogContainer .jspHorizontalBar
+{
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 16px;
+	background: transparent;
+}
+
+#slayer_dialogContainer .jspVerticalBar *,
+#slayer_dialogContainer .jspHorizontalBar *
+{
+	margin: 0;
+	padding: 0;
+}
+
+#slayer_dialogContainer .jspCap
+{
+	display: none;
+}
+
+#slayer_dialogContainer .jspHorizontalBar .jspCap
+{
+	float: left;
+}
+
+#slayer_dialogContainer .jspTrack
+{
+	background:url("../img/dialog/default/white_40.png?__cv=d22fc499fa9c127977c99a854dc75100") transparent;
+	position: relative;
+}
+
+#slayer_dialogContainer .jspDrag
+{
+	background:url("../img/dialog/default/black_40.png?__cv=a94e354878e3401d96fc22d696c14e00") transparent;
+	position: relative;
+	top: 0;
+	left: 0;
+	cursor: pointer;
+}
+
+#slayer_dialogContainer .jspHorizontalBar .jspTrack,
+#slayer_dialogContainer .jspHorizontalBar .jspDrag
+{
+	float: left;
+	height: 100%;
+}
+
+#slayer_dialogContainer .jspArrow
+{
+	background: #50506d;
+	text-indent: -20000px;
+	display: block;
+	cursor: pointer;
+}
+
+#slayer_dialogContainer .jspArrowr .jspDisabled
+{
+	cursor: default;
+	background: #80808d;
+}
+
+#slayer_dialogContainer .jspVerticalBar .jspArrow
+{
+	height: 16px;
+}
+
+#slayer_dialogContainer .jspHorizontalBarr .jspArrow
+{
+	width: 10px;
+	float: left;
+	height: 100%;
+}
+
+#slayer_dialogContainer .jspVerticalBar .jspArrow:focus
+{
+	outline: none;
+}
+
+#slayer_dialogContainer .jspCorner
+{
+	background: #eeeef4;
+	float: left;
+	height: 100%;
+}
+
+
+/* Buddy Add/Remove Feature Styles */
+div.buddyFeedback {
+    background-color: white;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 5px solid #C0C0C0;
+    border: 5px solid rgba(80, 80, 80, 0.3);
+    border-radius: 10px 10px 10px 10px;
+    color: black;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 10px;
+    width: 300px;
+    z-index: 9999;
+}
+
+div.buddyFeedback a.close {
+    width: 8px;
+    height: 8px;
+    background:url("../img/dialog/default/close.png?__cv=1ab671f8fd2e36e84eb124cef0047200") transparent;
+    display: block;
+    float: right;
+    cursor: pointer;
+}
+
+#slayer_resultList {
+    height : 200px;
+    margin-bottom:10px;
+}
+
+/* Tool Bars */
+#slayer_likeBar a {
+    text-decoration: none;
+}
+.horizontal.sl_likeBar_likesList div {
+    float: left !important;
+    margin-right: 12px !important;
+}
+.vertical.sl_likeBar_likesList div {
+    display: block !important;
+    margin-bottom: 14px !important;
+    text-align: left;
+}
+.sl_likeBar_moreLikes {
+    display: none;
+}
+.sl_likeBar_likesList {
+    display: inline-block;
+}
+.sl_likeBar_likesList, .sl_likeBar_moreLikes {
+    list-style-type: none;
+    text-align: center;
+    padding-left: 0;
+}
+.sl_likeBar_moreButton {
+    display: inline-block;
+}
+
+.sl_shareBar_moreShares {
+    display: none;
+}
+ul.sl_shareBar_sharesList {
+    margin: 0px;
+}
+
+.sl_shareBar_sharesList, .sl_shareBar_moreShares {
+    list-style-type: none;
+    padding-left: 0;
+}
+.sl_shareBar_moreButton {
+    background: url("../img/dialog/default/icons.png?__cv=c24e0a3ad8ce7d021d09daf126229e00") transparent;
+    height: 16px;
+    margin-right: 10px;
+    width: 16px;
+    background-position: 0 -112px;
+    cursor: pointer;
+    margin-left: 25px;
+}
+.sl_shareBar_moreButton.horizontal {
+    float: left;
+    display: inline;
+}
+.sl_shareBar_moreButton.vertical {
+    display: block;
+    margin-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sl_shareBar_more_list {
+    display: none;
+    position: absolute;
+    padding: 5px 5px 0;
+    background-color: #FFFFFF;
+    border: solid 1px #000000;
+    list-style: none outside none;
+    width: 18px;
+}
+.sl_shareBar_more_list.horizontal {
+    margin-top: 21px;
+    margin-left: -6px;
+}
+.sl_shareBar_more_list.vertical {
+    margin-top: -5px;
+    margin-left: 23px;
+    width: auto;
+    padding: 5px 0 5px 5px;
+}
+
+li.sl_shareBar_list_item.horizontal {
+    display: inline;
+}
+li.sl_shareBar_list_item.vertical {
+    display: block;
+    margin-bottom: 10px;
+}
+
+li.sl_shareBar_more_list_item {
+    display: table;
+    padding-bottom: 7px;
+}
+
+
+.slayer_shareBar {
+    background-color: #AAAAAA;
+    border-radius: 5px;
+    padding: 12px;
+    display: inline-block;
+}
+
+li a.slayer_shareUrlIcons {
+    background: url("../img/dialog/default/icons.png?__cv=c24e0a3ad8ce7d021d09daf126229e00") transparent;
+    height: 16px;
+    margin-right: 10px;
+    width: 16px;
+}
+li.horizontal a.slayer_shareUrlIcons {
+    float: left;
+}
+li.vertical a.slayer_shareUrlIcons {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+li.sl_shareBar_more_list_item.vertical a.slayer_shareUrlIcons {
+    float: left;
+    margin-right: 5px;
+}
+li.sl_shareBar_more_list_item.vertical {
+    display: inline;
+}
+
+li a.slayer_shareUrlIconFb {
+    background-position: 0 -16px;
+}
+li a.slayer_shareUrlIconTwitter{
+    background-position: 0 -32px;
+}
+li a.slayer_shareUrlIconBuzz {
+    background-position: 0 -48px;
+}
+li a.slayer_shareUrlIconXing {
+    background-position: 0 -64px;
+}
+li a.slayer_shareUrlIconLinkedin {
+    background-position: 0 -96px;
+}
+li a.slayer_shareUrlIconVkontakte  {
+    background-position: 0 -128px;
+}
+li button.slayer_shareUrlCopyButton {
+    border: none;
+    cursor: pointer;
+    height: 16px;
+    font-size: 11px;
+    border-radius: 3px;
+}
+li.horizontal button.slayer_shareUrlCopyButton {
+    margin-right: 10px;
+}
+li.vertical button.slayer_shareUrlCopyButton {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+
+button.slayer_shareUrlCopyButton.horizontal {
+    float: left;
+}
+
+.slayer_shareUrlCopyPopup {
+    display: none;
+    position: absolute;
+    width: 350px;
+    z-index: 1;
+    background-color: #FFFFFF;
+    padding: 8px;
+    border: solid 1px #000000;
+}
+li.sl_share_copy.horizontal div.slayer_shareUrlCopyPopup {
+    margin-left: -9px;
+    margin-top: 12px;
+}
+li.sl_share_copy.vertical div.slayer_shareUrlCopyPopup {
+    margin-left: 73px;
+    margin-top: -88px;
+}
+
+
+
+a.slayer_closeOverlaySmall {
+    background-size: 100%;
+    background: url("../img/dialog/default/close.png?__cv=1ab671f8fd2e36e84eb124cef0047200") no-repeat transparent;
+    width: 12px;
+    height: 13px;
+    margin-right: 0;
+    margin-top: 0;
+    position: absolute;
+    right: -3px;
+    top: 2px;
+    cursor: pointer;
+}
+.slayer_shareCopyInstruction {
+    padding-left: 2px;
+    padding-bottom: 10px;
+    width: 98%;
+    font-size: 12px;
+}
+div.slayer_shareUrlCopyPopup textarea.slayer_shareUrlText {
+    overflow: hidden;
+    width: 98%;
+    font-size: 11px;
+    height: 50px;
+    resize: none;
+}
+#slayer_dialog div.slayer_shareBar {
+    padding: 0px;
+    border: none;
+}

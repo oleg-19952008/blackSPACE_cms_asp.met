@@ -1,0 +1,17 @@
+@charset "utf-8";
+
+#inner-cont {   margin:25px 0 0 75px;width:535px;position:relative;}
+
+#balance {
+    position: absolute;
+    top: 35px;
+    left: 35px;
+    width:475px;height:325px;overflow:auto;z-index:1;
+}
+#sidenav {
+    position: absolute;
+    top:18px;
+    left: 35px;
+    text-align:center;
+    width:475px;
+}
