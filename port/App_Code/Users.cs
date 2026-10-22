@@ -1,6 +1,8 @@
 using System;
+using System.Data;
 using System.Data.Common;
 using System.Web;
+using System.Web.SessionState;
 using MySql.Data.MySqlClient;
 
 namespace DarkSpace

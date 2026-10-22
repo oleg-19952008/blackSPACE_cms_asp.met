@@ -142,9 +142,9 @@ namespace DarkSpace
                 if (hBidder == 0) continue;
                 long uid = GetUserIdFromPid(hBidder);
                 string itemName = v.ContainsKey("ItemName") ? v["ItemName"] : "";
-                object amount = v.ContainsKey("amount") ? v["amount"] : 0;
-                object apply = v.ContainsKey("apply") ? v["apply"] : 0;
-                object cBud = v.ContainsKey("cBud") ? v["cBud"] : 0;
+                object amount = v.ContainsKey("amount") ? v["amount"] : "0";
+                object apply = v.ContainsKey("apply") ? v["apply"] : "0";
+                object cBud = v.ContainsKey("cBud") ? v["cBud"] : "0";
                 string name = v.ContainsKey("name") ? v["name"] : "";
 
                 if (itemName == "drone_iris" && CurrentDrones(hBidder) < 8)
@@ -169,10 +169,10 @@ namespace DarkSpace
                 if (hBidder == 0) continue;
                 long uid = GetUserIdFromPid(hBidder);
                 string itemName = v.ContainsKey("ItemName") ? v["ItemName"] : "";
-                GiverCronJob(itemName, v.ContainsKey("amount") ? v["amount"] : 0, v.ContainsKey("apply") ? v["apply"] : 0,
-                             hBidder, uid, v.ContainsKey("cBud") ? v["cBud"] : 0);
+                GiverCronJob(itemName, v.ContainsKey("amount") ? v["amount"] : "0", v.ContainsKey("apply") ? v["apply"] : "0",
+                             hBidder, uid, v.ContainsKey("cBud") ? v["cBud"] : "0");
                 ClearCronJobDaily(itemName);
-                Logs(hBidder, v.ContainsKey("name") ? v["name"] : "", v.ContainsKey("amount") ? v["amount"] : 0);
+                Logs(hBidder, v.ContainsKey("name") ? v["name"] : "", v.ContainsKey("amount") ? v["amount"] : "0");
             }
         }
 

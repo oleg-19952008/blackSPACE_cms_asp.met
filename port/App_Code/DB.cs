@@ -114,10 +114,26 @@ namespace DarkSpace
         public static string Safe(string s)
         {
             if (string.IsNullOrEmpty(s)) return s ?? "";
-            using (var con = GetInstance())
+            // mysqli_real_escape_string equivalent. MySql.Data 6.9 removed the old
+            // MySqlCommand.EscapeString helper, so escape the same byte set manually.
+            // NOTE: relies on the default connection charset (no SET NAMES variants
+            // like GBK); all new code should use parameterized commands instead.
+            var sb = new System.Text.StringBuilder(s.Length + 8);
+            foreach (char c in s)
             {
-                return MySqlCommand.EscapeString(s);
+                switch (c)
+                {
+                    case '\'': sb.Append("\\'"); break;
+                    case '"': sb.Append("\\\""); break;
+                    case '\\': sb.Append("\\\\"); break;
+                    case '\0': sb.Append("\\0"); break;
+                    case '\n': sb.Append("\\n"); break;
+                    case '\r': sb.Append("\\r"); break;
+                    case '\x1a': sb.Append("\\Z"); break;
+                    default: sb.Append(c); break;
+                }
             }
+            return sb.ToString();
         }
 
         /// <summary>DB::getUserIP() — HTTP_CLIENT_IP / X_FORWARDED_FOR / REMOTE_ADDR.</summary>

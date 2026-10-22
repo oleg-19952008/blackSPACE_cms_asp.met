@@ -77,11 +77,14 @@
     <Compile Include="App_Code\AppConfig.cs" />
     <Compile Include="App_Code\Auction.cs" />
     <Compile Include="App_Code\Base.cs" />
+    <Compile Include="App_Code\Clan.cs" />
     <Compile Include="App_Code\Core.cs" />
     <Compile Include="App_Code\DB.cs" />
     <Compile Include="App_Code\DailyBonus.cs" />
     <Compile Include="App_Code\Encryption.cs" />
+    <Compile Include="App_Code\Factory.cs" />
     <Compile Include="App_Code\Hangar.cs" />
+    <Compile Include="App_Code\IxrServer.cs" />
     <Compile Include="App_Code\JsonUtil.cs" />
     <Compile Include="App_Code\News.cs" />
     <Compile Include="App_Code\PhpMailer.cs" />

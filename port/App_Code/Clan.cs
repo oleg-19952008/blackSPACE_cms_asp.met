@@ -261,13 +261,15 @@ namespace DarkSpace
         {
             _url = url ?? "";
             List<(string, object)> ps = null;
+            (string, object)[] psArr = null;
             if (lookup != null)
             {
                 string term = lookup.Trim('\'');
                 ps = new List<(string, object)> { ("@rs", "%" + term + "%") };
+                psArr = ps.ToArray();
             }
-            var rows = ps != null
-                ? Query("SELECT * FROM server_1_clan WHERE clanName LIKE @rs AND visible=1", ps.ToArray())
+            var rows = psArr != null
+                ? Query("SELECT * FROM server_1_clan WHERE clanName LIKE @rs AND visible=1", psArr)
                 : Query("SELECT * FROM server_1_clan WHERE visible=1");
             // PHP usort($clans, 'cust_sort') with $_GET['sort'] is applied by the
             // template layer (PhpTemplateRenderer, plan C3), not here.
@@ -826,7 +828,9 @@ namespace DarkSpace
 
         private static Dictionary<string, string> FirstRow(string sql, params (string Name, object Value)[] ps)
         {
-            var rows = Query(sql, ps);
+            // Cast through the untyped tuple: mcs treats `(string,object)` and
+            // `(string Name, object Value)` as distinct constructed types.
+            var rows = Query(sql, Array.ConvertAll(ps, t => ((string, object))t));
             return rows.Count > 0 ? rows[0] : null;
         }
 
