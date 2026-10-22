@@ -861,7 +861,1019 @@ namespace DarkSpace
         }
 
         // ------------------------------------------------------------------
-        // Заглушки методов, подключаемых следующими кусками A3.3–A3.6, чтобы
+        // A3.4 CPU-слоты/полнота проверки (Class.inventory.php, строки 516–1014) —
+        // ядро equip-логики Dock: cpuSlots, fullSystemCheck, shipspace,
+        // NotEmptyDrone, EmptyDrone, NotEmptyShip, EmptyShip, checkExtrasService.
+        //
+        // Структуры данных: PHP работает с объектами из $_SESSION['EQ']
+        // (result of init(), json_decode без assoc). Здесь _equipment —
+        // Dictionary<string,object>-дерево EqJson(Init()); доступ — классом Eq
+        // (dyn == null ⇔ PHP null; отсутствующий ключ == undefined property:
+        // null/'', foreach по null — пустой цикл как в PHP).
+        //
+        // PHP-замечания, сохранённые при переносе:
+        //  - cpuSlots(): возвращает 2/4/6/10 только если первый найденный extras-id
+        //    ∈ cpu-карты; иначе 0 (в т.ч. неявный null когда слот не найден → null,
+        //    но вызывается только после != null).
+        //  - fullSystemCheck(): $s вычисляется и не используется в drone-ветке;
+        //    extrasExits() вызывается ради побочного эффекта (результат null, if(!..)
+        //    проглатывается — return закомментирован в оригинале); в ship-ветке при
+        //    execute()-ошибке возвращается FALSE до проверок extras.
+        //  - shipspace(): переменные $L/$lo/$totalSlots в PHP не инициализированы —
+        //    при отсутствии совпадений notice + null; здесь default 0/null.
+        //  - NotEmptyDrone()/NotEmptyShip()/EmptyShip(): «if ($k >= $e): ... elseif
+        //    ($k < $e):» — синтаксис альтернативного if; при ложном обоих условий
+        //    функция возвращает null (editDB отдаёт его наружу). Сохранено (null).
+        //  - array_diff($pos, $pie) — по ЗНАЧЕНИЯМ; реализовано ArrayDiffValues
+        //    (строковое представление, как PHP-конвертация int|string).
+        //  - in_array($x, $rules['allowed']) — by-value против assoc-массива
+        //    allowed (значения id); AllowedContains сохраняет это (включая баг
+        //    heavy_guns с фиктивным ключом 'heavy_guns' из checkInput).
+        //  - $this->s (неинициализированное поле в CPU-ветке editDB) → 0 в C# так же,
+        //    как unset → null → 0 в арифметике PHP.
+        // ------------------------------------------------------------------
+
+        /// <summary>private cpuSlots($equipment, $target) — ёмкость CPU-слотов (2/4/6/10/0).</summary>
+        private long CpuSlots(Eq eq, string target)
+        {
+            var cpu = new Dictionary<string, string>(); // itemId => lootId (cpu_sle)
+            foreach (var vr in eq.Ret("items"))
+            {
+                string lid = eq.LootId(vr);
+                if (lid != null && lid.Contains("equipment_extra_cpu_sle-0"))
+                {
+                    cpu[Str(vr["I"])] = lid;
+                }
+            }
+            foreach (var hangs in eq.Ret("hangars"))
+            {
+                if (Str(hangs["hangarID"]) == Str(PP("hi")))
+                {
+                    var extras = hangs.Path("config", PT("to", "configId"), "ship", "EQ", "extras");
+                    if (extras != null && extras.Count > 0)
+                    {
+                        foreach (var vp in extras.Items)
+                        {
+                            string s = Str(vp);
+                            string c;
+                            if (cpu.TryGetValue(s, out c))
+                            {
+                                if (c == "equipment_extra_cpu_sle-01") return 2;
+                                else if (c == "equipment_extra_cpu_sle-02") return 4;
+                                else if (c == "equipment_extra_cpu_sle-03") return 6;
+                                else if (c == "equipment_extra_cpu_sle-04") return 10;
+                                else return 0;
+                            }
+                        }
+                    }
+                }
+            }
+            return 0; // PHP: неявный null; вызывается только когда результат != null
+        }
+
+        /// <summary>private fullSystemCheck($what, $target, $equipment) — хватает ли места в целевом слотсете.</summary>
+        private bool FullSystemCheck(string what, string target, Eq eq)
+        {
+            ShipSpace(what, target, eq, null); // $s — вычисляется и не используется (как в PHP)
+            if (target == "drones")
+            {
+                object id;
+                var from = PGet("from") as IDictionary<string, object>;
+                object droneItems;
+                if (from != null && from.TryGetValue("droneItems", out droneItems) && !IsEmpty(droneItems))
+                {
+                    id = FirstKeyOf(droneItems); // key(get_object_vars(...))
+                }
+                else
+                {
+                    id = PGetNested("to", "droneId");
+                }
+                AssertColumn(target, AllowedTargets, "target");
+                AssertColumn(what, AllowedWhatColumnsExt, "what");
+                var result = Query("SELECT " + what + " FROM server_1_hangar_config_" + target +
+                                  " WHERE playerID=@playerID && hangarID=@hangarID && item_id=@item_id",
+                                  Kv("@playerID", _pid), Kv("@hangarID", PLong(PP("hi"))), Kv("@item_id", id));
+                if (result.Count == 0) return false; // PHP: !empty($result[0][$what]) на пустом select → error
+                string val = GetStr(result[0], what);
+                if (val != "")
+                {
+                    if (val.Contains("|")) return false;
+                    if (what == "design" || what == "design2") return false;
+                    return true;
+                }
+                return true;
+            }
+            else
+            {
+                AssertColumn(target, AllowedTargets, "target");
+                AssertColumn(what, AllowedWhatColumnsExt, "what");
+                var result = Query("SELECT " + what + " FROM server_1_hangar_config_" + target +
+                                   " WHERE playerID=@playerID && hangarID=@hangarID && configNum=@configNum",
+                                   Kv("@playerID", _pid), Kv("@hangarID", PLong(PP("hi"))),
+                                   Kv("@configNum", PGetNested("to", "configId")));
+                if (result.Count == 0) return false;
+                long o;
+                string val = GetStr(result[0], what);
+                if (val != "")
+                {
+                    if (val.Contains("|")) o = val.Split('|').Length;
+                    else o = 1;
+                }
+                else return true;
+
+                if (what == "extras")
+                {
+                    ExtrasExits(); // if (!self::extrasExits()) {} — return закомментирован в оригинале
+                }
+                long s = ShipSpace(what, target, eq, null);
+                if (o < s)
+                {
+                    if (what == "extras")
+                    {
+                        foreach (var ve in eq.Ret("items"))
+                        {
+                            foreach (var iy in PFromItems())
+                            {
+                                if (Str(ve["I"]) == Str(iy.Value))
+                                {
+                                    string lid = eq.LootId(ve);
+                                    if (lid == "equipment_extra_cpu_sle-04" || lid == "equipment_extra_cpu_sle-03" ||
+                                        lid == "equipment_extra_cpu_sle-02" || lid == "equipment_extra_cpu_sle-01")
+                                    {
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                        return false; // PHP: циклы не прошли ни разу → неявный null → falsy
+                    }
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        private static readonly HashSet<string> AllowedWhatColumnsExt =
+            new HashSet<string>(AllowedWhatColumns.Concat(new[] { "default", "SM" }));
+
+        /// <summary>private shipspace($what, $target, $equipment, $drone_id = NULL) — вместимость слотсета.</summary>
+        private long ShipSpace(string what, string target, Eq eq, object droneId)
+        {
+            if (target == "drones")
+            {
+                object id;
+                if (droneId == null || !IsEmpty(droneId))
+                {
+                    var from = PGet("from") as IDictionary<string, object>;
+                    object droneItems;
+                    if (from != null && from.TryGetValue("droneItems", out droneItems) && !IsEmpty(droneItems))
+                    {
+                        id = FirstKeyOf(droneItems);
+                    }
+                    else
+                    {
+                        id = PGetNested("to", "droneId");
+                    }
+                }
+                else
+                {
+                    id = droneId;
+                }
+                object lo = null;
+                var hay = eq.General(target); // hangars[0]->general->{$target}
+                if (hay != null)
+                {
+                    foreach (var va in hay.Items)
+                    {
+                        if (Str(va["I"]) == Str(id)) lo = va["L"];
+                    }
+                }
+                var where = eq.Ret("itemInfo");
+                long totalSlots = 0;
+                string j = what == "design" ? what : "default";
+                foreach (var va in where)
+                {
+                    if (Str(va["L"]) == Str(lo))
+                    {
+                        totalSlots = ParseLong(Str(va.Path("levels", "0", "slotsets", j, "Q")));
+                    }
+                }
+                return totalSlots;
+            }
+            else if (target == "pet10")
+            {
+                var pet = eq.General("pet"); // hangars[0]->general->pet
+                object L = pet != null ? pet["L"] : null;
+                long lv = ParseLong(Str(pet != null ? pet["LV"] : null));
+                long lc = ParseLong(Str(pet != null ? pet.Path("lockedSlots", what) : null));
+                var where = eq.Ret("itemInfo");
+                long totalSlots = 0;
+                foreach (var va in where)
+                {
+                    if (Str(va["L"]) == Str(L))
+                    {
+                        totalSlots = ParseLong(Str(va.Path("levels", lv.ToString(CultureInfo.InvariantCulture), "slotsets", what, "Q")));
+                    }
+                }
+                return totalSlots - lc;
+            }
+            else
+            {
+                var gen = eq.General(target); // hangars[0]->general->{$target}
+                string sm = Str(gen != null ? gen["SM"] : null);
+                object lo = null;
+                var lids = eq.MapLootIds(); // map.lootIds (php-ассoc массив)
+                if (lids != null)
+                {
+                    foreach (var kv in lids.D)
+                        if (Str(kv.Value) == sm) { lo = kv.Key; break; } // array_keys(...)[0]
+                }
+                var where = eq.Ret("itemInfo");
+                long totalSlots = 0;
+                foreach (var va in where)
+                {
+                    if (Str(va["L"]) == Str(lo))
+                    {
+                        totalSlots = ParseLong(Str(va.Path("levels", "0", "slotsets", what, "Q")));
+                    }
+                }
+                if (what == "extras")
+                {
+                    return totalSlots + CpuSlots(eq, target);
+                }
+                return totalSlots;
+            }
+        }
+
+        /// <summary>private NotEmptyDrone(...) — дроновый слотсет уже занят.</summary>
+        private string NotEmptyDrone(List<Dictionary<string, string>> result, string what, string target, Eq eq)
+        {
+            long s = ShipSpace(what, target, eq, null);
+            var pos = PFromItemsValues();
+            string cur = result.Count > 0 ? GetStr(result[0], what) : "";
+            if (cur.Contains("|"))
+            {
+                return ErrorTrans("Do NOT cheat!"); // второй return в оригинале недостижим
+            }
+            var pie = SplitPipe(cur);
+            long k = pos.Count;
+            long r = s - 1;
+            if (k >= r)
+            {
+                for (long i = 0; i < r; i++) pie.Add(GetByIndex(PFromItems(), i));
+                AddToDb(pie, target, what, null);
+                var ms = ArrayDiffValues(pos, pie);
+                return CompleteTrans(ms, k == 1 ? 1 : 2);
+            }
+            else if (k < r)
+            {
+                for (long i = 0; i < k; i++) pie.Add(GetByIndex(PFromItems(), i));
+                AddToDb(pie, target, what, null);
+                var ms = ArrayDiffValues(pos, pie);
+                return CompleteTrans(ms, 1);
+            }
+            return null; // PHP: оба условия ложны → неявный null
+        }
+
+        /// <summary>private EmptyDrone(...) — свободный дроновый слотсет.</summary>
+        private string EmptyDrone(string what, string target, Eq eq)
+        {
+            var pos = PFromItemsValues();
+            long s = ShipSpace(what, target, eq, null);
+            var pie = new List<object>();
+            long k = pos.Count;
+            if (k >= s)
+            {
+                for (long i = 0; i < s; i++) pie.Add(GetByIndex(PFromItems(), i));
+                AddToDb(pie, target, what, null);
+                return CompleteTrans(ArrayDiffValues(pos, pie), 2);
+            }
+            else if (k < s)
+            {
+                for (long i = 0; i < k; i++) pie.Add(GetByIndex(PFromItems(), i));
+                AddToDb(pie, target, what, null);
+                return CompleteTrans(ArrayDiffValues(pos, pie), 1);
+            }
+            return null;
+        }
+
+        /// <summary>private NotEmptyShip(...) — заполненный ship/pet слотсет (главная equip-логика).</summary>
+        private string NotEmptyShip(List<Dictionary<string, string>> result, string what, string target, Eq eq)
+        {
+            Dictionary<string, Dictionary<string, object>> rules;
+            List<object> pos;
+            long k;
+            if (what == "extras")
+            {
+                rules = CheckInput(what);
+                pos = CheckExtrasService();
+                k = pos.Count;
+            }
+            else
+            {
+                rules = CheckInput(what);
+                pos = PFromItemsValues();
+                k = pos.Count;
+            }
+            long s = ShipSpace(what, target, eq, null);
+            var items = PFromItems();
+            string cur = result.Count > 0 ? GetStr(result[0], what) : "";
+            if (cur.Contains("|"))
+            {
+                var pie = SplitPipe(cur);
+                long c = pie.Count;
+                long e = s - c;
+                k = items.Count;
+                if (k >= e)
+                {
+                    for (long i = 0; i < e; i++) PushIfAllowed(pie, what, rules, pos, items, i);
+                    AddToDb(pie, target, what, null);
+                    var ms = DiffFor(what, items, pie);
+                    return CompleteTrans(ms, k == 1 ? 1 : 2);
+                }
+                else if (k < e)
+                {
+                    for (long i = 0; i < k; i++) PushIfAllowed(pie, what, rules, pos, items, i);
+                    AddToDb(pie, target, what, null);
+                    return CompleteTrans(DiffFor(what, items, pie), 1);
+                }
+                return null;
+            }
+            else
+            {
+                var pie = SplitPipe(cur);
+                k = items.Count;
+                long r = s - 1;
+                if (k >= r)
+                {
+                    for (long i = 0; i < r; i++) PushIfAllowed(pie, what, rules, pos, items, i);
+                    AddToDb(pie, target, what, null);
+                    if (k == 1)
+                    {
+                        return CompleteTrans(DiffFor(what, items, pie), 1);
+                    }
+                    else if (what == "heavy_guns")
+                    {
+                        return CompleteTrans(pie, 1);
+                    }
+                    // PHP: ветка без return → неявный null
+                    return null;
+                }
+                else if (k < r)
+                {
+                    for (long i = 0; i < k; i++) PushIfAllowed(pie, what, rules, pos, items, i);
+                    AddToDb(pie, target, what, null);
+                    if (what == "extras")
+                    {
+                        return CompleteTrans(ArrayDiffValues(items.Select(x => x.Value).ToList(), pie), 2);
+                    }
+                    return CompleteTrans(ArrayDiffValues(pos, pie), 1);
+                }
+                return null;
+            }
+        }
+
+        /// <summary>private EmptyShip(...) — свободный ship/pet слотсет.</summary>
+        private string EmptyShip(string what, string target, Eq eq)
+        {
+            Dictionary<string, Dictionary<string, object>> rules;
+            List<object> pos;
+            long k;
+            if (what == "extras")
+            {
+                rules = CheckInput(what);
+                pos = CheckExtrasService();
+                k = pos.Count;
+            }
+            else
+            {
+                rules = CheckInput(what);
+                pos = PFromItemsValues();
+                k = pos.Count;
+            }
+            long s = ShipSpace(what, target, eq, null);
+            var pie = new List<object>();
+            var items = PFromItems();
+            if (k >= s)
+            {
+                for (long i = 0; i < s; i++) PushIfAllowed(pie, what, rules, pos, items, i);
+                AddToDb(pie, target, what, null);
+                if (what == "heavy_guns")
+                {
+                    return CompleteTrans(ArrayDiffValues(pos, pie), 1);
+                }
+                if (what == "extras")
+                {
+                    return CompleteTrans(ArrayDiffValues(items.Select(x => x.Value).ToList(), pie), 2);
+                }
+                return CompleteTrans(ArrayDiffValues(pos, pie), 2);
+            }
+            else if (k < s)
+            {
+                for (long i = 0; i < k; i++) PushIfAllowed(pie, what, rules, pos, items, i);
+                AddToDb(pie, target, what, null);
+                if (what == "extras")
+                {
+                    return CompleteTrans(ArrayDiffValues(items.Select(x => x.Value).ToList(), pie), 2);
+                }
+                return CompleteTrans(ArrayDiffValues(pos, pie), 1);
+            }
+            return null;
+        }
+
+        /// <summary>private checkExtrasService() — дедупликация from-items по lootid (первые wins).</summary>
+        private List<object> CheckExtrasService()
+        {
+            var argsAll = new Dictionary<string, object>(); // lootid => itemId
+            foreach (var kv in PFromItems())
+            {
+                var result = Query("SELECT * FROM server_1_player_all_items WHERE playerID=@playerID && id=@id",
+                                   Kv("@playerID", _pid), Kv("@id", kv.Value));
+                if (result.Count > 0)
+                {
+                    string lootid = GetStr(result[0], "lootid");
+                    if (!argsAll.ContainsKey(lootid)) argsAll[lootid] = kv.Value;
+                }
+            }
+            return argsAll.Values.ToList();
+        }
+
+        // helpers A3.4 ------------------------------------------------------------
+
+        /// <summary>params-&gt;from-&gt;items как упорядоченные пары (ключ=>значение).</summary>
+        private List<KeyValuePair<string, object>> PFromItems()
+        {
+            var res = new List<KeyValuePair<string, object>>();
+            var from = PGet("from") as IDictionary<string, object>;
+            object itemsObj;
+            if (from == null || !from.TryGetValue("items", out itemsObj) || itemsObj == null) return res;
+            var dict = itemsObj as IDictionary<string, object>;
+            if (dict != null)
+            {
+                foreach (var kv in dict) res.Add(new KeyValuePair<string, object>(kv.Key, kv.Value));
+                return res;
+            }
+            var list = itemsObj as System.Collections.IEnumerable;
+            if (list != null)
+            {
+                int i = 0;
+                foreach (var v in list) res.Add(new KeyValuePair<string, object>(i.ToString(CultureInfo.InvariantCulture), v));
+            }
+            return res;
+        }
+
+        private List<object> PFromItemsValues()
+        {
+            return PFromItems().Select(x => x.Value).ToList();
+        }
+
+        /// <summary>$this-&gt;params-&gt;from-&gt;items[$i] (по числовому индексу как в PHP).</summary>
+        private object GetByIndex(List<KeyValuePair<string, object>> items, long i)
+        {
+            string key = i.ToString(CultureInfo.InvariantCulture);
+            foreach (var kv in items) if (kv.Key == key) return kv.Value;
+            return null; // PHP: undefined index → notice + null
+        }
+
+        /// <summary>array_diff по значениям (строковое представление, PHP int|string-конверсии).</summary>
+        private static List<object> ArrayDiffValues(List<object> a, List<object> b)
+        {
+            var setB = new HashSet<string>(b.Select(Str));
+            return a.Where(x => !setB.Contains(Str(x))).ToList();
+        }
+
+        /// <summary>explode("|", $x): '' → [""] как в PHP.</summary>
+        private static List<object> SplitPipe(string x)
+        {
+            var l = new List<object>();
+            foreach (var p in (x ?? "").Split('|')) l.Add(p);
+            return l;
+        }
+
+        /// <summary>in_array($v, $rules['allowed']) — by-value против значений assoc-массива.</summary>
+        private static bool AllowedContains(Dictionary<string, object> allowed, object v)
+        {
+            string s = Str(v);
+            return allowed != null && allowed.Values.Any(x => Str(x) == s);
+        }
+
+        /// <summary>Тело «for»-пуша из NotEmptyShip/EmptyShip (сохранены баги heavy_guns/extras).</summary>
+        private void PushIfAllowed(List<object> pie, string what,
+            Dictionary<string, Dictionary<string, object>> rules, List<object> pos,
+            List<KeyValuePair<string, object>> items, long i)
+        {
+            if (what == "extras")
+            {
+                var p = GetByIndex(items.Select(x => new KeyValuePair<string, object>(x.Key, x.Value)).ToList(), i);
+                // $pos[$i] — позиционный доступ к списку checkExtrasService
+                object pi = i < pos.Count ? pos[(int)i] : null;
+                if (AllowedContains(rules["allowed"], pi)) pie.Add(pi);
+            }
+            else if (what == "heavy_guns")
+            {
+                object hg;
+                if (rules["allowed"].TryGetValue("heavy_guns", out hg)) pie.Add(hg); // фиктивный ключ из checkInput
+            }
+            else
+            {
+                var it = GetByIndex(items, i);
+                if (AllowedContains(rules["allowed"], it)) pie.Add(it);
+            }
+        }
+
+        /// <summary>$ms для CompleteTrans: extras сравнивает from-items, остальное — $pos.</summary>
+        private List<object> DiffFor(string what, List<KeyValuePair<string, object>> items, List<object> pie)
+        {
+            // для both branches identical when pos == items values
+            return ArrayDiffValues(items.Select(x => x.Value).ToList(), pie);
+        }
+
+        private static string Str(object o)
+        {
+            return o == null ? "" : Convert.ToString(o, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>key(get_object_vars($obj)) — первый ключ словаря/списка.</summary>
+        private static object FirstKeyOf(object o)
+        {
+            var d = o as IDictionary<string, object>;
+            if (d != null)
+            {
+                foreach (var k in d.Keys) return k;
+                return null;
+            }
+            return "0"; // JSON-массив: get_object_vars даёт {"0":...}
+        }
+
+        // ------------------------------------------------------------------
+        // A3.5 Конфиги (Class.inventory.php, строки 1015–1534): editDB, editJson,
+        // checkInConfig, ifExistsPet/ifExistsDrone/GetPet, shipconfigsGenerator,
+        // droneconfigsGenerator, petconfigsGenerator.
+        // ------------------------------------------------------------------
+
+        /// <summary>private editDB($equipment) — главный обработчик drag&amp;drop-экипировки Dock.</summary>
+        private string EditDb(Eq eq)
+        {
+            if (_droneEquip)
+            {
+                string target = PT("to", "target") + "s";
+                string what;
+                if (PT("to", "configId") == "1")
+                    what = PT("to", "slotset") == "design" ? "design" : "EQ";
+                else
+                    what = PT("to", "slotset") == "design" ? "design2" : "EQ2";
+
+                var repeat = PGetNested("from", "droneItems") as IDictionary<string, object>;
+                var unique = new List<KeyValuePair<string, List<object>>>();
+                var seen = new HashSet<string>();
+                if (repeat != null)
+                {
+                    foreach (var kv in repeat)
+                    {
+                        var lst = ToObjectList(kv.Value);
+                        string sig = string.Join("\u0001", lst.Select(Str));
+                        if (seen.Add(sig)) unique.Add(new KeyValuePair<string, List<object>>(kv.Key, lst));
+                    }
+                }
+                foreach (var entry in unique)
+                {
+                    ShipSpace(what, target, eq, entry.Key); // $s — не используется (как в PHP)
+                    AssertColumn(target, AllowedTargets, "target");
+                    AssertColumn(what, AllowedWhatColumnsExt, "what");
+                    var result = Query("SELECT " + what + " FROM server_1_hangar_config_" + target +
+                                       " WHERE playerID=@playerID && hangarID=@hangarID && item_id=@item_id",
+                                       Kv("@playerID", _pid), Kv("@hangarID", PLong(PP("hi"))),
+                                       Kv("@item_id", entry.Key));
+                    if (result.Count == 0) return ErrorTrans("Something went wrong!");
+                    var value = entry.Value;
+                    string cur = GetStr(result[0], what);
+                    if (cur != "") value.Add(cur);
+                    AddToDb(value, target, what, entry.Key);
+                }
+                return CompleteTrans(null, 1);
+            }
+            else
+            {
+                // $moved = array(); — в оригинале не используется
+                if (PT("from", "target") == "inventory")
+                {
+                    string target, what, mode; // mode: "item_id" | "configNum"
+                    if (PT("to", "target") == "pet")
+                    {
+                        target = PT("to", "target") + "10";
+                        what = PT("to", "slotset");
+                        mode = "configNum";
+                    }
+                    else if (PT("to", "target") == "drone")
+                    {
+                        target = PT("to", "target") + "s";
+                        if (PT("to", "configId") == "1")
+                            what = PT("to", "slotset") == "design" ? "design" : "EQ";
+                        else
+                            what = PT("to", "slotset") == "design" ? "design2" : "EQ2";
+                        mode = "item_id";
+                    }
+                    else
+                    {
+                        target = PT("to", "target");
+                        what = PT("to", "slotset");
+                        mode = "configNum";
+                    }
+                    AssertColumn(target, AllowedTargets, "target");
+                    AssertColumn(what, AllowedWhatColumnsExt, "what");
+                    string sqli = "SELECT " + what + " FROM server_1_hangar_config_" + target +
+                                  " WHERE playerID=@playerID && hangarID=@hangarID && " +
+                                  (mode == "item_id" ? "item_id=@sel" : "configNum=@sel");
+                    object selVal = mode == "item_id" ? PGetNested("to", "droneId") : PGetNested("to", "configId");
+
+                    if (what == "") // PHP: $what == null (slotset отсутствует в json)
+                        return ErrorTrans("You are not able to fit it into that " + target + "");
+
+                    if (!FullSystemCheck(what, target, eq))
+                        return ErrorTrans("You are not able to fit it into that " + target + "");
+
+                    var result = Query(sqli, Kv("@playerID", _pid), Kv("@hangarID", PLong(PP("hi"))), Kv("@sel", selVal));
+                    bool nonEmpty = result.Count > 0 && GetStr(result[0], what) != "";
+                    if (target == "drones")
+                    {
+                        if (nonEmpty) return NotEmptyDrone(result, what, target, eq);
+                        return EmptyDrone(what, target, eq);
+                        // PHP: «fit into that slot» ниже — недостижимо
+                    }
+                    else
+                    {
+                        if (nonEmpty) return NotEmptyShip(result, what, target, eq);
+                        return EmptyShip(what, target, eq);
+                    }
+                }
+                else
+                {
+                    // Снятие предмета (from = ship/drone/pet). В PHP при провале всех
+                    // внутренних условий функция завершается с неянным null.
+                    string target, what, mode;
+                    if (PT("from", "target") == "pet")
+                    {
+                        target = PT("from", "target") + "10";
+                        what = PT("from", "slotset");
+                        mode = "configNum";
+                    }
+                    else if (PT("from", "target") == "drone")
+                    {
+                        target = PT("from", "target") + "s";
+                        if (PT("from", "configId") == "1")
+                            what = PT("from", "slotset") == "design" ? "design" : "EQ";
+                        else
+                            what = PT("from", "slotset") == "design" ? "design2" : "EQ2";
+                        mode = "item_id";
+                    }
+                    else
+                    {
+                        target = PT("from", "target");
+                        what = PT("from", "slotset");
+                        mode = "configNum";
+                    }
+                    AssertColumn(target, AllowedTargets, "target");
+                    AssertColumn(what, AllowedWhatColumnsExt, "what");
+                    string sqli = "SELECT " + what + " FROM server_1_hangar_config_" + target +
+                                  " WHERE playerID=@playerID && hangarID=@hangarID && " +
+                                  (mode == "item_id" ? "item_id=@sel" : "configNum=@sel");
+                    object selVal = mode == "item_id" ? PGetNested("from", "droneId") : PGetNested("from", "configId");
+
+                    var result = Query(sqli, Kv("@playerID", _pid), Kv("@hangarID", PLong(PP("hi"))), Kv("@sel", selVal));
+                    if (result.Count > 0)
+                    {
+                        string cur = GetStr(result[0], what);
+                        if (cur != "")
+                        {
+                            var items = PFromItems();
+                            if (cur.Contains("|"))
+                            {
+                                var pie = SplitPipe(cur);
+                                foreach (var l in items.Select(x => x.Value))
+                                    pie = ArrayDiffValues(pie, new List<object> { l });
+                                foreach (var ve in eq.Ret("items"))
+                                {
+                                    foreach (var iy in items)
+                                    {
+                                        if (Str(ve["I"]) == Str(iy.Value))
+                                        {
+                                            string lid = eq.LootId(ve);
+                                            if (lid == "equipment_extra_cpu_sle-04" || lid == "equipment_extra_cpu_sle-03" ||
+                                                lid == "equipment_extra_cpu_sle-02" || lid == "equipment_extra_cpu_sle-01")
+                                            {
+                                                // $this->s не инициализировано (PHP: null → 0)
+                                                var left = new List<object>();
+                                                for (long n = 0; n < _sCount; n++)
+                                                    left.Add(PieAt(pie, n)); // undefined index → null
+                                                pie = ArrayDiffValues(pie, left);
+                                                pie.Add(iy.Value);
+                                                _cpuFilled = false;
+                                                DelFromDb(left, target, what);
+                                                return CompleteTrans(pie, 1, 1);
+                                            }
+                                            else
+                                            {
+                                                DelFromDb(pie, target, what);
+                                                return CompleteTrans(null, 1);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var pie = new List<object> { "" };
+                                foreach (var ve in eq.Ret("items"))
+                                {
+                                    foreach (var iy in items)
+                                    {
+                                        if (Str(ve["I"]) == Str(iy.Value))
+                                        {
+                                            string lid = eq.LootId(ve);
+                                            if (lid == "equipment_extra_cpu_sle-04" || lid == "equipment_extra_cpu_sle-03" ||
+                                                lid == "equipment_extra_cpu_sle-02" || lid == "equipment_extra_cpu_sle-01")
+                                            {
+                                                _cpuFilled = false;
+                                                DelFromDb(pie, target, what);
+                                                return CompleteTrans(new List<object> { iy.Value }, 1, 1);
+                                            }
+                                            else
+                                            {
+                                                DelFromDb(pie, target, what);
+                                                return CompleteTrans(null, 1);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return null; // PHP: неявное завервление метода → null
+                }
+            }
+        }
+
+        private object PieAt(List<object> pie, long n)
+        {
+            string key = n.ToString(CultureInfo.InvariantCulture);
+            for (int i = 0; i < pie.Count; i++)
+                if (((long)i).ToString(CultureInfo.InvariantCulture) == key) return pie[i];
+            return null;
+        }
+
+        /// <summary>public editJson() — точка входа equip-транзакции (экипировка берётся из сессии).</summary>
+        public string EditJson()
+        {
+            GC.KeepAlive(_copyright); // no-op guard оригинала
+            var sessionEq = SessionManager.Get("EQ") as string;
+            if (_equipment != null && !_equipmentIsEmpty)
+            {
+                // оборудование уже загружено (например, через ExtrasExits)
+            }
+            else
+            {
+                // PHP: $this->equipment = new stdClass(); затем = $_SESSION['EQ'];
+                _equipment = sessionEq != null ? Eq.FromBase64Json(sessionEq) : new Eq(null);
+                _equipmentIsEmpty = sessionEq == null;
+            }
+            return CheckInConfig((Eq)_equipment);
+        }
+
+        /// <summary>private checkInConfig() — запрет экипировки предмета, уже стоящего в целевой раскладке.</summary>
+        private string CheckInConfig(Eq eq)
+        {
+            if (PT("from", "target") == "inventory")
+            {
+                var droneItems = PGetNested("from", "droneItems");
+                if (droneItems != null && !IsEmpty(droneItems))
+                {
+                    return EditDb(eq);
+                }
+                string target, what;
+                if (PT("to", "target") == "drone") { target = PT("to", "target") + "s"; what = "default"; }
+                else if (PT("to", "target") == "ship") { target = PT("to", "target"); what = PT("to", "slotset"); }
+                else { target = PT("to", "target"); what = PT("to", "slotset"); }
+
+                var needle = PFromItemsValues();
+                string conf = PT("to", "configId");
+                var args = eq.HangarArgs(conf, target); // hangars[0]->config->{$conf}->{$target}
+                if (args != null)
+                {
+                    foreach (var val in args.Items)
+                    {
+                        var eqList = val.Path("EQ", what);
+                        if (eqList != null && eqList.Count > 0)
+                        {
+                            var inter = eqList.Items
+                                .Select(x => Str(x))
+                                .Intersect(needle.Select(Str))
+                                .ToList();
+                            if (inter.Count > 0) return ErrorTrans("You can not equip that!");
+                        }
+                    }
+                }
+                return EditDb(eq);
+            }
+            return EditDb(eq);
+        }
+
+        /// <summary>private ifExistsPet($pet) — {id, lootid} предмета-пета у игрока, иначе null.</summary>
+        private Dictionary<string, string> IfExistsPet(string pet)
+        {
+            var rows = Query("SELECT `id`, `lootid` FROM `server_1_player_all_items` WHERE `lootid`=@lootid && `playerID`= @playerID",
+                             Kv("@playerID", _pid), Kv("@lootid", pet));
+            return rows.Count > 0 ? rows[0] : null;
+        }
+
+        /// <summary>private ifExistsDrone() — все дроны игрока (4 известных lootid), иначе null.</summary>
+        private List<Dictionary<string, string>> IfExistsDrone()
+        {
+            var rows = Query("SELECT `id`, `lootid` FROM `server_1_player_all_items` WHERE `lootid`=@lootid1 OR `lootid`=@lootid2 OR `lootid`=@lootid3 OR `lootid`=@lootid4 && `playerID`= @playerID",
+                             Kv("@playerID", _pid), Kv("@lootid1", "drone_iris"), Kv("@lootid2", "drone_flax"),
+                             Kv("@lootid3", "drone_apis"), Kv("@lootid4", "drone_zeus"));
+            return rows.Count > 0 ? rows : null;
+        }
+
+        /// <summary>private GetPet($petId) — состояние пета (hp/lv/name/loot-level/lockedSlots).</summary>
+        private Eq GetPetRow(Dictionary<string, string> petId)
+        {
+            var result = Query("SELECT * FROM `server_1_player_pet10` WHERE `playerID`= @playerID && `item_id`=@itemid",
+                               Kv("@playerID", _pid), Kv("@itemid", petId["id"]));
+            if (result.Count == 0) return null;
+            var row = result[0];
+            _lootids.Add(petId["lootid"]);
+            long keying = _lootids.Count - 1; // max(array_keys(lootids)) — php-ассоциативные ключи 0..n-1
+            var pet = new Dictionary<string, object>
+            {
+                { "I", petId["id"] },
+                { "HP", GetStr(row, "pet_hp") },
+                { "LV", ParseLong(GetStr(row, "pet_level")) },
+                { "PN", GetStr(row, "pet_name") },
+                { "L", keying },
+                { "lockedSlots", new Dictionary<string, object>
+                    {
+                        { "lasers", ParseLong(Slot(row, "lockedSlots", 0)) },
+                        { "generators", ParseLong(Slot(row, "lockedSlots", 1)) },
+                        { "gears", ParseLong(Slot(row, "lockedSlots", 2)) },
+                        { "protocols", ParseLong(Slot(row, "lockedSlots", 3)) },
+                    }
+                },
+            };
+            return new Eq(pet);
+        }
+
+        private static string Slot(Dictionary<string, string> row, string col, int i)
+        {
+            var a = (GetStr(row, col)).Split('|');
+            return i < a.Length ? a[i] : "";
+        }
+
+        /// <summary>private shipconfigsGenerator($hid, $conf) — EQ корабля раскладки (lasers/generators/heavy_guns/extras).</summary>
+        private Eq ShipConfigsGenerator(object hid, object conf)
+        {
+            var result = Query("SELECT * FROM `server_1_hangar_config_ship` WHERE `playerID`= @playerID && `hangarID`=@hangarID && `configNum`=@configNum",
+                               Kv("@playerID", _pid), Kv("@hangarID", hid), Kv("@configNum", conf));
+            var eqDict = new Dictionary<string, object>();
+            var ship = new Dictionary<string, object> { { "EQ", eqDict } };
+            foreach (var value in result)
+            {
+                SplitCol(value, "lasers", eqDict);
+                SplitCol(value, "generators", eqDict);
+                SplitCol(value, "heavy_guns", eqDict);
+                SplitCol(value, "extras", eqDict);
+            }
+            return new Eq(ship);
+        }
+
+        private static void SplitCol(Dictionary<string, string> row, string col, Dictionary<string, object> into)
+        {
+            string v = GetStr(row, col);
+            if (v == "") return; // PHP !empty()
+            if (v.Contains("|")) into[col] = v.Split('|').Cast<object>().ToList();
+            else into[col] = new List<object> { v };
+        }
+
+        // ------------------------------------------------------------------
+        // Eq — тонкая обёртка над json-деревом init() (PHP-стиль доступа к
+        // объектам из $_SESSION['EQ']): отсутствующий ключ/индекс == null,
+        // итерация по null == пустой цикл.
+        // ------------------------------------------------------------------
+        private sealed class Eq
+        {
+            public readonly object Dyn;
+            public Eq(object dyn) { Dyn = dyn; }
+
+            public static Eq FromBase64Json(string b64)
+            {
+                try
+                {
+                    var json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(b64));
+                    return new Eq(JsonUtil.DecodeObject(json));
+                }
+                catch (Exception) { return new Eq(null); }
+            }
+
+            public Eq this[string key]
+            {
+                get
+                {
+                    var d = Dyn as IDictionary<string, object>;
+                    object o;
+                    return d != null && d.TryGetValue(key, out o) ? new Eq(o) : new Eq(null);
+                }
+            }
+
+            public Eq Path(params string[] keys)
+            {
+                var cur = this;
+                foreach (var k in keys) cur = cur[k];
+                return cur;
+            }
+
+            /// <summary>data.ret.$name как список объектов (пусто если null).</summary>
+            public List<Eq> Ret(string name)
+            {
+                var l = ItemsOf(this["data"]["ret"][name]);
+                return l;
+            }
+
+            public Eq MapLootIds() { return new Eq(((IDictionary<string, object>)null) ?? AsMap(this["data"]["map"]["lootIds"])); }
+
+            private static object AsMap(Eq e) { return e != null ? e.Dyn : null; }
+
+            public List<Eq> Items
+            {
+                get { return ItemsOf(this); }
+            }
+
+            /// <summary>hangars[0]-&gt;general-&gt;$target (null если нет).</summary>
+            public Eq General(string target)
+            {
+                var hangs = Ret("hangars");
+                if (hangs.Count == 0) return new Eq(null);
+                return hangs[0]["general"][target];
+            }
+
+            /// <summary>hangars[0]-&gt;config-&gt;$conf-&gt;$target (для checkInConfig).</summary>
+            public Eq HangarArgs(string conf, string target)
+            {
+                var hangs = Ret("hangars");
+                if (hangs.Count == 0) return new Eq(null);
+                return hangs[0]["config"][conf][target];
+            }
+
+            /// <summary>data.map.lootIds[$vr-&gt;L]</summary>
+            public string LootId(Eq vr)
+            {
+                var ids = this["data"]["map"]["lootIds"];
+                var d = ids.Dyn as IDictionary<string, object>;
+                object o;
+                if (d != null && d.TryGetValue(Str(vr["I"] != null ? vr["Dyn"] : vr["Dyn"]), out o)) return null;
+                if (d != null && d.TryGetValue(Str(vr["L"].Dyn), out o)) return Convert.ToString(o, CultureInfo.InvariantCulture);
+                var l = ids.Dyn as Newtonsoft.Json.Linq.JArray;
+                if (l != null)
+                {
+                    long idx;
+                    if (long.TryParse(Str(vr["L"].Dyn), out idx) && idx >= 0 && idx < l.Count)
+                        return Convert.ToString((object)l[(int)idx], CultureInfo.InvariantCulture);
+                }
+                return null;
+            }
+
+            private static List<Eq> ItemsOf(Eq e)
+            {
+                var res = new List<Eq>();
+                if (e == null || e.Dyn == null) return res;
+                var d = e.Dyn as IDictionary<string, object>;
+                if (d != null)
+                {
+                    foreach (var kv in d) res.Add(new Eq(kv.Value));
+                    return res;
+                }
+                var arr = e.Dyn as Newtonsoft.Json.Linq.JArray;
+                if (arr != null)
+                {
+                    foreach (var t in arr) res.Add(new Eq(t));
+                }
+                return res;
+            }
+
+            public int Count
+            {
+                get
+                {
+                    var d = Dyn as IDictionary<string, object>;
+                    if (d != null) return d.Count;
+                    var arr = Dyn as Newtonsoft.Json.Linq.JArray;
+                    if (arr != null) return arr.Count;
+                    return 0;
+                }
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // Заглушки методов, подключаемых следующими кусками A3.6, чтобы
         // init() компилировался уже сейчас. Каждый следующий коммит заменяет
         // реализацию портом из Class.inventory.php.
         // ------------------------------------------------------------------
