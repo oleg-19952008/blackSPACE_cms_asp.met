@@ -92,6 +92,7 @@
     <Compile Include="App_Code\RegisterProvisioning.cs" />
     <Compile Include="App_Code\SessionManager.cs" />
     <Compile Include="App_Code\Signup.cs" />
+    <Compile Include="App_Code\Skylab.cs" />
     <Compile Include="App_Code\TemplateManager.cs" />
     <Compile Include="App_Code\Unity.cs" />
     <Compile Include="App_Code\UnityMailer.cs" />
