@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
+using MySql.Data.MySqlClient;
 
 namespace DarkSpace
 {
@@ -25,6 +26,9 @@ namespace DarkSpace
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            // indexInternal.es.php lines 6–8: if (isset($_GET['dontShow']) && $_GET['dontShow'] === '1') exit;
+            if (Request.QueryString["dontShow"] == "1") { Response.End(); return; }
+
             var users = new Users();
             long userId = users.CheckSession(Session); // Class.Users.php::checkSession()
 
@@ -36,6 +40,31 @@ namespace DarkSpace
 
             litError.Text = SessionManager.ErrorData(Session);
             SessionManager.ClearError(Session);
+
+            // indexInternal.es.php bootstrap (lines 14–33), ported:
+            //   $_SESSION['fact'] / $_SESSION['premium'] = DataRow['factionId'/'premium'];
+            long factionId = users.DataRow != null ? PlayerLog.ToLong(users.DataRow["factionId"]) : 0;
+            Session["fact"] = factionId.ToString(CultureInfo.InvariantCulture);
+            Session["premium"] = users.DataRow != null
+                ? PlayerLog.ToLong(users.DataRow["premium"]).ToString(CultureInfo.InvariantCulture) : "0";
+
+            var unity = new Unity();
+            if (unity.CheckIpBan(Unity.GetClientIp()))
+            {
+                // header('Location: http://127.0.0.1/?calmdown=99') — в порте редирект на тот же путь локально
+                Response.Redirect("/?calmdown=99", true);
+                return;
+            }
+
+            var @base = new Base();
+            @base.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"])); // $base->setId(...)
+            if (@base.CheckBan())
+            {
+                Response.Redirect("/?calmdown=99", true);
+                return;
+            }
+            unity.ApplyRankList(PlayerLog.ToLong(users.DataRow["playerID"]));    // $unity->applyRankList(...)
+            unity.ApplyRankListNpc(PlayerLog.ToLong(users.DataRow["playerID"])); // $unity->applyRankListNpc(...)
 
             // Minimal internal-start shell: enough for smoke-testing the auth chain.
             var info = new HtmlGenericControl("div");
@@ -51,8 +80,9 @@ namespace DarkSpace
 
         /// <summary>
         /// Диспетчер по action/subaction как в indexInternal.es.php.
-        /// Пока портирована только ветка internalSkylab (кусок A2.8); прочие
-        /// действия добавляются кусками фазы B по PORTING-PLAN.md.
+        /// Пока портированы ветки internalCompanyChoose (B-кусок 1, строки 36–64),
+        /// internalSkylab (кусок A2.8) и заглушки фазы B для остальных действий;
+        /// прочие действия добавляются кусками фазы B по PORTING-PLAN.md.
         /// </summary>
         private void HandleAction(Users users, HttpRequest request)
         {
@@ -61,12 +91,103 @@ namespace DarkSpace
             if (string.IsNullOrEmpty(action)) action = request.Form["action"];
             if (string.IsNullOrEmpty(action)) return;
 
+            // Порядок if/elseif оригинала: internalCompanyChoose проверяется первым и
+            // отдельно от factionId-gate (строки 36–65).
+            if (action == "internalCompanyChoose")
+            {
+                HandleInternalCompanyChoose(users, request);
+                return;
+            }
+
+            // PHP: elseif ($Users->DataRow['factionId'] === '0') → редирект на выбор фракции
+            // для ВСЕХ прочих действий (строки 64–65).
+            if (users.DataRow != null && PlayerLog.ToLong(users.DataRow["factionId"]) == 0)
+            {
+                Response.Redirect("/internal.aspx?action=internalCompanyChoose", true);
+                return;
+            }
+
             switch (action)
             {
                 case "internalSkylab":
                     HandleInternalSkylab(users, request);
                     break;
+                // TODO (фаза B): internalStart/Gates/JPA/Payment/HoF (B3), internalBalance (B4),
+                // internalHistory (B5), internalDock* (B6/B10), internalAuction (B7),
+                // internalBoard/Messaging (B8), internalUserDataChange (B9), Shop/inventory (B10).
             }
+        }
+
+        /// <summary>
+        /// Port of indexInternal.es.php lines 36–64 (action=internalCompanyChoose).
+        /// subaction=factionChoose persists faction/map/coords and echoes the redirect URL;
+        /// otherwise the CompanyChoose header/body would be rendered (фаза C — шаблоны),
+        /// here a minimal HTML form shell is emitted instead.
+        /// </summary>
+        private void HandleInternalCompanyChoose(Users users, HttpRequest request)
+        {
+            // PHP gate: && $Users->DataRow['factionId'] === '0' — при выбранной фракции
+            // original falls through to the second branch (redirect back to internalCompanyChoose),
+            // effectively rendering nothing extra for factionId!=0 on this action.
+            if (PlayerLog.ToLong(users.DataRow["factionId"]) != 0)
+            {
+                Response.Redirect("/internal.aspx?action=internalCompanyChoose", true);
+                return;
+            }
+
+            var factory = new Factory();
+            factory.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+
+            string subaction = request.QueryString["subaction"];
+            string factionIdStr = request.QueryString["factionID"];
+            long fid;
+            // isset(subaction, factionID) && subaction==='factionChoose' && factionID>0 && factionID<4
+            if (subaction == "factionChoose" && !string.IsNullOrEmpty(factionIdStr)
+                && long.TryParse(factionIdStr, NumberStyles.Any, CultureInfo.InvariantCulture, out fid)
+                && fid > 0 && fid < 4)
+            {
+                long mapId, x, y;
+                if (fid == 1) { mapId = 1; x = 1000; y = 1000; }
+                else if (fid == 2) { mapId = 5; x = 19800; y = 1000; }
+                else { mapId = 9; x = 19600; y = 11900; }
+                Execute(
+                    "UPDATE server_1_players SET factionId = @fid, mapId = @mapId, x = @x, y = @y WHERE playerID = @pid",
+                    Kv("@fid", fid), Kv("@mapId", mapId), Kv("@x", x), Kv("@y", y),
+                    Kv("@pid", PlayerLog.ToLong(users.DataRow["playerID"])));
+                // echo 'indexInternal.es.php?action=internalStart'; exit;
+                Response.Write("indexInternal.es.php?action=internalStart");
+                Response.End();
+                return;
+            }
+
+            // require CompanyChoose_Header.php / xajax.php / internalHeader.php / CompanyChoose_Body.php
+            // TODO (фаза C): шаблон CompanyChoose_Body через TemplateManager. Smoke-оболочка:
+            var panel = new HtmlGenericControl("div");
+            panel.Attributes["id"] = "companyChoosePanel";
+            panel.InnerHtml =
+                "<h3>Choose your company</h3>" +
+                "<ul>" +
+                "<li><a href=\"/internal.aspx?action=internalCompanyChoose&amp;subaction=factionChoose&amp;factionID=1\">MMO</a></li>" +
+                "<li><a href=\"/internal.aspx?action=internalCompanyChoose&amp;subaction=factionChoose&amp;factionID=2\">EIC</a></li>" +
+                "<li><a href=\"/internal.aspx?action=internalCompanyChoose&amp;subaction=factionChoose&amp;factionID=3\">VRU</a></li>" +
+                "</ul>";
+            phContent.Controls.Add(panel);
+        }
+
+        /// <summary>One-shot parameterized UPDATE (factionChoose writes server_1_players).</summary>
+        private static void Execute(string sql, params KeyValuePair<string, object>[] ps)
+        {
+            using (var con = DB.GetInstance())
+            using (var cmd = new MySqlCommand(sql, con))
+            {
+                foreach (var p in ps) cmd.Parameters.AddWithValue(p.Key, p.Value);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        private static KeyValuePair<string, object> Kv(string name, object value)
+        {
+            return new KeyValuePair<string, object>(name, value);
         }
 
         /// <summary>

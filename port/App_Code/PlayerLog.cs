@@ -67,7 +67,7 @@ namespace DarkSpace
             return result;
         }
 
-        internal static long ToLong(object v)
+        public static long ToLong(object v)
         {
             if (v == null || v == DBNull.Value) return 0;
             try { return Convert.ToInt64(v, System.Globalization.CultureInfo.InvariantCulture); }

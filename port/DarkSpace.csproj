@@ -83,12 +83,14 @@
     <Compile Include="App_Code\DailyBonus.cs" />
     <Compile Include="App_Code\Encryption.cs" />
     <Compile Include="App_Code\Factory.cs" />
+    <Compile Include="App_Code\GalaxyGate.cs" />
     <Compile Include="App_Code\Hangar.cs" />
     <Compile Include="App_Code\IxrServer.cs" />
     <Compile Include="App_Code\JsonUtil.cs" />
     <Compile Include="App_Code\News.cs" />
     <Compile Include="App_Code\PhpMailer.cs" />
     <Compile Include="App_Code\PlayerLog.cs" />
+    <Compile Include="App_Code\Rank.cs" />
     <Compile Include="App_Code\RegisterProvisioning.cs" />
     <Compile Include="App_Code\SessionManager.cs" />
     <Compile Include="App_Code\Signup.cs" />
