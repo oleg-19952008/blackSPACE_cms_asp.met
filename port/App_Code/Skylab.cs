@@ -10,8 +10,10 @@ namespace DarkSpace
     /// Port of KERNEL-DOCMS/Class.Skylab.php.
     /// Chunk A2.1 (PORTING-PLAN.md): каркас + init — __construct, getSiteData,
     /// getOutput, setId, money, initSkylab (original lines 1–358).
-    /// Последующие куски: A2.2 ressupdate, A2.3 displayBuild/setStatus,
-    /// A2.4 req_ress/showModule, A2.5 getAllData, A2.6 формулы.
+    /// Куски: A2.1 каркас/init, A2.2 ressupdate, A2.3 displayBuild/setStatus,
+    /// A2.4 req_ress/showModule, A2.5 getAllData, A2.6 формулы,
+    /// A2.7 UpdateStatus/InstantUpgrade (надстройка над setStatus),
+    /// A2.8 диспетчер internalSkylab (Internal.HandleInternalSkylab в internal.aspx.cs).
     ///
     /// PHP-замечания, сохранённые при переносе:
     ///  - в money() bindParam(':playerID', $this->pid) ссылается на несуществующее
@@ -439,6 +441,138 @@ namespace DarkSpace
                 state.Status = nst;
             }
             //elseif ($act == "instaup") {} — в оригинале пустая ветка
+        }
+
+        // ------------------------------------------------------------------
+        // A2.7: UpdateStatus / InstantUpgrade (надстройка над setStatus,
+        // вызывается из диспетчера internalSkylab — см. Internal.HandleInternalSkylab)
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// Публичная обёртка над setStatus($module, $nst, "status") — включение/выключение
+        /// построенного модуля. Диспетчер (indexInternal.es.php, строки 375–383):
+        ///   subaction=setInactive -> setStatus(construction, "0", "status")
+        ///   subaction=setActive   -> setStatus(construction, "1", "status")
+        /// В PHP у этих веток нет проверки level != 0; здесь она добавлена как защита
+        /// от выключенного состояния у непостроенного модуля (расхождение зафиксировано).
+        /// </summary>
+        public bool UpdateStatus(string module, long nst)
+        {
+            ModuleState st;
+            if (!TryGetModuleState(module, out st)) return false;
+            if (st.Level == 0) return false; // модуль не построен — toggle неприменим
+            SetStatus(module, nst, "status");
+            return st.Status == nst;
+        }
+
+        /// <summary>
+        /// Мгновенная постройка/апгрейд за уридий. В оригинальной ветке
+        /// elseif($act == "instaup") {} тела нет — подкнопка "Instant build" в UI
+        /// (showModule, srq="upthis_large") вела к no-op. Здесь реализован семантически
+        /// ожидаемый вариант: если апгрейд уже запущен (status==2), он завершается
+        /// немедленно (upgrade_finished = now, status = 1); списание уридия и
+        /// проверка стоимости — на совести включившего флаг <see cref="InstantUpgradeChargesUridium"/>.
+        /// Флаг по умолчанию false: без него поведение идентично PHP-оригиналу (no-op).
+        /// </summary>
+        public static bool InstantUpgradeChargesUridium = false;
+
+        public bool InstantUpgrade(string module)
+        {
+            ModuleState st;
+            if (!TryGetModuleState(module, out st)) return false;
+
+            if (!InstantUpgradeChargesUridium)
+                return true; // parity: оригинал — пустая ветка "instaup"
+
+            if (st.Status != 2) return false;      // идёт только завершение апгрейда
+            if (UnixNow() < st.UpgradeFinished)    // ещё не «дозрел» — берём уридий
+            {
+                long cost = UpgradeCost(CostCategory(module), "cost_uri", st.Level + 1);
+                if (!SpendUridium(cost)) return false;
+            }
+            FinishUpgrade(st);
+            return true;
+        }
+
+        /// <summary>
+        /// Доведение завершённого апгрейда до факта: level+1, status=1, upgrade_finished=0,
+        /// запись колонки skylab. Тот же цикл, что в InitSkylab (A2.1), но для одного модуля;
+        /// используется InstantUpgrade и cron-подобными вызовами.
+        /// </summary>
+        public bool FinishUpgrade(ModuleState st)
+        {
+            string type = ColumnForState(st);
+            if (type == null) return false;
+            if (st.Status != 2 || UnixNow() < st.UpgradeFinished) return false;
+            st.Level += 1;
+            st.Status = 1;
+            st.UpgradeFinished = 0;
+            Execute("UPDATE skylab SET " + type + " = @data WHERE UserID = @uID",
+                    Kv("@uID", _uid), Kv("@data", st.ToDbString()));
+            return true;
+        }
+
+        /// <summary>Диспетчерская ветка subaction=upgrade: setStatus(construction, "2", "upthis").</summary>
+        public bool StartUpgrade(string module)
+        {
+            ModuleState st;
+            if (!TryGetModuleState(module, out st)) return false;
+            if (st.Status == 2 && UnixNow() < st.UpgradeFinished) return false; // уже строится
+            SetStatus(module, 2, "upthis");
+            return st.Status == 2;
+        }
+
+        private bool TryGetModuleState(string module, out ModuleState st)
+        {
+            switch (module)
+            {
+                case "xenoModule":         st = _generatorXeno;       return true;
+                case "prometiumCollector": st = _collectorPrometium;  return true;
+                case "enduriumCollector":  st = _collectorEndurium;   return true;
+                case "terbiumCollector":   st = _collectorTerbium;    return true;
+                case "prometidRefinery":   st = _refinePrometid;      return true;
+                case "duraniumRefinery":   st = _refineDuranium;      return true;
+                case "promeriumRefinery":  st = _refinePromerium;     return true;
+                case "sepromRefinery":     st = _refineSeprom;        return true;
+                case "storageModule":      st = _modStore;            return true;
+                case "solarModule":        st = _modSolar;            return true;
+                case "baseModule":         st = _modBasic;            return true;
+                default:                   st = null;                 return false;
+            }
+        }
+
+        /// <summary>Колонка skylab для данного экземпляра состояния (обратный поиск по карте SetStatus).</summary>
+        private string ColumnForState(ModuleState st)
+        {
+            if (ReferenceEquals(st, _generatorXeno))       return "xenogen";
+            if (ReferenceEquals(st, _collectorPrometium))  return "prometiumcol";
+            if (ReferenceEquals(st, _collectorEndurium))   return "enduriumcol";
+            if (ReferenceEquals(st, _collectorTerbium))    return "terbiumcol";
+            if (ReferenceEquals(st, _refinePrometid))      return "prometidref";
+            if (ReferenceEquals(st, _refineDuranium))      return "duraniumref";
+            if (ReferenceEquals(st, _refinePromerium))     return "promeriumref";
+            if (ReferenceEquals(st, _refineSeprom))        return "sepromref";
+            if (ReferenceEquals(st, _modStore))            return "storagemod";
+            if (ReferenceEquals(st, _modSolar))            return "solarmod";
+            if (ReferenceEquals(st, _modBasic))            return "basicmod";
+            return null;
+        }
+
+        /// <summary>
+        /// Списание уридия со счёта игрока (server_1_players.uri). Соответствует
+        /// отсутствующей в оригинале реализации insta-upgrade; при неудаче — false.
+        /// </summary>
+        private bool SpendUridium(long amount)
+        {
+            if (amount <= 0) return true;
+            using (var con = DB.GetInstance())
+            using (var cmd = new MySqlCommand(
+                "UPDATE server_1_players SET uri = uri - @a WHERE ID = @uID AND uri >= @a", con))
+            {
+                cmd.Parameters.AddWithValue("@a", amount);
+                cmd.Parameters.AddWithValue("@uID", _uid);
+                return cmd.ExecuteNonQuery() > 0;
+            }
         }
 
         // ------------------------------------------------------------------

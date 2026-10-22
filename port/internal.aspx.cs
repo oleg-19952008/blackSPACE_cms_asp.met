@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
@@ -41,6 +44,106 @@ namespace DarkSpace
                              "<p>User ID: " + HttpUtility.HtmlEncode(userId.ToString()) + "</p>" +
                              "<p><a href=\"/GameAPI.ashx\">Game API</a> | <a href=\"/\">Logout page</a></p>";
             phContent.Controls.Add(info);
+
+            // Action dispatch (port of indexInternal.es.php dispatcher, phase B).
+            HandleAction(users, Request);
+        }
+
+        /// <summary>
+        /// Диспетчер по action/subaction как в indexInternal.es.php.
+        /// Пока портирована только ветка internalSkylab (кусок A2.8); прочие
+        /// действия добавляются кусками фазы B по PORTING-PLAN.md.
+        /// </summary>
+        private void HandleAction(Users users, HttpRequest request)
+        {
+            // PHP: if (isset($_POST['action'])) $_GET['action'] = $_POST['action'];
+            string action = request.QueryString["action"];
+            if (string.IsNullOrEmpty(action)) action = request.Form["action"];
+            if (string.IsNullOrEmpty(action)) return;
+
+            switch (action)
+            {
+                case "internalSkylab":
+                    HandleInternalSkylab(users, request);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Port of indexInternal.es.php lines 363–390 (elseif ($_GET['action'] === 'internalSkylab')).
+        /// Порядок оригинала сохранён: setId -> initSkylab -> getAllData (включает повторный
+        /// initSkylab и доведение завершённых апгрейдов), затем обработка subaction'ов,
+        /// после чего Body вызывает ressupdate("update") и getSiteData().
+        /// В PHP subaction читается из $_GET независимо от метода запроса — здесь так же.
+        /// </summary>
+        private void HandleInternalSkylab(Users users, HttpRequest request)
+        {
+            var skylab = new Skylab();
+            skylab.SetId((int)(long)users.DataRow["ID"]);   // $Skylab->setId($Users->DataRow['ID'])
+            skylab.InitSkylab();                            // $Skylab->initSkylab()
+            skylab.GetAllData();                            // $Skylab->getAllData(); // including initSkylab
+
+            string subaction = request.QueryString["subaction"];
+            string construction = request.QueryString["construction"];
+
+            if (!string.IsNullOrEmpty(subaction))
+            {
+                if (subaction == "setInactive" && !string.IsNullOrEmpty(construction))
+                {
+                    // $Skylab->setStatus($_GET['construction'], "0", "status");
+                    skylab.SetStatus(construction, 0, "status");
+                }
+                else if (subaction == "upgrade")
+                {
+                    // $Skylab->setStatus($_GET['construction'], "2", "upthis");
+                    // В оригинале нет проверки isset($_GET['construction']) — при пустом
+                    // имени setStatus просто не находит модуль и ничего не делает.
+                    skylab.SetStatus(construction, 2, "upthis");
+                }
+                else if (subaction == "setActive")
+                {
+                    // $Skylab->setStatus($_GET['construction'], "1", "status");
+                    skylab.SetStatus(construction, 1, "status");
+                }
+                else if (subaction == "instantUpgrade")
+                {
+                    // $Skylab->setStatus($_GET['construction'], "1", "instaup");
+                    // Ветка "instaup" в Class.Skylab.php пуста (см. A2.7): вызываем
+                    // SetStatus для сигнатурного паритета и дополнительно InstantUpgrade
+                    // (no-op, пока InstantUpgradeChargesUridium == false).
+                    skylab.SetStatus(construction, 1, "instaup");
+                    if (!string.IsNullOrEmpty(construction))
+                        skylab.InstantUpgrade(construction);
+                }
+            }
+
+            // require FILES . 'INDEXINTERNAL/internalSkylab_Body.php':
+            // $Skylab->ressupdate("update"); $Lab = $Skylab->getSiteData();
+            skylab.RessUpdate("update");
+            var lab = skylab.GetSiteData();
+
+            // TODO (фаза C): рендер шаблона internalSkylab_Body через TemplateManager.
+            // Для smoke-теста отдаём сводку по лаборатории.
+            var panel = new HtmlGenericControl("div");
+            panel.Attributes["id"] = "skylabPanel";
+            var sb = new System.Text.StringBuilder();
+            sb.Append("<h3>Skylab</h3><pre>");
+            foreach (var kv in lab)
+                sb.Append(HttpUtility.HtmlEncode(kv.Key + " = " + RenderDataValue(kv.Value))).Append('\n');
+            sb.Append("</pre>");
+            panel.InnerHtml = sb.ToString();
+            phContent.Controls.Add(panel);
+        }
+
+        private static string RenderDataValue(object v)
+        {
+            var d = v as IDictionary<string, object>;
+            if (d != null)
+                return "{" + string.Join(", ", d.Select(p => p.Key + ": " + RenderDataValue(p.Value))) + "}";
+            var l = v as IList<object>;
+            if (l != null)
+                return "[" + string.Join(", ", l.Select(RenderDataValue)) + "]";
+            return Convert.ToString(v, CultureInfo.InvariantCulture) ?? "";
         }
     }
 }
