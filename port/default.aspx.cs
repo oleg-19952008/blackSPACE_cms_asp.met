@@ -7,10 +7,11 @@ using MySql.Data.MySqlClient;
 namespace DarkSpace
 {
     /// <summary>
-    /// Port of the root index.php — skeleton stage:
+    /// Port of the root index.php:
     ///  * input sanitisation (Init.php AntiHTML block) is applied via SessionManager
-    ///  * the "recoverTrue" and "loginForm_default_*" POST branches are ported
-    ///  * the signup branch and template rendering (header/body) come in steps 3-4
+    ///  * the "recoverTrue" (Unity::PasswordRecovery) and "loginForm_default_*" POST
+    ///    branches are ported; the signup branch lives in Signup.cs (partial class)
+    ///  * template rendering (FILES INDEX/header.php + body.php) via TemplateManager
     /// </summary>
     public partial class _Default : Page
     {
@@ -23,9 +24,9 @@ namespace DarkSpace
             // if(isset($_POST['recoverTrue']) && !empty($_POST['recoverTrue']))
             if (!string.IsNullOrEmpty(recoverTrue))
             {
-                // $unity->passwordRecovery(...) — ported in step 3 (Class.unity.php).
-                SessionManager.AppendError(Session,
-                    "<div>Password recovery is not migrated yet.</div>");
+                // $unity->passwordRecovery($_POST['recoverPw']) — Class.unity.php port.
+                var unity = new Unity();
+                SessionManager.AppendError(Session, unity.PasswordRecovery(recoverPw ?? ""));
             }
 
             // loginForm_default_* branch
@@ -51,7 +52,13 @@ namespace DarkSpace
                 }
             }
 
-            litError.Text = SessionManager.ErrorData(Session);
+            // require FILES . 'INDEX/header.php'; require FILES . 'INDEX/body.php';
+            // Template output is handled by TemplateManager (migration step 4):
+            // the legacy FILES/en_US/INDEX/{header,body}.php are streamed verbatim with
+            // {{SERVER}}/{{ERRORDATA}}/{{MODALSCRIPT}}/{{BANBOX}} token substitution.
+            // NOTE: errorData is consumed once inside the body template, exactly like PHP.
+            TemplateManager.RenderHeader(Context);
+            TemplateManager.RenderBody(Context);
         }
 
         private const string UnknownComboHtml =
@@ -89,8 +96,8 @@ namespace DarkSpace
                         Response.Redirect("http://" + AppConfig.Host + "/?calmdown=99&until=Banned%20Permanent", true);
                     }
 
-                    // $unity->cPT($row['banned_until']) — temporary-ban time check, step 3.
-                    if (IsBanActive(bannedUntil))
+                    // $unity->cPT($row['banned_until']) — temporary-ban time check.
+                    if (Unity.Cpt(bannedUntil))
                     {
                         Response.Redirect("http://" + AppConfig.Host + "/?calmdown=99&until=" + HttpUtility.UrlEncode(bannedUntil), true);
                     }
@@ -133,17 +140,5 @@ namespace DarkSpace
             }
         }
 
-        /// <summary>
-        /// Placeholder for unity->cPT(): parses "Y-m-d H:i:s"-style ban expiry vs now
-        /// (Europe/Moscow per Init.php timezone). Refined when Class.unity.php is ported.
-        /// </summary>
-        private static bool IsBanActive(string bannedUntil)
-        {
-            if (string.IsNullOrWhiteSpace(bannedUntil)) return false;
-            DateTime dt;
-            if (!DateTime.TryParse(bannedUntil, out dt)) return false;
-            DateTime nowMoscow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, AppConfig.TimeZone);
-            return dt > nowMoscow;
-        }
     }
 }

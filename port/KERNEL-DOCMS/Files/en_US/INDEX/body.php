@@ -14,33 +14,7 @@
             f.parentNode.insertBefore(j, f);
         })(window, document, 'script', 'dataLayer', ' -NWZ6XP');
         
-        <?php 
-		 if(isset($_GET['calmdown']) && $_GET['calmdown']=99){
-				?>
-				jQuery(document).ready(function() {
-                    document.getElementById('busy_layer').style.display = 'block';
-                    document.getElementById('errorBox').style.display = 'block';
-                }); 
-                function errorBoxClose() {
-                    document.getElementById('busy_layer').style.display = 'none';
-                    document.getElementById('errorBox').style.display = 'none';
-                }
-				<?php
-		 }
-	
-        if(!empty($_SESSION['errorData'])){
-            ?>
-               jQuery(document).ready(function() {
-                    document.getElementById('busy_layer').style.display = 'block';
-                    document.getElementById('errorBox').style.display = 'block';
-                }); 
-                function errorBoxClose() {
-                    document.getElementById('busy_layer').style.display = 'none';
-                    document.getElementById('errorBox').style.display = 'none';
-                }
-            <?php
-        }
-        ?>
+        {{MODALSCRIPT}}
 		function pwRecover(){
 			document.getElementById('logBox').style.display = 'none';
 			document.getElementById('pwRecover').style.display = 'block';
@@ -72,39 +46,20 @@
     <!-- End Google Tag Manager -->
 
     <div id="container">
-	<?php if(isset($_GET['calmdown']) && $_GET['calmdown']=99){
-	?>
-		<div id="busy_layer" style="visibility: visible; display: block;"></div>
-        <div id="errorBox" style="display: block; width: 500px;">
-            <div id="errorBox_close">
-                <a href="javascript:void(0);" onclick="errorBoxClose();"><img src="./do_img/global/clan/close.jpg?"></a>
-            </div>
-			<br />
-             <img src="./acp/css/images/banned.gif">
-            <?php if(isset($_GET['until'])): echo 'Banned until: '.date("M d, Y H:i:s", strtotime(str_replace("-","/", $_GET['until']))); endif;?>
-        </div>
-	<?php
-	}
-	?>
+	{{BANBOX}}
         <div id="busy_layer" style="visibility: visible; display: none;"></div>
         <div id="errorBox" style="display: none;">
             <div id="errorBox_close">
                 <a href="javascript:void(0);" onclick="errorBoxClose();"><img src="./do_img/global/clan/close.jpg?"></a>
             </div>
-             <?php 
-                if(!empty($_SESSION['errorData'])){
-                    echo $_SESSION['errorData'];
-                    unset($_SESSION['errorData']);
-
-                }
-            ?>
+             {{ERRORDATA}}
             
         </div>
 		<div id="pwRecover">
             <div id="recover_close">
                 <a href="javascript:void(0);" onclick="closeRecover();"><img src="./do_img/global/clan/close.jpg?"></a>
             </div>
-            <form style="padding: 15px; margin-top: 20px;"  method="POST" action="/?locale=us&amp;aid=1" name="loginForm_default">
+            <form style="padding: 15px; margin-top: 20px;"  method="POST" action="{{SERVER}}/?locale=us&amp;aid=1" name="loginForm_default">
 				<div id="loginForm_default_label_username_container">
                     <label id="recoverPw_lable" for="recoverPw">Email:</label>
                 </div>
@@ -119,7 +74,7 @@
         </div>
 
 <body>
-  <link href="css/indexstyle.css" rel="stylesheet">
+  <link href="Styles/darkspace.css" rel="stylesheet">
 
  <div class="body"></div>
         <div class="grad"></div>
@@ -129,7 +84,7 @@
         <br>
 
         <div class="login">
-            <form  id="loginForm_default" method="post" action="/?locale=us&amp;aid=0" name="loginForm_default">
+            <form  id="loginForm_default" method="post" action="{{SERVER}}/?locale=us&amp;aid=0" name="loginForm_default">
 
                 <!-- login -->
                 <div id="loginForm_default_input_username_container">
