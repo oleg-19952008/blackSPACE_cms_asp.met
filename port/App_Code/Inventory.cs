@@ -564,6 +564,235 @@ namespace DarkSpace
         }
 
         // ------------------------------------------------------------------
+        // A3.3 БД-оперы/валидация (Class.inventory.php, строки 373–515):
+        // addToDB, delFromDb, checkInput, extrasExits.
+        //
+        // PHP-замечания, сохранённые при переносе:
+        //  - array_unique(array_map('serialize',...)) — дедупликация массива id с
+        //    сохранением первых ключей; реализовано DistinctKeepKeys.
+        //  - $target/$what интерполируются в имя таблицы/колонки — в вызывающем
+        //    коде (A3.4/A3.5) это всегда значения из белого списка
+        //    (ship/drones/pet10; lasers/generators/heavy_guns/extras/EQ/EQ2/design);
+        //    здесь добавлена runtime-проверка whitelist.
+        //  - delFromDb() при неудачном execute() возвращает NULL (не false).
+        //  - checkInput(): ветка heavy_guns пишет allowed['heavy_guns'] (фиктивный
+        //    ключ вместо $key) — баг оригинала сохранён; ветка extras пишет
+        //    allowed[lootId] вместо allowed[$key]; default-ветка возвращает
+        //    items как disallowed без ключей-порядка ('allowed' остаётся пустым).
+        //  - extrasExits(): «KAN IKKE HUSKE HVAD JEG GIK IGANG MED HER!» — метод
+        //    ничего не возвращает (собирает $extras и бросает); портирован как no-op
+        //    с сохранением побочного init().
+        // ------------------------------------------------------------------
+
+        /// <summary>private addToDB($arrays, $target, $what, $drone_id = NULL).</summary>
+        private string AddToDb(List<object> arrays, string target, string what, object droneId = null)
+        {
+            var array = DistinctKeepKeys(arrays);
+            foreach (var vln in array)
+            {
+                if (!CheckItemsOwnerShip(vln))
+                {
+                    return ErrorTrans("Do NOT cheat!");
+                }
+            }
+
+            string imp = what == "design"
+                ? Convert.ToString(array.Count > 0 ? array[0] : "", CultureInfo.InvariantCulture)
+                : string.Join("|", array.Select(x => Convert.ToString(x, CultureInfo.InvariantCulture)));
+
+            bool toDrone = PT("to", "target") == "drone";
+            AssertColumn(target, AllowedTargets, "target");
+            AssertColumn(what, AllowedWhatColumns, "what");
+
+            string sql = toDrone
+                ? "UPDATE server_1_hangar_config_" + target + " SET " + what + "=@imp WHERE playerID=@playerID && hangarID=@hangarID && item_id=@item_id"
+                : "UPDATE server_1_hangar_config_" + target + " SET " + what + "=@imp WHERE playerID=@playerID && hangarID=@hangarID && configNum=@configNum";
+
+            int affected;
+            if (toDrone)
+            {
+                object itemId = (droneId != null && !IsEmpty(droneId))
+                    ? droneId
+                    : PGetNested("to", "droneId");
+                affected = Execute(sql, Kv("@imp", imp), Kv("@playerID", _pid),
+                                   Kv("@hangarID", PLong(PP("hi"))), Kv("@item_id", itemId));
+            }
+            else
+            {
+                affected = Execute(sql, Kv("@imp", imp), Kv("@playerID", _pid),
+                                   Kv("@hangarID", PLong(PP("hi"))),
+                                   Kv("@configNum", PGetNested("to", "configId")));
+            }
+            if (affected >= 0) return CompleteTrans(null, 1);
+            return ErrorTrans("Something went wrong!");
+        }
+
+        /// <summary>private delFromDb($array, $target, $what) — true при успехе, иначе null.</summary>
+        private bool? DelFromDb(List<object> array, string target, string what)
+        {
+            string imp = string.Join("|", array.Select(x => Convert.ToString(x, CultureInfo.InvariantCulture)));
+
+            bool fromDrone = PT("from", "target") == "drone";
+            AssertColumn(target, AllowedTargets, "target");
+            AssertColumn(what, AllowedWhatColumns, "what");
+
+            string sql = fromDrone
+                ? "UPDATE server_1_hangar_config_" + target + " SET " + what + "=@imp WHERE playerID=@playerID && hangarID=@hangarID && item_id=@item_id"
+                : "UPDATE server_1_hangar_config_" + target + " SET " + what + "=@imp WHERE playerID=@playerID && hangarID=@hangarID && configNum=@configNum";
+
+            int affected;
+            if (fromDrone)
+            {
+                affected = Execute(sql, Kv("@imp", imp), Kv("@playerID", _pid),
+                                   Kv("@hangarID", PLong(PP("hi"))),
+                                   Kv("@item_id", PGetNested("from", "droneId")));
+            }
+            else
+            {
+                affected = Execute(sql, Kv("@imp", imp), Kv("@playerID", _pid),
+                                   Kv("@hangarID", PLong(PP("hi"))),
+                                   Kv("@configNum", PGetNested("from", "configId")));
+            }
+            if (affected >= 0) return true;
+            return null; // PHP: нет return в else -> NULL
+        }
+
+        private static readonly HashSet<string> AllowedTargets =
+            new HashSet<string> { "ship", "drones", "pet10" };
+        private static readonly HashSet<string> AllowedWhatColumns =
+            new HashSet<string> { "lasers", "generators", "heavy_guns", "extras", "protocols", "EQ", "EQ2", "design" };
+
+        private static void AssertColumn(string value, HashSet<string> whitelist, string name)
+        {
+            if (value == null || !whitelist.Contains(value))
+                throw new ArgumentException("Illegal inventory config column: " + name);
+        }
+
+        /// <summary>array_unique по строковому представлению, первые позиции/ключи сохраняются.</summary>
+        private static List<object> DistinctKeepKeys(List<object> arr)
+        {
+            var seen = new HashSet<string>();
+            var res = new List<object>();
+            foreach (var v in arr)
+            {
+                string s = Convert.ToString(v, CultureInfo.InvariantCulture);
+                if (seen.Add(s)) res.Add(v);
+            }
+            return res;
+        }
+
+        /// <summary>PHP empty() для scalar-значений из json (null/""/0/"0"/false).</summary>
+        protected static bool IsEmpty(object o)
+        {
+            if (o == null) return true;
+            if (o is bool) return !(bool)o;
+            string s = Convert.ToString(o, CultureInfo.InvariantCulture);
+            return s == "" || s == "0" || s == "false";
+        }
+
+        /// <summary>
+        /// private checkInput($what) — валидация предметов по типу сервер_shop_items.
+        /// Возвращает {"allowed":{...}, "disallowed":{...}} (ключи — как в PHP, см.
+        /// замечания про фиктивные ключи heavy_guns/extras).
+        /// </summary>
+        private Dictionary<string, Dictionary<string, object>> CheckInput(string what)
+        {
+            var re = new Dictionary<string, Dictionary<string, object>>
+            {
+                { "disallowed", new Dictionary<string, object>() },
+                { "allowed", new Dictionary<string, object>() },
+            };
+            var items = PItems(); // params->from->items
+            if (what == "heavy_guns")
+            {
+                foreach (var kv in items)
+                {
+                    var result = Query(@"SELECT * FROM server_1_player_all_items
+                                         INNER JOIN server_shop_items ON server_1_player_all_items.lootid=server_shop_items.lootId
+                                         WHERE server_shop_items.type=1 && server_1_player_all_items.id = @id",
+                                       Kv("@id", kv.Value));
+                    if (result.Count > 0) re["allowed"]["heavy_guns"] = kv.Value; // баг оригинала: фиктивный ключ
+                    else re["disallowed"][kv.Key] = kv.Value;
+                }
+            }
+            else if (what == "lasers")
+            {
+                foreach (var kv in items)
+                {
+                    var result = Query(@"SELECT * FROM server_1_player_all_items
+                                         INNER JOIN server_shop_items ON server_1_player_all_items.lootid=server_shop_items.lootId
+                                         WHERE server_shop_items.type=0 && server_1_player_all_items.id = @id",
+                                       Kv("@id", kv.Value));
+                    if (result.Count > 0) re["allowed"][kv.Key] = kv.Value;
+                    else re["disallowed"][kv.Key] = kv.Value;
+                }
+            }
+            else if (what == "generators")
+            {
+                foreach (var kv in items)
+                {
+                    var result = Query(@"SELECT * FROM server_1_player_all_items
+                                         INNER JOIN server_shop_items ON server_1_player_all_items.lootid=server_shop_items.lootId
+                                         WHERE server_1_player_all_items.id = @id AND (server_shop_items.type=3 OR server_shop_items.type=4)",
+                                       Kv("@id", kv.Value));
+                    if (result.Count > 0) re["allowed"][kv.Key] = kv.Value;
+                    else re["disallowed"][kv.Key] = kv.Value;
+                }
+            }
+            else if (what == "extras")
+            {
+                foreach (var kv in items)
+                {
+                    var result = Query(@"SELECT * FROM server_1_player_all_items
+                                         INNER JOIN server_shop_items ON server_1_player_all_items.lootid=server_shop_items.lootId
+                                         WHERE server_1_player_all_items.id = @id AND (server_shop_items.type=7 OR server_shop_items.type=8 OR server_shop_items.type=9 OR server_shop_items.type=10 OR server_shop_items.type=11)",
+                                       Kv("@id", kv.Value));
+                    if (result.Count > 0) re["allowed"][GetStr(result[0], "lootId")] = kv.Value;
+                    else re["disallowed"][kv.Key] = kv.Value;
+                }
+            }
+            else
+            {
+                foreach (var kv in items) re["disallowed"][kv.Key] = kv.Value;
+            }
+            return re;
+        }
+
+        /// <summary>params-&gt;from-&gt;items как упорядоченные пары (ключ=>значение).</summary>
+        private List<KeyValuePair<string, object>> PItems()
+        {
+            var res = new List<KeyValuePair<string, object>>();
+            var from = PGet("from") as IDictionary<string, object>;
+            object itemsObj;
+            if (from == null || !from.TryGetValue("items", out itemsObj) || itemsObj == null) return res;
+            var dict = itemsObj as IDictionary<string, object>;
+            if (dict != null)
+            {
+                foreach (var kv in dict) res.Add(new KeyValuePair<string, object>(kv.Key, kv.Value));
+                return res;
+            }
+            var list = itemsObj as System.Collections.IEnumerable;
+            if (list != null)
+            {
+                int i = 0;
+                foreach (var v in list) res.Add(new KeyValuePair<string, object>(i.ToString(CultureInfo.InvariantCulture), v));
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// private extrasExits() — незавершённый метод оригинала («KAN IKKE HUSKE...»):
+        /// перезагружает init(), собирает lootIds экипированных предметов и ничего не
+        /// возвращает. Портирован как no-op с сохранением побочного эффекта init().
+        /// </summary>
+        private void ExtrasExits()
+        {
+            _equipment = Init();
+            // conf/hi/extras в оригинале вычисляются и выбрасываются — сохранено как комментарий:
+            // var conf = PT("to", "configId"); var hi = PP("hi");
+        }
+
+        // ------------------------------------------------------------------
         // helpers доступа к params (json_decode-структура submitParams)
         // ------------------------------------------------------------------
 
@@ -586,6 +815,23 @@ namespace DarkSpace
         protected static string TrimNum(double d)
         {
             return d.ToString("0", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>params-&gt;$key1-&gt;$key2 (вложенный объект) как строка ('' если нет).</summary>
+        private string PT(string key1, string key2)
+        {
+            var inner = PGet(key1) as IDictionary<string, object>;
+            object o;
+            return inner != null && inner.TryGetValue(key2, out o) && o != null
+                ? Convert.ToString(o, CultureInfo.InvariantCulture) : "";
+        }
+
+        /// <summary>params-&gt;$key1-&gt;$key2 (вложенный объект) как raw value.</summary>
+        private object PGetNested(string key1, string key2)
+        {
+            var inner = PGet(key1) as IDictionary<string, object>;
+            object o;
+            return inner != null && inner.TryGetValue(key2, out o) ? o : null;
         }
 
         private object PGet(string key)
