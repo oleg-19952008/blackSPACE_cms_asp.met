@@ -93,6 +93,7 @@
     <Compile Include="App_Code\SessionManager.cs" />
     <Compile Include="App_Code\Signup.cs" />
     <Compile Include="App_Code\Inventory.cs" />
+    <Compile Include="App_Code\Shop.cs" />
     <Compile Include="App_Code\Skylab.cs" />
     <Compile Include="App_Code\TemplateManager.cs" />
     <Compile Include="App_Code\Unity.cs" />
