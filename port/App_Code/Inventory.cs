@@ -43,13 +43,15 @@ namespace DarkSpace
         private int _hasPet;                         // 0/1 (в PHP не инициализирован -> null/false)
         private object _params;                      // результат json_decode(submitParams)
         private Dictionary<string, object> _json;    // результат init()
-        private object _equipment;
+        private object _equipment;      // Eq-обёртка (см. class Eq) либо null
+        private bool _equipmentIsEmpty = true;
         private int _totalSlots;
         private object _pie;
         private bool _droneEquip = false;
         private object _cpuslot;
         private bool _cpuFilled = false;
         private object _s;
+        private long SCount { get { return ParseLong(Str(_s)); } } // PHP: null → 0 при сравнении/цикле
         private object _cuCpu = null;
 
         /* Constructor does everything that needs to be done at every load */
@@ -164,7 +166,7 @@ namespace DarkSpace
         /// $ret==2 → {"isError":0,"data":{"ret":[...$m]}}; $ret==1 → ret:1; иначе ret:0.
         /// При $update != null добавляется data.update.slotCpuMove = values($m).
         /// </summary>
-        protected string CompleteTrans(IEnumerable<Dictionary<string, object>> m, int ret, object update = null)
+        protected string CompleteTrans(IEnumerable<object> m, int ret, object update = null)
         {
             var data = new Dictionary<string, object>();
             var jsn = new Dictionary<string, object>
@@ -174,7 +176,7 @@ namespace DarkSpace
             };
             if (ret == 2)
             {
-                data["ret"] = new List<Dictionary<string, object>>(m);
+                data["ret"] = m == null ? new List<object>() : new List<object>(m);
             }
             else if (ret == 1)
             {
@@ -189,7 +191,7 @@ namespace DarkSpace
             {
                 data["update"] = new Dictionary<string, object>
                 {
-                    { "slotCpuMove", new List<Dictionary<string, object>>(m) },
+                    { "slotCpuMove", m == null ? new List<object>() : new List<object>(m) },
                 };
             }
             return Encode(jsn);
@@ -787,7 +789,11 @@ namespace DarkSpace
         /// </summary>
         private void ExtrasExits()
         {
-            _equipment = Init();
+            // PHP: $this->equipment = self::init(); — там init() возвращает массив, а
+            // последующие $this->equipment->... в незавершённом методе оригинала всё равно
+            // не используются (мёртвый код после цикла). Здесь сохраняем только побочный
+            // эффект перезагрузки _json.
+            Init();
             // conf/hi/extras в оригинале вычисляются и выбрасываются — сохранено как комментарий:
             // var conf = PT("to", "configId"); var hi = PP("hi");
         }
@@ -934,7 +940,7 @@ namespace DarkSpace
         /// <summary>private fullSystemCheck($what, $target, $equipment) — хватает ли места в целевом слотсете.</summary>
         private bool FullSystemCheck(string what, string target, Eq eq)
         {
-            ShipSpace(what, target, eq, null); // $s — вычисляется и не используется (как в PHP)
+            _s = ShipSpace(what, target, eq, null); // $s — вычисляется и не используется (как в PHP)
             if (target == "drones")
             {
                 object id;
@@ -985,7 +991,7 @@ namespace DarkSpace
                 {
                     ExtrasExits(); // if (!self::extrasExits()) {} — return закомментирован в оригинале
                 }
-                long s = ShipSpace(what, target, eq, null);
+                long s = _s = ShipSpace(what, target, eq, null);
                 if (o < s)
                 {
                     if (what == "extras")
@@ -1109,7 +1115,7 @@ namespace DarkSpace
         /// <summary>private NotEmptyDrone(...) — дроновый слотсет уже занят.</summary>
         private string NotEmptyDrone(List<Dictionary<string, string>> result, string what, string target, Eq eq)
         {
-            long s = ShipSpace(what, target, eq, null);
+            long s = _s = ShipSpace(what, target, eq, null);
             var pos = PFromItemsValues();
             string cur = result.Count > 0 ? GetStr(result[0], what) : "";
             if (cur.Contains("|"))
@@ -1140,7 +1146,7 @@ namespace DarkSpace
         private string EmptyDrone(string what, string target, Eq eq)
         {
             var pos = PFromItemsValues();
-            long s = ShipSpace(what, target, eq, null);
+            long s = _s = ShipSpace(what, target, eq, null);
             var pie = new List<object>();
             long k = pos.Count;
             if (k >= s)
@@ -1176,7 +1182,7 @@ namespace DarkSpace
                 pos = PFromItemsValues();
                 k = pos.Count;
             }
-            long s = ShipSpace(what, target, eq, null);
+            long s = _s = ShipSpace(what, target, eq, null);
             var items = PFromItems();
             string cur = result.Count > 0 ? GetStr(result[0], what) : "";
             if (cur.Contains("|"))
@@ -1252,7 +1258,7 @@ namespace DarkSpace
                 pos = PFromItemsValues();
                 k = pos.Count;
             }
-            long s = ShipSpace(what, target, eq, null);
+            long s = _s = ShipSpace(what, target, eq, null);
             var pie = new List<object>();
             var items = PFromItems();
             if (k >= s)
@@ -1438,7 +1444,7 @@ namespace DarkSpace
                 }
                 foreach (var entry in unique)
                 {
-                    ShipSpace(what, target, eq, entry.Key); // $s — не используется (как в PHP)
+                    _s = ShipSpace(what, target, eq, entry.Key); // $this->s в оригинале присваивается ($s = self::shipspace(...))
                     AssertColumn(target, AllowedTargets, "target");
                     AssertColumn(what, AllowedWhatColumnsExt, "what");
                     var result = Query("SELECT " + what + " FROM server_1_hangar_config_" + target +
@@ -1564,7 +1570,7 @@ namespace DarkSpace
                                             {
                                                 // $this->s не инициализировано (PHP: null → 0)
                                                 var left = new List<object>();
-                                                for (long n = 0; n < _sCount; n++)
+                                                for (long n = 0; n < SCount; n++)
                                                     left.Add(PieAt(pie, n)); // undefined index → null
                                                 pie = ArrayDiffValues(pie, left);
                                                 pie.Add(iy.Value);
@@ -1623,21 +1629,20 @@ namespace DarkSpace
         }
 
         /// <summary>public editJson() — точка входа equip-транзакции (экипировка берётся из сессии).</summary>
-        public string EditJson()
+        public string EditJson(HttpSessionState session)
         {
             GC.KeepAlive(_copyright); // no-op guard оригинала
-            var sessionEq = SessionManager.Get("EQ") as string;
-            if (_equipment != null && !_equipmentIsEmpty)
+            // PHP: if (isset($this->equipment) && !empty($this->equipment)) {} else { $this->equipment = $_SESSION['EQ']; }
+            // В реальном рантайме flashAPI/inventory.php на action=move НЕ вызывает init(),
+            // поэтому _equipment всегда пуст → берём base64(JSON) из $_SESSION['EQ'].
+            var eqWrap = _equipment as Eq;
+            if (eqWrap == null || eqWrap.Dyn == null)
             {
-                // оборудование уже загружено (например, через ExtrasExits)
+                var sessionEq = session != null ? session["EQ"] as string : null;
+                eqWrap = sessionEq != null ? Eq.FromBase64Json(sessionEq) : new Eq(null);
+                _equipment = eqWrap;
             }
-            else
-            {
-                // PHP: $this->equipment = new stdClass(); затем = $_SESSION['EQ'];
-                _equipment = sessionEq != null ? Eq.FromBase64Json(sessionEq) : new Eq(null);
-                _equipmentIsEmpty = sessionEq == null;
-            }
-            return CheckInConfig((Eq)_equipment);
+            return CheckInConfig(eqWrap);
         }
 
         /// <summary>private checkInConfig() — запрет экипировки предмета, уже стоящего в целевой раскладке.</summary>
@@ -1798,9 +1803,17 @@ namespace DarkSpace
                 return l;
             }
 
-            public Eq MapLootIds() { return new Eq(((IDictionary<string, object>)null) ?? AsMap(this["data"]["map"]["lootIds"])); }
+            public Eq MapLootIds() { return this["data"]["map"]["lootIds"]; }
 
-            private static object AsMap(Eq e) { return e != null ? e.Dyn : null; }
+            /// <summary>PHP-ассоциативное представление узла (пустой словарь если не dict).</summary>
+            public IDictionary<string, object> D
+            {
+                get
+                {
+                    var d = Dyn as IDictionary<string, object>;
+                    return d ?? new Dictionary<string, object>();
+                }
+            }
 
             public List<Eq> Items
             {
@@ -1823,14 +1836,18 @@ namespace DarkSpace
                 return hangs[0]["config"][conf][target];
             }
 
-            /// <summary>data.map.lootIds[$vr-&gt;L]</summary>
+            /// <summary>data.map.lootIds[$vr-&gt;L] — PHP $lids[$ve-&gt;L].</summary>
             public string LootId(Eq vr)
             {
                 var ids = this["data"]["map"]["lootIds"];
                 var d = ids.Dyn as IDictionary<string, object>;
-                object o;
-                if (d != null && d.TryGetValue(Str(vr["I"] != null ? vr["Dyn"] : vr["Dyn"]), out o)) return null;
-                if (d != null && d.TryGetValue(Str(vr["L"].Dyn), out o)) return Convert.ToString(o, CultureInfo.InvariantCulture);
+                if (d != null)
+                {
+                    object o;
+                    if (d.TryGetValue(Str(vr["L"].Dyn), out o))
+                        return Convert.ToString(o, CultureInfo.InvariantCulture);
+                    return null; // PHP undefined index → null
+                }
                 var l = ids.Dyn as Newtonsoft.Json.Linq.JArray;
                 if (l != null)
                 {
