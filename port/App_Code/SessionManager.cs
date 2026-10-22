@@ -55,6 +55,35 @@ namespace DarkSpace
         }
 
         /// <summary>
+        /// $_SESSION['Upgradeings'][$itemID]['success'] — written by base::upgradeItem(),
+        /// read back by the upgrade UI on the next request. Stored as a serialized map.
+        /// </summary>
+        private const string KeyUpgradeings = "Upgradeings";
+
+        public static void SetUpgradeSuccess(HttpSessionState s, string itemId, int success)
+        {
+            var map = GetUpgradeings(s);
+            map[itemId] = success;
+            s[KeyUpgradeings] = Newtonsoft.Json.JsonConvert.SerializeObject(map);
+        }
+
+        public static System.Collections.Generic.Dictionary<string, int> GetUpgradeings(HttpSessionState s)
+        {
+            string json = s[KeyUpgradeings] as string;
+            if (string.IsNullOrEmpty(json))
+                return new System.Collections.Generic.Dictionary<string, int>();
+            try
+            {
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<System.Collections.Generic.Dictionary<string, int>>(json)
+                       ?? new System.Collections.Generic.Dictionary<string, int>();
+            }
+            catch (Newtonsoft.Json.JsonException)
+            {
+                return new System.Collections.Generic.Dictionary<string, int>();
+            }
+        }
+
+        /// <summary>
         /// Init.php: str_replace(['<','>',"'","\u2018","'",'\\'], ['&lt;','&gt;','&quot;','&#39;','&#92;'], $arr)
         /// Applied to every POST/GET value before business logic runs.
         /// </summary>
