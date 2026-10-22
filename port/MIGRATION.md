@@ -40,6 +40,11 @@ Templates `FILES/GLOBALS/*/header|body.php` → Master Pages + .aspx,
 проверка css/js/resources/webfonts/swf_global, rewrite-политика (чистые URL убраны — см. комментарий в Web.config),
 настройка IIS/Application Pool, приёмочное тестирование, удаление PHP-наследия.
 
+## Детальный план по кускам
+См. [PORTING-PLAN.md](PORTING-PLAN.md) — разбивка миграции на атомарные коммиты
+(целые небольшие классы либо группы методов огромных классов: Clan, Skylab, Inventory, Shop, Rank, GalaxyGate),
+ветки диспетчера `internal.aspx` и шаблоны Body с указанием строк оригинала и зависимостей.
+
 ## Известные расхождения / техдолг
 - ECB + IV в начале ciphertext унаследован из PHP для совместимости с уже записанными pwHash;
   после сброса паролей пользователей мигрировать на AES-CBC/GCM.
