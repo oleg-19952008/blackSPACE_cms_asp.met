@@ -373,7 +373,249 @@ namespace DarkSpace
         }
 
         // ------------------------------------------------------------------
-        // Заглушки методов, подключаемых следующими кусками A3.2–A3.6, чтобы
+        // A3.2 Продажа (Class.inventory.php, строки 178–372): renamePet/setName,
+        // cashOut, checkDB, sell, checkItemsOwnerShip, DelDrone/sellDrone,
+        // wipeDrone/wipeConfigs, changeShipModel.
+        //
+        // PHP-замечания, сохранённые при переносе:
+        //  - renamePet(): условие «if ($left > 0)» в оригинале инвертировано — при
+        //    ДОСТАТОЧНЫХ средствах пишется «Renaming pet failed» и возвращается
+        //    ошибка; при НЕдостаточных — списание 3000 uri. Дефект сохранён 1:1.
+        //  - cashOut(): ветка scd=='u' обновляет колонку credits значением
+        //    (uri+$price) («SET credits = (uri+$price)») — баг оригинала сохранён.
+        //  - sell(): !empty($tran) OR $tran != NULL для int эквивалентно $tran != null.
+        //  - wipeDrone()/wipeConfigs()/changeShipModel() обращаются к
+        //    params->params->hi (вложенный объект); при отсутствии — PHP notice →
+        //    null → bindParam(0). Здесь PLong(PP("hi")) даёт 0 — эквивалентно.
+        // ------------------------------------------------------------------
+
+        /// <summary>public renamePet() — переименование пета за 3000 уридия.</summary>
+        public string RenamePet()
+        {
+            var newName = PS("name");
+            long left = PLong(GetOrEmpty(_money, "uridium")) - 3000;
+            if (left > 0) // инвертированный дефект оригинала — см. замечания
+            {
+                DB.Pmc(_pid, "Renaming pet failed", "error");
+                return ErrorTrans("You do not have uridium enough!");
+            }
+            else
+            {
+                if (Execute("UPDATE server_1_players SET uri = (uri-3000) WHERE playerID=@playerID",
+                            Kv("@playerID", _pid)) >= 0)
+                {
+                    DB.Pmc(_pid, "-3000 uridium | pet renamed", "uridium");
+                    return SetName(newName);
+                }
+                return ErrorTrans("Something went wrong");
+            }
+        }
+
+        /// <summary>private setName($name) — UPDATE pet_name у пета игрока.</summary>
+        private string SetName(string name)
+        {
+            if (Execute("UPDATE server_1_player_pet10 SET pet_name = @name WHERE playerID=@playerID",
+                        Kv("@name", name), Kv("@playerID", _pid)) >= 0)
+            {
+                DB.Pmc(_pid, "Pet name changed to: " + name, "equipment");
+                return CompleteTrans(null, 1);
+            }
+            return ErrorTrans("Something went wrong");
+        }
+
+        /// <summary>
+        /// private cashOut($itemId, $q) — зачисление денег от продажи.
+        /// Возвращает true/false как PHP.
+        /// </summary>
+        private bool CashOut(object itemId, object q)
+        {
+            var result = Query(@"SELECT * FROM server_1_player_all_items
+                                 INNER JOIN server_shop_items ON server_1_player_all_items.lootid=server_shop_items.lootid
+                                 WHERE server_1_player_all_items.id = @id",
+                               Kv("@id", itemId));
+            var row = result.Count > 0 ? result[0] : new Dictionary<string, string>();
+            double price = ParseDouble(GetStr(row, "sell")) * ParseDouble(Convert.ToString(q, CultureInfo.InvariantCulture));
+            string priceS = TrimNum(price); // PHP "$price" из int*int всегда целое
+            string scd = GetStr(row, "scd");
+            if (scd == "c")
+            {
+                DB.Pmc(_pid, "+" + priceS + " credits | sold " + q + " x " + itemId, "credits");
+                return Execute("UPDATE server_1_players SET credits = (credits+" + priceS + ") WHERE playerID=@playerID",
+                               Kv("@playerID", _pid)) >= 0;
+            }
+            else if (scd == "u")
+            {
+                DB.Pmc(_pid, "+" + priceS + " uridium | sold " + q + " x " + itemId, "uridium");
+                // баг оригинала: SET credits = (uri+$price)
+                return Execute("UPDATE server_1_players SET credits = (uri+" + priceS + ") WHERE playerID=@playerID",
+                               Kv("@playerID", _pid)) >= 0;
+            }
+            else
+            {
+                DB.Pmc(_pid, "+" + priceS + " credits | sold " + q + " x " + itemId, "credits");
+                return Execute("UPDATE server_1_players SET credits = (credits+" + priceS + ") WHERE playerID=@playerID",
+                               Kv("@playerID", _pid)) >= 0;
+            }
+        }
+
+        /// <summary>private checkDB($id) — количество Q предмета у игрока.</summary>
+        private long CheckDb(object id)
+        {
+            var result = Query("SELECT Q FROM server_1_player_all_items WHERE playerID=@playerID && id=@id",
+                               Kv("@playerID", _pid), Kv("@id", id));
+            return result.Count > 0 ? ParseLong(GetStr(result[0], "Q")) : 0;
+        }
+
+        /// <summary>public sell($tran = NULL) — продажа предмета (с проверкой владельца).</summary>
+        public string Sell(int? tran = null)
+        {
+            var itemID = PGet("itemId");
+            if (CheckItemsOwnerShip(itemID))
+            {
+                var q = PGet("quantity");
+                if (!IsNumeric(q))
+                {
+                    return ErrorTrans("Something went wrong!");
+                }
+                else
+                {
+                    long pq = CheckDb(itemID);
+                    long ql = ParseLong(Convert.ToString(q, CultureInfo.InvariantCulture));
+                    if (ql > pq) ql = pq;
+                    string qs = Convert.ToString(ql, CultureInfo.InvariantCulture);
+                    if (Execute("UPDATE server_1_player_all_items SET Q = (Q -" + qs + ") WHERE id = @id",
+                                Kv("@id", itemID)) >= 0)
+                    {
+                        CashOut(itemID, ql);
+                        if (tran != null)
+                            return CheckMinus(Convert.ToString(itemID, CultureInfo.InvariantCulture), tran);
+                        return CheckMinus(Convert.ToString(itemID, CultureInfo.InvariantCulture));
+                    }
+                    return ErrorTrans("Something went wrong!");
+                }
+            }
+            return ErrorTrans("Cheating is no allowed!"); // орфография оригинала
+        }
+
+        /// <summary>private checkItemsOwnerShip($itemID) — предмет принадлежит игроку?</summary>
+        private bool CheckItemsOwnerShip(object itemID)
+        {
+            var result = Query("SELECT id FROM server_1_player_all_items WHERE id=@id && playerID=@playerID",
+                               Kv("@id", itemID), Kv("@playerID", _pid));
+            return result.Count > 0;
+        }
+
+        /// <summary>private DelDrone($itemID) — удаление дрона из всех конфигов.</summary>
+        private void DelDrone(object itemID)
+        {
+            Execute("DELETE FROM server_1_hangar_config_drones WHERE item_id = @id", Kv("@id", itemID));
+        }
+
+        /// <summary>public sellDrone() — продажа дрона: чистит статы/конфиги, затем sell(2).</summary>
+        public string SellDrone()
+        {
+            var itemID = PGet("itemId");
+            if (CheckItemsOwnerShip(itemID))
+            {
+                Execute("DELETE FROM server_1_player_drones WHERE item_sale_id = @id", Kv("@id", itemID));
+                DelDrone(itemID);
+                return Sell(2);
+            }
+            return ErrorTrans("Cheating is no allowed!");
+        }
+
+        /// <summary>private wipeDrone($drone) — очистка колонки EQ/EQ2+design конфига дронов.</summary>
+        private string WipeDrone(string drone)
+        {
+            // $drone — внутреннее имя колонки из whitelist ('EQ'|'EQ2')
+            string sqli = "UPDATE server_1_hangar_config_drones SET " + drone + " = '', design = '' WHERE ";
+            sqli += "playerID=@playerID && hangarID=@hangarID";
+            if (Execute(sqli, Kv("@playerID", _pid), Kv("@hangarID", PLong(PP("hi")))) >= 0)
+            {
+                return CompleteTrans(null, 1);
+            }
+            return ErrorTrans("Something went wrong!");
+        }
+
+        /// <summary>public wipeConfigs() — сброс ship-конфига и drone-конфига выбранной раскладки.</summary>
+        public string WipeConfigs()
+        {
+            string drone = PLong(PGet("configID")) == 1 ? "EQ" : "EQ2";
+            string sqli = "UPDATE server_1_hangar_config_ship AS s SET s.lasers = '', s.generators = '', s.heavy_guns = '', s.extras = '' WHERE ";
+            sqli += " s.playerID=@playerID && s.configNum=@configNum && s.hangarID=@hangarID";
+            if (Execute(sqli, Kv("@playerID", _pid), Kv("@configNum", PGet("configID")),
+                        Kv("@hangarID", PLong(PP("hi")))) >= 0)
+            {
+                return WipeDrone(drone);
+            }
+            return ErrorTrans("Something went wrong!");
+        }
+
+        /// <summary>public changeShipModel() — смена выбранной модели корабля в ангаре.</summary>
+        public string ChangeShipModel()
+        {
+            if (Execute("UPDATE server_1_player_hangar_general_ship SET ship_selected_model=@shipmodel WHERE playerID=@playerID && hangarID=@hangarID",
+                        Kv("@shipmodel", PS("lootId")), Kv("@playerID", _pid),
+                        Kv("@hangarID", PLong(PP("hi")))) >= 0)
+            {
+                return CompleteTrans(null, 1);
+            }
+            return ErrorTrans("Something went wrong!");
+        }
+
+        // ------------------------------------------------------------------
+        // helpers доступа к params (json_decode-структура submitParams)
+        // ------------------------------------------------------------------
+
+        protected static bool IsNumeric(object o)
+        {
+            if (o == null) return false;
+            double d;
+            return double.TryParse(Convert.ToString(o, CultureInfo.InvariantCulture),
+                                   NumberStyles.Any, CultureInfo.InvariantCulture, out d);
+        }
+
+        /// <summary>PHP-совместимый парсинг double ('' / мусор -> 0).</summary>
+        protected static double ParseDouble(string s)
+        {
+            double d;
+            return double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out d) ? d : 0;
+        }
+
+        /// <summary>Целочисленное представление числа для конкатенации в SQL/строки (PHP (string)int).</summary>
+        protected static string TrimNum(double d)
+        {
+            return d.ToString("0", CultureInfo.InvariantCulture);
+        }
+
+        private object PGet(string key)
+        {
+            var d = _params as IDictionary<string, object>;
+            object o;
+            return d != null && d.TryGetValue(key, out o) ? o : null;
+        }
+
+        private string PS(string key)
+        {
+            object o = PGet(key);
+            return o == null ? "" : Convert.ToString(o, CultureInfo.InvariantCulture);
+        }
+
+        private long PLong(object o)
+        {
+            return o == null ? 0 : ParseLong(Convert.ToString(o, CultureInfo.InvariantCulture));
+        }
+
+        /// <summary>params-&gt;params-&gt;$key (вложенный объект).</summary>
+        private object PP(string key)
+        {
+            var inner = PGet("params") as IDictionary<string, object>;
+            object o;
+            return inner != null && inner.TryGetValue(key, out o) ? o : null;
+        }
+
+        // ------------------------------------------------------------------
+        // Заглушки методов, подключаемых следующими кусками A3.3–A3.6, чтобы
         // init() компилировался уже сейчас. Каждый следующий коммит заменяет
         // реализацию портом из Class.inventory.php.
         // ------------------------------------------------------------------
