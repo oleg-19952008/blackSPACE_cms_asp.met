@@ -340,6 +340,7 @@ namespace DarkSpace
 
             double total = 1.0;
             double pammo = total - 0.67;
+            double pspecial = total - 0.04; // PHP line 287: $pspecial = $total - 0.04;
             double pgate = total - 0.13;
             double presource = total - 0.12;
             double pvoucher = total - 0.03;

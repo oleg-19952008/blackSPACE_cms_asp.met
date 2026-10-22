@@ -134,7 +134,6 @@ namespace DarkSpace
             }
             return points;
         }
-
         /// <summary>rank::calculatePlayer($arg) — same but substr($key,4) ("ship11"→"11"), no skips.</summary>
         public static long CalculatePlayer(RankKillArg arg)
         {
@@ -165,19 +164,21 @@ namespace DarkSpace
 
         /// <summary>rank::getNpcInfo($arg) — loads ships.Id/Name/rankPoints for the collected
         /// npc ids and re-keys arg.npcINFO by Id. PHP built the IN list with implode("','") over
-        /// numeric ids — parameterized here (same result set).</summary>
+        /// numeric ids — parameterized here (same result set).
+        /// NOTE: PHP used PDO::FETCH_ASSOC → all row values are strings; C# MySqlDataReader
+        /// returns typed objects, so rows are stringified once on load for parity.</summary>
         private static RankKillArg GetNpcInfo(RankKillArg arg)
         {
             if (arg.NpcIds.Count == 0)
             {
-                arg.NpcInfo = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                arg.NpcInfo = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
                 return arg;
             }
             var names = arg.NpcIds.Select((id, idx) => "@n" + idx).ToArray();
             var ps = arg.NpcIds.Select((id, idx) => Kv("@n" + idx, id)).ToArray();
             var rows = Query(
                 "SELECT Id, Name, rankPoints FROM ships WHERE Id in (" + string.Join(",", names) + ")", ps);
-            var peer = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var peer = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
             foreach (var val in rows)
                 peer[Get(val, "Id")] = val;
             arg.NpcInfo = peer;
@@ -193,7 +194,7 @@ namespace DarkSpace
             if (rows.Count == 0) return null;
             var first = rows[0];
             first.Remove("playerID"); // unset($result[0]['playerID'])
-            var re = new RankKillArg { PlayerNpc = first, NpcInfo = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) };
+            var re = new RankKillArg { PlayerNpc = first, NpcInfo = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase) };
             foreach (var kv in first)
             {
                 // PHP condition ($key!="ship11" OR $key!="ship12" OR $key!="ship13") is always true
@@ -211,7 +212,7 @@ namespace DarkSpace
             if (rows.Count == 0) return null;
             var first = rows[0];
             first.Remove("playerID");
-            var re = new RankKillArg { PlayerNpc = first, NpcInfo = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) };
+            var re = new RankKillArg { PlayerNpc = first, NpcInfo = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase) };
             foreach (var kv in first)
                 re.NpcIds.Add(Substr(kv.Key, 3));
             return GetNpcInfo(re);
@@ -222,21 +223,14 @@ namespace DarkSpace
         // ------------------------------------------------------------------
 
         /// <summary>rank::cr_allplayers($fid) — number of players of a faction.
-        /// PHP: empty($fid) → falls through returning null; dead HTML tail dropped.</summary>
+        /// PHP: empty($fid) → falls through returning null; dead HTML tail dropped.
+        /// PDO rowCount() on a SELECT counts fetched rows — ported via COUNT(*).</summary>
         public long? CrAllplayers(long fid)
         {
             if (fid == 0) return null; // PHP !empty($fid) gate (0/null/false are empty)
-            long result;
-            using (var con = DB.GetInstance())
-            using (var cmd = new MySqlCommand("SELECT playerID FROM server_1_players WHERE factionId = @fid", con))
-            {
-                cmd.Parameters.AddWithValue("@fid", fid);
-                using (var rdr = cmd.ExecuteReader())
-                {
-                    result = rdr.Rows.Count > 0 ? rdr.Rows.Count : 0;
-                }
-            }
-            return result;
+            var rows = Query("SELECT COUNT(*) AS cnt FROM server_1_players WHERE factionId = @fid",
+                Kv("@fid", fid));
+            return rows.Count > 0 ? ToLong(rows[0]["cnt"]) : 0;
         }
 
         /// <summary>rank::ur_exp() — top-13 exp HTML rows (showuser attribute stays the
@@ -662,9 +656,9 @@ namespace DarkSpace
     /// gePlayerKills()/getNpcKill() and consumed by calculatePlayer()/calculateNpcs().</summary>
     public class RankKillArg
     {
-        public Dictionary<string, string> PlayerNpc;              // $arg['playerNPC'] — kill columns
-        public Dictionary<string, string> NpcInfo;                // $arg['npcINFO'] — id ⇒ ships row
-        public List<string> NpcIds = new List<string>();          // pre-getNpcInfo id list
+        public Dictionary<string, string> PlayerNpc;                          // $arg['playerNPC'] — kill columns
+        public Dictionary<string, Dictionary<string, string>> NpcInfo;        // $arg['npcINFO'] — id ⇒ ships row
+        public List<string> NpcIds = new List<string>();                      // pre-getNpcInfo id list
     }
 
     /// <summary>
