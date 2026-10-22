@@ -74,7 +74,7 @@ namespace DarkSpace
             catch { return 0; } // PHP (int)'abc' === 0
         }
 
-        internal static double ToDouble(object v)
+        public static double ToDouble(object v)
         {
             if (v == null || v == DBNull.Value) return 0;
             try { return Convert.ToDouble(v, System.Globalization.CultureInfo.InvariantCulture); }

@@ -23,6 +23,13 @@ namespace DarkSpace
             }
         }
 
+        /// <summary>Safe string getter for assoc rows (works for both &lt;string,string&gt; and &lt;string,object&gt; dictionaries).</summary>
+        public static string Str(IDictionary<string, string> d, string key)
+        {
+            string o;
+            return d != null && d.TryGetValue(key, out o) && o != null ? o : "";
+        }
+
         /// <summary>PHP json_encode(array('status'=>..,'message'=>..)) for AJAX error replies.</summary>
         public static string StatusMessage(string status, string message)
         {
