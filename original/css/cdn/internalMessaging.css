@@ -1,0 +1,1808 @@
+/* Base Container */
+/*#domessaging {
+    width: 803px;
+    position: relative;
+    top: 0;
+    left: 32px;
+    font-family: Arial;
+    font-size: 12px;
+}*/
+
+/* Base Element Definitions */
+#domessaging input, #domessaging textarea {
+    background-color: #1e272f;
+    border: 1px solid #303e4b;
+    color: white;
+    font-family: Arial;
+    font-size: 12px;
+}
+
+#domessaging input.error, #domessaging textarea.error {
+    border: 1px solid #8c1a25 !important;
+}
+
+#domessaging textarea {
+    color: #999999;
+}
+
+#domessaging .relative {
+    position: relative;
+}
+
+#domessaging .hidden {
+    display: none;
+}
+
+/* Loader */
+#domessaging #loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url(/do_img/global/messaging/loader.gif?__cv=742c828b59f24a779f6fb79f0806fc00);
+    background-position: center center;
+    background-repeat: no-repeat;
+    z-index: 13;
+}
+
+/* Basic Sprite Definitions */
+#domessaging .icon-add {
+    background-image: url(/do_img/global/messaging/sprites/add_icon_22x22.png?__cv=9e8d701e781154457b3d272216702600);
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    background-position: 0 -22px;
+}
+
+#domessaging .icon-add-rollover {
+    background-position: 0 -44px;
+}
+
+#domessaging .icon-add-click {
+    background-position: 0 -66px;
+}
+
+#domessaging .icon-add-disabled {
+    background-position: 0 0;
+    cursor: default;
+}
+
+#domessaging .icon-info {
+    background-image: url(/do_img/global/messaging/sprites/info_button_sprite_24x24.png?__cv=02f677de70aec6b4726320e7e2705200);
+    width: 24px;
+    height: 24px;
+    cursor: help;
+    background-position: 0 0;
+}
+
+#domessaging .icon-info-rollover {
+    background-position: -24px 0;
+}
+
+#domessaging .icon-info-click {
+    background-position: -48px 0;
+}
+
+#domessaging .icon-trash {
+    background-image: url(/do_img/global/messaging/sprites/trash_icon_22x22.png?__cv=05fa7a54bc39e3b751655148cfcbf100);
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+}
+
+#domessaging .icon-trash-rollover {
+    background-position: 0 -22px;
+}
+
+#domessaging .icon-trash-click {
+    background-position: 0 -44px;
+}
+
+#domessaging .icon-mail {
+    background-image: url(/do_img/global/messaging/sprites/mail_icon_29x19.png?__cv=aeaca3002d23a32afc0d7762152de900);
+    width: 29px;
+    height: 19px;
+    cursor: pointer;
+}
+
+#domessaging .icon-mail-rollover {
+    background-position: 0 -19px;
+}
+
+#domessaging .icon-mail-click {
+    background-position: 0 -38px;
+}
+
+#domessaging .icon-status {
+    background-image: url(/do_img/global/messaging/sprites/messaging_icons_20x20.png?__cv=44576321f4f2bde1ddfab85b54687000);
+    width: 20px;
+    height: 20px;
+}
+
+#domessaging .icon-status-read {
+    background-position: -20px;
+}
+
+#domessaging .icon-status-answered {
+    background-position: -40px;
+}
+
+#domessaging .icon-spam {
+    background-image: url(/do_img/global/messaging/sprites/spam_icon_22x22.png?__cv=4a400c34c41c2dbcec56f11410fc4600);
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+}
+
+#domessaging .icon-spam-rollover {
+    background-position: -22px;
+}
+
+#domessaging .icon-spam-click {
+    background-position: -44px;
+}
+
+#domessaging .icon-reply {
+    background-image: url(/do_img/global/messaging/sprites/reply_icons_22x15.png?__cv=48782c93bace602bbcb12cdca5ff2800);
+    width: 22px;
+    height: 15px;
+}
+
+#domessaging .icon-reply-note {
+    background-position: 0 0;
+}
+
+#domessaging .icon-reply-all {
+    background-position: 0 -15px;
+}
+
+#domessaging .icon-reply-forward {
+    background-position: 0 -30px;
+}
+
+#domessaging .button-dropdown {
+    background-image: url(/do_img/global/messaging/sprites/dropdown_sprite_157x22.png?__cv=53b3682e3b0a432fac93cf945d2a2f00);
+    width: 130px;
+    height: 18px;
+    cursor: pointer;
+    padding-left: 27px;
+    padding-top: 4px;
+    color: white;
+}
+
+#domessaging .button-dropdown-rollover {
+    background-position: 0 -22px;
+}
+
+#domessaging .button-dropdown-click {
+    background-position: 0 -44px;
+}
+
+#domessaging .button-close {
+    background-image: url(/do_img/global/messaging/sprites/close_button_sprite.png?__cv=fa1f7ef0f89ab04212dbf02f3424d700);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+#domessaging .button-close-rollover {
+    background-position: 0 -24px;
+}
+
+#domessaging .button-close-click {
+    background-position: 0 -48px;
+}
+
+#domessaging .button-close-disabled {
+    background-position: 0 -72px;
+    cursor: default;
+}
+
+#domessaging .button-red {
+    background-image: url(/do_img/global/messaging/sprites/button_red_130x19.png?__cv=933e7bee8c0230929af3d330b5f73300);
+    width: 130px;
+    height: 17px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 2px;
+}
+
+#domessaging .button-red-rollover {
+    background-position: 0 -19px;
+}
+
+#domessaging .button-red-click {
+    background-position: 0 -38px;
+}
+
+#domessaging .button-green {
+    background-image: url(/do_img/global/messaging/sprites/button_green_130x19.png?__cv=05a762486f76a0e3df37c93071a22300);
+    width: 130px;
+    height: 17px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 2px;
+}
+
+#domessaging .button-green-rollover {
+    background-position: 0 -19px;
+}
+
+#domessaging .button-green-click {
+    background-position: 0 -38px;
+}
+
+#domessaging .button-biggreen {
+    background: url(/do_img/global/messaging/sprites/button_sprite_180x32px.png?__cv=848179494d8463903f996de0971f8b00);
+    width: 180px;
+    height: 27px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 5px;
+}
+
+#domessaging .button-biggreen-rollover {
+    background-position: 0 -128px;
+}
+
+#domessaging .button-biggreen-click {
+    background-position: 0 -160px;
+}
+
+#domessaging .button-biggreen-disabled {
+    background-position: 0 -192px;
+    cursor: default;
+}
+
+#domessaging .button-cancel {
+    background-image: url(/do_img/global/messaging/sprites/button_sprite_180x32px.png?__cv=848179494d8463903f996de0971f8b00);
+    width: 180px;
+    height: 27px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 7px;
+}
+
+#domessaging .button-cancel-rollover {
+    background-position: 0 -32px;
+}
+
+#domessaging .button-cancel-click {
+    background-position: 0 -64px;
+}
+
+#domessaging .button-answer {
+    background-image: url(/do_img/global/messaging/sprites/answer_button_sprite_140x19.png?__cv=21b0463a2f35ed536aaa6c7d6eb8f900);
+    width: 140px;
+    height: 19px;
+}
+
+#domessaging .button-answer .label {
+    width: 89px;
+    height: 17px;
+    padding-left: 30px;
+    padding-top: 2px;
+    float: left;
+    text-align: left;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#domessaging .button-answer-rollover {
+    background-position: 0 -19px;
+}
+
+#domessaging .button-answer-click {
+    background-position: 0 -38px;
+}
+
+#domessaging .button-answer .triangle {
+    background-image: url(/do_img/global/messaging/sprites/answer_triangle_sprite_15x19.png?__cv=d2572fd1b531f8c40a76138164d9fd00);
+    background-position: 2px 0;
+    background-repeat: no-repeat;
+    width: 15px;
+    height: 19px;
+    float: left;
+    width: 21px;
+    height: 19px;
+}
+
+#domessaging .button-answer .triangle-rollover {
+    background-position: 2px -19px;
+}
+
+#domessaging .button-answer .triangle-click {
+    background-position: 2px -38px;
+}
+
+#domessaging .button-checkbox {
+    background-image: url(/do_img/global/messaging/sprites/checkbox_button_82x28.png?__cv=9b1088fd46bd21349a45a195042eec00);
+    width: 56px;
+    height: 22px;
+    cursor: pointer;
+    padding-left: 26px;
+    padding-top: 6px;
+    color: white;
+}
+
+#domessaging .button-checkbox-rollover {
+    background-position: 0 -28px;
+}
+
+#domessaging .button-checkbox-checked {
+    background-position: 0 -56px;
+}
+
+#domessaging .button-checkbox-checked-rollover {
+    background-position: 0 -84px;
+}
+
+#domessaging .button-left {
+    background-image: url(/do_img/global/messaging/sprites/left_26x22.png?__cv=10039baef85cd55a22f40d776be14600);
+    width: 26px;
+    height: 22px;
+    background-position: 0 -22px;
+    cursor: pointer;
+}
+
+#domessaging .button-left-rollover {
+    background-position: 0 -44px;
+}
+
+#domessaging .button-left-disabled {
+    background-position: 0 0;
+    cursor: default;
+}
+
+#domessaging .button-right {
+    background-image: url(/do_img/global/messaging/sprites/right_26x22.png?__cv=a9e546d685f9f6fe85daed9ca8430500);
+    width: 26px;
+    height: 22px;
+    background-position: 0 -22px;
+    cursor: pointer;
+}
+
+#domessaging .button-right-rollover {
+    background-position: 0 -44px;
+}
+
+#domessaging .button-right-disabled {
+    background-position: 0 0;
+    cursor: default;
+}
+
+#domessaging .button-blacklist {
+    background-image: url(/do_img/global/messaging/sprites/blacklist_button_130_28.png?__cv=6a5d1ddfdfabe9fcc1d305672f9c3500);
+    width: 130px;
+    height: 21px;
+    text-align: center;
+    padding-top: 7px;
+    font-weight: bold;
+    color: #eeeaea;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+#domessaging .button-blacklist-rollover {
+    background-position: 0 -28px;
+}
+
+#domessaging .button-blacklist-clicked {
+    background-position: 0 -56px;
+}
+
+#domessaging .checkbox {
+    background-image: url(/do_img/global/messaging/sprites/checkbox_sprite_18x19.png?__cv=2f690427bd5273120548c7a7fb640800);
+    width: 18px;
+    height: 19px;
+    cursor: pointer;
+}
+
+#domessaging .checkbox-rollover {
+    background-position: 0 -19px;
+}
+
+#domessaging .checkbox-checked {
+    background-position: 0 -38px;
+}
+
+#domessaging .checkbox-checked-rollover {
+    background-position: 0 -56px;
+}
+
+/* Frame */
+/*
+#domessaging #frame {
+    width: 803px;
+    border: 0;
+}
+
+#domessaging #frame .frame-top {
+    background-image: url(/do_img/global/messaging/frame/frame_top.jpg?__cv=88192ed3483133d36ad8622c02224000);
+    width: 803px;
+    height: 27px;
+}
+
+#domessaging #frame .frame-bottom {
+    background-image: url(/do_img/global/messaging/frame/frame_bottom.jpg?__cv=658b50ba65339ab9d948c5d83225ee00);
+    width: 803px;
+    height: 24px;
+}
+
+#domessaging #frame .frame-left, #domessaging #frame .frame-right {
+    width: 14px;
+    position: relative;
+}
+
+#domessaging #frame .frame-left {
+    background-image: url(/do_img/global/messaging/frame/frame_left_middle.jpg?__cv=eed7a9ce32383a88c87c413571a6a300);
+}
+
+#domessaging #frame .frame-right {
+    background-image: url(/do_img/global/messaging/frame/frame_right_middle.jpg?__cv=6fd125b83004bdbc427f7bffc0b1ed00);
+}
+
+#domessaging #frame .frame-left-top, #domessaging #frame .frame-left-bottom, #domessaging #frame .frame-right-top , #domessaging #frame .frame-right-bottom {
+    width: 14px;
+    height: 159px;
+    position: absolute;
+}
+
+#domessaging #frame .frame-left-top {
+    background-image: url(/do_img/global/messaging/frame/frame_left_top.jpg?__cv=6bc2db385a9f78384e0bca8599f0a900);
+    top: 0;
+}
+
+#domessaging #frame .frame-left-bottom {
+    background-image: url(/do_img/global/messaging/frame/frame_left_bottom.jpg?__cv=8e1278991decee27d3ea73ee15c0aa00);
+    bottom: 24px;
+}
+
+#domessaging #frame .frame-right-top {
+    background-image: url(/do_img/global/messaging/frame/frame_right_top.jpg?__cv=27eb8f51790e89d3dc89790895e75800);
+    top: 0;
+}
+
+#domessaging #frame .frame-right-bottom {
+    background-image: url(/do_img/global/messaging/frame/frame_right_bottom.jpg?__cv=08fc77ff6bd249fb86a58a096aeeff00);
+    bottom: 24px;
+}
+*/
+
+#domessaging {
+    background-color: #1d242c;
+}
+
+/* Sub-Nav */
+#domessaging #subNav_container {
+    position: absolute;
+    height: 25px;
+    left: 56px;
+    position: absolute;
+    top: 0;
+}
+
+#domessaging #subNav_container .tab {
+    background-image: url(/do_img/global/pilotSheet/profilePage/tab_inactive1.jpg?__cv=491773b46f05dd34c2ae423de5e95800);
+    background-repeat: no-repeat;
+    cursor: pointer;
+    float: left;
+    height: 25px;
+    width: 184px;
+    margin-right: 5px;
+    font-family: Verdana, Tahoma, sans-serif;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+#domessaging #subNav_container .tab div {
+    width: 184px;
+    text-align: center;
+    padding-top: 3px;
+}
+
+#domessaging #subNav_container .tab-rollover, #domessaging #subNav_container .tab-active {
+    background-image: url(/do_img/global/pilotSheet/profilePage/tab_active.jpg?__cv=af06774e97a98879d2b4cd781b350400);
+    color: black;
+}
+
+/* Real-Container */
+/*#domessaging #realContainer {
+    position: relative;
+    width: 775px;
+    min-height: 500px;
+}*/
+
+/* Base-View */
+#domessaging .baseView {
+    position: relative;
+    min-height: 500px;
+}
+
+#domessaging .baseView .gradient-top {
+    background-image: url(/do_img/global/messaging/gradient_top.png?__cv=696615a6cddccf1f50f85faaa91e8400);
+    width: 775px;
+    height: 30px;
+    position: absolute;
+    top: 45px;
+    left: 0;
+}
+
+#domessaging .baseView .gradient-bottom {
+    background-image: url(/do_img/global/messaging/gradient_bottom.png?__cv=384671d8036bdc7afd16c7b582513300);
+    width: 775px;
+    height: 30px;
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+}
+
+#domessaging .baseView .header {
+    background-image: url(/do_img/global/messaging/content_header.png?__cv=e13f90f41b5e3c31b22ec14f165fea00);
+    width: 772px;
+    height: 45px;
+    margin-left: 2px;
+}
+
+#domessaging .baseView .entryList {
+    position: relative;
+    left: 22px;
+    margin-top: 20px;
+}
+
+#domessaging .baseView .entryList .entry {
+    position: relative;
+    width: 736px;
+    height: 44px;
+    background-color: #3c4e5e;
+    margin-bottom: 2px;
+    border: 2px solid #485d70;
+    -moz-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
+}
+
+/* Notes-View */
+#domessaging #notesView #domsg_notes_new {
+    position: absolute;
+    top: 8px;
+    right: 23px;
+}
+
+#domessaging #notesViewEntrys .entry .date {
+    color: #cccccc;
+}
+
+#domessaging #notesViewEntrys .entryClosed .closed-subject {
+    color: white;
+    font-weight: bold;
+    position: absolute;
+    top: 8px;
+    left: 20px;
+}
+
+#domessaging #notesViewEntrys .entryClosed .closed-body {
+    color: #999999;
+    position: absolute;
+    top: 23px;
+    left: 20px;
+}
+
+#domessaging #notesViewEntrys .entryClosed .closed-clickarea {
+    width: 695px;
+    height: 40px;
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    cursor: pointer;
+}
+
+#domessaging #notesViewEntrys .entryClosed .open-subject {
+    display: none;
+}
+
+#domessaging #notesViewEntrys .entryClosed .open-body {
+    display: none;
+}
+
+#domessaging #notesViewEntrys .entryClosed .date {
+    position: absolute;
+    top: 14px;
+    right: 45px;
+}
+
+#domessaging #notesViewEntrys .entryClosed .save {
+    display: none;
+}
+
+#domessaging #notesViewEntrys .entryClosed .forward {
+    display: none;
+}
+
+#domessaging #notesViewEntrys .entryClosed .delete {
+    position: absolute;
+    top: 11px;
+    right: 11px;
+}
+
+#domessaging #notesViewEntrys .entryClosed .open-closebtn {
+    display: none;
+}
+
+#domessaging #notesViewEntrys .entryRollover {
+    border: 2px solid #99ccff;
+}
+
+#domessaging #notesViewEntrys .entryOpen {
+    height: 143px;
+    border: 2px solid #6ba0d0;
+}
+
+#domessaging #notesViewEntrys .entryOpen .closed-subject {
+    display: none;
+}
+
+#domessaging #notesViewEntrys .entryOpen .closed-body {
+    display: none;
+}
+
+#domessaging #notesViewEntrys .entryOpen .closed-clickarea {
+    display: none;
+}
+
+#domessaging #notesViewEntrys .entryOpen .open-subject {
+    position: absolute;
+    top: 5px;
+    left: 8px;
+}
+
+#domessaging #notesViewEntrys .entryOpen .open-subject input {
+    width: 590px;
+}
+
+#domessaging #notesViewEntrys .entryOpen .open-body {
+    position: absolute;
+    top: 29px;
+    left: 8px;
+}
+
+#domessaging #notesViewEntrys .entryOpen .open-body textarea {
+    width: 718px;
+    height: 77px;
+}
+
+#domessaging #notesViewEntrys .entryOpen .date {
+    position: absolute;
+    right: 35px;
+    top: 7px;
+}
+
+#domessaging #notesViewEntrys .entryOpen .save {
+    position: absolute;
+    bottom: 6px;
+    right: 68px;
+}
+
+#domessaging #notesViewEntrys .entryOpen .forward {
+    position: absolute;
+    bottom: 6px;
+    right: 36px;
+}
+
+#domessaging #notesViewEntrys .entryOpen .delete {
+    position: absolute;
+    bottom: 5px;
+    right: 11px;
+}
+
+#domessaging #notesViewEntrys .entryOpen .open-closebtn {
+    position: absolute;
+    top: 2px;
+    right: 5px;
+}
+
+#domessaging #notesViewEntrys .entryNew .save {
+    right: 11px;
+}
+
+/* Folder-View */
+#domessaging #folderView #domsg_messages_checkboxAll {
+    position: absolute;
+    top: 7px;
+    left: 17px;
+}
+
+#domessaging #folderView #domsg_messages_deleteChecked {
+    position: absolute;
+    top: 10px;
+    left: 100px;
+}
+
+#domessaging #folderView #domsg_messages_dropdown {
+    position: absolute;
+    top: 10px;
+    left: 140px;
+}
+
+#domessaging #folderView #domsg_messages_dropdownLayer {
+    position: absolute;
+    top: 32px;
+    left: 160px;
+    background-color: black;
+    width: 135px;
+    border: 1px solid #666;
+    border-top: 0px;
+    z-index: 8;
+    color: #808080;
+    cursor: pointer;
+}
+
+#domessaging #folderView #domsg_messages_dropdownLayer div {
+    padding-left: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+#domessaging #folderView #domsg_messages_dropdownLayer div.rollover {
+    background-color: #2f4d65;
+}
+
+#domessaging #folderView #domsg_messages_new {
+    position: absolute;
+    top: 8px;
+    right: 23px;
+}
+
+#domessaging #folderView #domsg_messages_pageInfo {
+    position: absolute;
+    top: 12px;
+    right: 395px;
+    color: #808080;
+}
+
+#domessaging #folderView #domsg_messages_pageLeft {
+    position: absolute;
+    top: 9px;
+    left: 385px;
+}
+
+#domessaging #folderView #domsg_messages_pageRight {
+    position: absolute;
+    top: 9px;
+    left: 413px;
+}
+
+#domessaging #folderViewEntrys .entry {
+    background-color: #2b333b;
+    border: 1px solid #2b333b;
+    -moz-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
+}
+
+#domessaging #folderViewEntrys .entry .checkbox {
+    position: absolute;
+    top: 10px;
+    left: 7px;
+}
+
+#domessaging #folderViewEntrys .entry .avatar {
+    background-color: black;
+    position: absolute;
+    top: 5px;
+    left: 30px;
+    width: 30px;
+    height: 30px;
+}
+
+#domessaging #folderViewEntrys .entry .sender {
+    position: absolute;
+    top: 5px;
+    left: 75px;
+    color: #cccccc;
+}
+
+#domessaging #folderViewEntrys .entry .date {
+    position: absolute;
+    top: 22px;
+    left: 75px;
+    color: #cccccc;
+}
+
+#domessaging #folderViewEntrys .entryClosed .subject {
+    position: absolute;
+    top: 5px;
+    left: 235px;
+    color: #cccccc;
+    width: 400px;
+    height: 18px;
+    overflow: hidden;
+}
+
+#domessaging #folderViewEntrys .entryClosed .closed-body {
+    position: absolute;
+    top: 22px;
+    left: 235px;
+    color: #cccccc;
+    height: 18px;
+    overflow: hidden;
+    width: 400px;
+}
+
+#domessaging #folderViewEntrys .entryClosed .open-body {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryClosed .closed-delete {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#domessaging #folderViewEntrys .entryClosed .open-delete {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryClosed .closed-clickarea {
+    width: 625px;
+    height: 40px;
+    position: absolute;
+    top: 1px;
+    left: 70px;
+    cursor: pointer;
+}
+
+#domessaging #folderViewEntrys .entryClosed .open-linesep {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryClosed .image-stamp {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryClosed .socialBox {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryClosed .close-linesep {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryClosed .fraud-protection {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryClosed .open-closebtn {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryClosed .closed-status {
+    position: absolute;
+    top: 10px;
+    right: 35px;
+}
+
+#domessaging #folderViewEntrys .entryClosed .open-blacklist {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryClosed .open-reply {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryClosed .open-recipients {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryRollover {
+    border: 1px solid #485d70;
+}
+
+#domessaging #folderViewEntrys .entryOpen {
+    height: 143px;
+    border: 1px solid #485d70;
+}
+
+#domessaging #folderViewEntrys .entryOpen .subject {
+    position: absolute;
+    top: 5px;
+    left: 235px;
+    color: white;
+    width: 430px;
+    height: 30px;
+    overflow: hidden;
+}
+
+#domessaging #folderViewEntrys .entryOpen .closed-body {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryOpen .open-body {
+    position: absolute;
+    left: 235px;
+    top: 50px;
+    width: 490px;
+    color: white;
+}
+
+#domessaging #folderViewEntrys .entryOpen .open-body .parent {
+    margin-left: 5px;
+    margin-top: 10px;
+    color: #999999;
+    width: 485px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .open-body .parent-separator {
+    height: 1px;
+    background-color: #999999;
+    width: 485px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .open-body .parent-text {
+    margin-top: 5px;
+    margin-left: 10px;
+    width: 475px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .closed-clickarea {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryOpen .open-linesep {
+    position: absolute;
+    top: 40px;
+    left: 30px;
+    background-color: #547797;
+    width: 684px;
+    height: 1px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .image-stamp {
+    position: absolute;
+    left: 30px;
+    top: 45px;
+    bottom: 45px;
+    width: 200px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .image-stamp img {
+    position: relative;
+    left: 50%;
+    margin-left: -87px;
+    width: 175px;
+    height: 63px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .socialBox {
+    position: absolute;
+    text-align: center;
+    width: 150px;
+    bottom: 48px;
+    color: white;
+}
+
+#domessaging #folderViewEntrys .entryOpen .socialBox .socialIcon {
+    width: 22px;
+    height: 22px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .socialBox .socialIcon:hover {
+    background-position: -22px 0;
+    cursor: pointer;
+}
+
+#domessaging #folderViewEntrys .entryOpen .socialBox .followUs {
+    position: absolute;
+    left: 30px;
+    top: 8px;
+    font-size: 8px;
+    font-family: Verdana, Arial, sans-serif;
+}
+
+#domessaging #folderViewEntrys .entryOpen .socialBox .facebook {
+    position: absolute;
+    left: 32px;
+    top: 25px;
+    background: url(/do_img/global/externalHome/socialIconFacebook.png?__cv=d83caf7be7498e61fbdfb52b61966800);
+}
+
+#domessaging #folderViewEntrys .entryOpen .socialBox .twitter {
+    position: absolute;
+    left: 58px;
+    top: 25px;
+    background: url(/do_img/global/externalHome/socialIconTwitter.png?__cv=4bf2c255170d4a001453e94979b6fe00);
+}
+
+#domessaging #folderViewEntrys .entryOpen .socialBox .youtube {
+    position: absolute;
+    left: 84px;
+    top: 25px;
+    background: url(/do_img/global/externalHome/socialIconYoutube.png?__cv=c48da75f70a41292e589b227bf826f00);
+}
+
+#domessaging #folderViewEntrys .entryOpen .close-linesep {
+    position: absolute;
+    bottom: 40px;
+    left: 30px;
+    background-color: #547797;
+    width: 684px;
+    height: 1px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .fraud-protection {
+    position: absolute;
+    bottom: 7px;
+    left: 235px;
+    width: 470px;
+    color: #FFD800;
+    font-size: 10px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .closed-delete {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryOpen .open-delete {
+    position: absolute;
+    right: 147px;
+    bottom: 5px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .open-closebtn {
+    position: absolute;
+    top: 2px;
+    right: 5px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .closed-status {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryOpen .open-blacklist {
+    position: absolute;
+    right: 170px;
+    bottom: 5px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .open-reply {
+    position: absolute;
+    right: 5px;
+    bottom: 6px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .open-recipients {
+    position: absolute;
+    left: 75px;
+    top: 50px;
+    color: #6ba0d0;
+}
+
+#domessaging #folderViewEntrys .entryOpen .open-recipients .label {
+    font-weight: bold;
+}
+
+#domessaging #folderViewEntrys .entryUnread {
+    background-color: #3c4e5e;
+}
+
+#domessaging #folderViewEntrys .entryUnread .sender {
+    color: white;
+}
+
+#domessaging #folderViewEntrys .entryUnread .subject {
+    font-weight: bold;
+    color: white;
+}
+
+#domessaging #folderViewEntrys .entrySystem .subject {
+    color: #ffd800;
+}
+
+#domessaging #folderViewEntrys .entrySystem .sender {
+    color: #ffd800;
+    font-weight: bold;
+}
+
+#domessaging #folderViewEntrys .entrySystem .open-delete {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+}
+
+#domessaging #folderViewEntrys .entryClosed .action-popup {
+    display: none;
+}
+
+#domessaging #folderViewEntrys .entryOpen .action-popup {
+    position: absolute;
+    bottom: 28px;
+    right: 6px;
+    background-color: #1b2025;
+    border: 1px solid #101316;
+    color: #cccccc;
+    width: 170px;
+    height: 62px;
+    -moz-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .action-popup .actionEntry {
+    height: 21px;
+    cursor: pointer;
+    position: relative;
+}
+
+#domessaging #folderViewEntrys .entryOpen .action-popup .actionEntry-rollover {
+    background-color: black;
+}
+
+#domessaging #folderViewEntrys .entryOpen .action-popup .actionEntry .icon {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+}
+
+#domessaging #folderViewEntrys .entryOpen .action-popup .actionEntry .label {
+    position: absolute;
+    top: 3px;
+    left: 28px;
+}
+
+#domessaging #folderViewEntrys .entryOutbox .open-delete {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+}
+
+/** Message Write **/
+#domessaging #messageWriteView .gradient-top {
+    top: 42px;
+}
+
+#domessaging #messageWriteView .gradient-bottom {
+    bottom: 0;
+}
+
+#domessaging #messageWriteView .contactSearch {
+    background-image: url(/do_img/global/messaging/writemsg/bg_contactsearch.png?__cv=f14bb927fd62f5f99c762c53184d1e00);
+    width: 227px;
+    height: 67px;
+    position: absolute;
+    top: 0px;
+    left: 2px;
+}
+#notesView_entry_new_open-body_counter{
+    position: absolute;
+    left: 625px;
+    top: 10px;
+    color: #A0A0A0;
+}
+
+#domessaging #messageWriteView #domsg_msgwrite_userSearch {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 180px;
+    background-color: #3c4e5e;
+    color: #5d93c2;
+    border: 1px solid #212b33;
+}
+
+#domessaging #messageWriteView .namecheck-positive {
+    background-image: url(/do_img/global/messaging/sprites/namecheck_positiv.png?__cv=44f902a63a0dc22a97ae775a92530c00);
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+
+#domessaging #messageWriteView .namecheck-negative {
+    background-image: url(/do_img/global/messaging/sprites/namecheck_negative.png?__cv=825be78a2fe3e730a3ffb83a081c7700);
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+
+#domessaging #messageWriteView #domsg_msgwrite_userSearchAddBtn {
+    position: absolute;
+    top: 10px;
+    left: 195px;
+}
+
+#domessaging #messageWriteView .contactSearch .contactLabel {
+    position: absolute;
+    top: 45px;
+    left: 20px;
+    width: 206px;
+    text-align: left;
+    font-weight: bold;
+    color: #ffcc00;
+}
+
+#domessaging #messageWriteView #messageWriteContacts {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+#domessaging #messageWriteView .contactList {
+    background-image: url(/do_img/global/messaging/writemsg/bg_contactlist.png?__cv=1a96294f57ff63c99fb77a3e3590fe00);
+    width: 210px;
+    min-height: 300px;
+    position: absolute;
+    top: 67px;
+    left: 9px;
+    bottom: 5px;
+}
+
+#domessaging #messageWriteView .contactList .entry {
+    position: relative;
+    height: 40px;
+    left: 5px;
+    width: 199px;
+}
+
+#domessaging #messageWriteView .contactList .entry-rollover {
+    background-color: #202a32;
+}
+
+#domessaging #messageWriteView .contactList .entry .avatar {
+    position: absolute;
+    top: 5px;
+    left: 10px;
+    width: 30px;
+    height: 30px;
+    background-color: white;
+}
+
+#domessaging #messageWriteView .contactList .entry .label {
+    position: absolute;
+    top: 12px;
+    left: 55px;
+    color: #ccc;
+    font-weight: bold;
+}
+
+#domessaging #messageWriteView .contactList .entryClan {
+    background-color: #182936;
+}
+
+#domessaging #messageWriteView .contactList .entryClan .label {
+    top: 6px;
+    color: #ffcc00;
+}
+
+#domessaging #messageWriteView .contactList .entryClan .info {
+    position: absolute;
+    top: 20px;
+    left: 55px;
+    color: #ccc;
+}
+
+#domessaging #messageWriteView .contactList .bottom {
+    background-image: url(/do_img/global/messaging/writemsg/bg_contactlist_bottom.png?__cv=f77c40a0c453a9be4694e80190cb4600);
+    width: 210px;
+    height: 2px;
+    position: absolute;
+    bottom: 0px;
+}
+
+#domessaging #messageWriteView .recipients {
+    background-image: url(/do_img/global/messaging/writemsg/bg_recipients.png?__cv=085d6ba4ee0278348b53473ee6ee1300);
+    width: 546px;
+    height: 43px;
+    position: absolute;
+    top: 0px;
+    left: 229px;
+}
+
+#domessaging #messageWriteView .recipients .label {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    font-weight: bold;
+    color: #cccccc;
+}
+
+#domessaging #messageWriteView .recipients #domsg_recipientList {
+    position: absolute;
+    top: 6px;
+    left: 70px;
+    width: 430px;
+    height: 27px;
+    border: 1px solid #212b33;
+    background-color: #3c4e5e;
+}
+
+#domessaging #messageWriteView .recipients #domsg_recipientList .recipient {
+    float: left;
+    color: #cccccc;
+    border: 2px solid #242d35;
+    padding: 2px;
+    margin-left: 2px;
+    margin-right: 8px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    position: relative;
+}
+
+#domessaging #messageWriteView .recipients #domsg_recipientList .recipient .remove {
+    position: absolute;
+    top: -18px;
+    right: -10px;
+}
+
+#domessaging #messageWriteView .recipients .help {
+    position: absolute;
+    top: 9px;
+    right: 17px;
+}
+
+#domessaging #messageWriteView .recipients .error {
+	border: 1px solid #8c1a25 !important;
+}
+
+#reCaptcha .content {
+    position: absolute;
+    top: 50px;
+    left: 230px;
+    width: 540px;
+    padding: 20px 0;
+    height: auto!important;
+}
+#domessaging #messageWriteView .content {
+    position: absolute;
+    top: 50px;
+    left: 230px;
+    width: 540px;
+    height: 400px;
+}
+
+
+#domessaging #messageWriteView .content .subjectLabel {
+    position: absolute;
+    left: 10px;
+    color: #cccccc;
+    font-weight: bold;
+}
+
+#domessaging #messageWriteView .content .subject {
+    position: absolute;
+    top: 15px;
+    left: 5px;
+}
+
+#domessaging #messageWriteView .content .subject input {
+    width: 520px;
+    padding: 2px;
+    background-color: #3c4e5e;
+    color: #cccccc;
+    border: 0;
+}
+
+#domessaging #messageWriteView .content .body {
+    position: absolute;
+    top: 40px;
+    left: 5px;
+}
+
+#domessaging #messageWriteView .content .body textarea {
+    width: 520px;
+    padding: 2px;
+    background-color: #3c4e5e;
+    color: #cccccc;
+    border: 0;
+    min-height: 180px;
+    margin-bottom: 0;
+}
+
+#domessaging #messageWriteView .content .body .parent {
+    background-color: #3c4e5e;
+    position: relative;
+    width: 524px;
+    color: #999999;
+}
+
+#domessaging #messageWriteView .content .body .parent .separator {
+    width: 485px;
+    height: 1px;
+    position: relative;
+    top: 5px;
+    left: 5px;
+    background-color: #999999;
+}
+
+#domessaging #messageWriteView .content .body .parent .dateUser {
+    position: relative;
+    width: 470px;
+    left: 15px;
+    margin-top: 5px;
+}
+
+#domessaging #messageWriteView .content .body .parent .text {
+    position: relative;
+    width: 470px;
+    left: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#domessaging #messageWriteView .sendbar {
+    background-image: url(/do_img/global/messaging/writemsg/write_message_footer.png?__cv=63c67a90f8226c7b78b7152131ea0500);
+    width: 542px;
+    height: 40px;
+    position: absolute;
+    left: 234px;
+    bottom: 0;
+}
+
+#domessaging #messageWriteView .sendbar #domsg_msgwrite_cancelBtn {
+    position: absolute;
+    top: 6px;
+    left: 150px;
+}
+
+
+#domsg_msgwrite_txtCounter{
+    position: absolute;
+    left: 10px;
+    top: 12px;
+    color: #A0A0A0;
+    text-align: center;
+    width: 70px;
+}
+
+#domessaging #messageWriteView .sendbar #domsg_msgwrite_sendMessageBtn {
+    position: absolute;
+    top: 6px;
+    right: 25px;
+    padding-top: 7px;
+}
+
+/* Contacts-View */
+#domessaging #contactsView #domsg_contacts_pageInfo {
+    position: absolute;
+    top: 12px;
+    left: 312px;
+    color: #808080;
+}
+
+#domessaging #contactsView #domsg_contacts_pageLeft {
+    position: absolute;
+    top: 9px;
+    left: 385px;
+}
+
+#domessaging #contactsView #domsg_contacts_pageRight {
+    position: absolute;
+    top: 9px;
+    left: 413px;
+}
+
+#domessaging #contactsView .contactList {
+    margin-bottom: 15px;
+    margin-top: 20px;
+    position: relative;
+}
+
+#domessaging #contactsView #domsg_contacts_blackListButton {
+    position: absolute;
+    top: 6px;
+    right: 20px;
+}
+
+#domessaging #contactsView .contact {
+    width: 771px;
+    height: 54px;
+    position: relative;
+    background-color: #232a32;
+}
+
+#domessaging #contactsView .contact-row-b {
+    background-color: #1d242c;
+}
+
+#domessaging #contactsView .contact .avatar {
+    position: absolute;
+    top: 4px;
+    left: 60px;
+    width: 45px;
+    height: 45px;
+    background-color: white;
+}
+
+#domessaging #contactsView .contact .username {
+    position: absolute;
+    top: 11px;
+    left: 130px;
+    color: white;
+    font-weight: bold;
+}
+
+#domessaging #contactsView .contact .username-invite {
+    color: #99ff00;
+}
+
+#domessaging #contactsView .contact .status {
+    position: absolute;
+    top: 26px;
+    left: 130px;
+    color: #7a7b7e;
+}
+
+#domessaging #contactsView .contact .sendMsg {
+    position: absolute;
+    top: 17px;
+    right: 35px;
+}
+
+#domessaging #contactsView .contact .delete {
+    position: absolute;
+    top: 16px;
+    right: 70px;
+}
+
+#domessaging #contactsView .contact .confirm {
+    position: absolute;
+    top: 17px;
+    right: 152px;
+}
+
+#domessaging #contactsView .contact .decline {
+    position: absolute;
+    top: 17px;
+    right: 17px;
+}
+
+#domessaging #contactsView .blackList {
+    position: absolute;
+    right: 20px;
+    top: 32px;
+    width: 180px;
+    min-height: 0;
+    z-index: 8;
+    background-color: #1b2025;
+    border: 2px solid #0e1216;
+    -moz-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
+}
+
+#domessaging #contactsView .blackList .entry {
+    position: relative;
+    height: 25px;
+}
+
+#domessaging #contactsView .blackList .entry-rollover {
+    background-color: black;
+}
+
+#domessaging #contactsView .blackList .entry .label {
+    position: absolute;
+    color: white;
+    left: 5px;
+    top: 6px;
+}
+
+#domessaging #contactsView .blackList .entry .delete {
+    position: absolute;
+    right: 5px;
+    top: 2px;
+}
+
+/* Help Layer */
+#domessaging .helpLayer {
+    background-image: url(/do_img/global/messaging/help/layer_bg.png?__cv=213a135ae2583d5f368bc269e91b4400);
+    position: absolute;
+    left: 130px;
+    top: 50px;
+    z-index: 10;
+    width: 600px;
+    height: 300px;
+}
+
+#domessaging .helpLayer .title {
+    color: #FFCC04;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 12px;
+    height: 20px;
+}
+
+#domessaging .helpLayer .close-help {
+    position: absolute;
+    right: 7px;
+    top: 7px;
+}
+
+#domessaging .helpLayer .content {
+    background-image: url(/do_img/global/messaging/help/inner_bg.png?__cv=ea3759958b49e525b8a0c699eb01d200);
+    width: 510px;
+    height: 215px;
+    overflow-y: scroll;
+    position: relative;
+    left: 40px;
+    top: 21px;
+    padding: 5px;
+    color: #ccc;
+    font-size: 12px;
+}
+
+/* Base/Confirm/Error/Success Layer */
+#domessaging .layerContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: black;
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+    filter: alpha(opacity=70);
+    -moz-opacity: 0.7;
+    -khtml-opacity: 0.7;
+    opacity: 0.7;
+}
+
+#domessaging .baseLayer {
+    position: absolute;
+    width: 359px;
+    z-index: 11;
+    left: 222px;
+    top: 50px;
+}
+
+#domessaging .baseLayer .header {
+    background-image: url(/do_img/global/popups/hangar/popup_header.png?__cv=57187cad6e380a0957fc186fd7b20b00);
+    color: #FFCC04;
+    font-size: 13px;
+    font-weight: bold;
+    height: 27px;
+    margin-top: 7px;
+    text-align: center;
+    padding-top: 12px;
+    width: 359px;
+}
+
+#domessaging .baseLayer .header .close {
+    background-image: url(/do_img/global/popups/hangar/close_button_sprite.png?__cv=fa1f7ef0f89ab04212dbf02f3424d700);
+    float: right;
+    height: 24px;
+    margin-right: 7px;
+    margin-top: -5px;
+    width: 24px;
+    cursor: pointer;
+}
+
+#domessaging .baseLayer .header .close-rollover {
+    background-position: 0 48px;
+}
+
+#domessaging .baseLayer .header .closeCaptcha {
+    background-image: url(/do_img/global/popups/hangar/close_button_sprite.png?__cv=fa1f7ef0f89ab04212dbf02f3424d700);
+    float: right;
+    height: 24px;
+    margin-right: 7px;
+    margin-top: -5px;
+    width: 24px;
+    cursor: pointer;
+}
+.button-cancelReCaptcha-rollover {
+     background-position: 0 48px;
+ }
+
+#domessaging .baseLayer .content {
+    background-image: url(/do_img/global/popups/hangar/popup_middle.png?__cv=56226ac40551323a9a89453ad36fc500);
+    text-align: center;
+    width: 359px;
+}
+
+#domessaging .baseLayer .content .icon {
+    height: 53px;
+    padding-top: 10px;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+}
+
+#domessaging .baseLayer .content .text {
+    color: #AbAbAB;
+    font-size: 13px;
+    font-family: Verdana, Arial, sans-serif;
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+#domessaging .baseLayer .footer {
+    background-image: url(/do_img/global/popups/hangar/popup_footer.png?__cv=bda06559499f3631035304b343035900);
+    height: 49px;
+    width: 359px;
+    position: relative;
+}
+
+#domessaging .baseLayer .footer .button {
+    background-image: url(/do_img/global/popups/hangar/button_sprite_150x32px.png?__cv=221b3d144671e9354638ad5a6bd9cf00);
+    height: 26px;
+    width: 150px;
+    position: absolute;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
+    text-align: center;
+    padding-top: 6px;
+    cursor: pointer;
+}
+
+#domessaging .confirmLayer .content .icon {
+    background-image: url(/do_img/global/popups/icon_question.png?__cv=70c3a930d8d50265d35ae9fe4036b600);
+}
+
+#domessaging .confirmLayer .footer .button-confirm {
+    background-position: 0 -96px;
+    top: 0px;
+    left: 20px;
+}
+
+#domessaging .confirmLayer .footer .button-confirm-rollover {
+    background-position: 0 -128px;
+}
+
+#domessaging .confirmLayer .footer .button-abort {
+    background-position: 0 0;
+    top: 0px;
+    right: 20px;
+}
+
+#domessaging .confirmLayer .footer .button-abort-rollover {
+    background-position: 0 -32px;
+}
+
+#domessaging .errorLayer .content .icon {
+    background-image: url(/do_img/global/popups/icon_error.png?__cv=1ccb0dcd83aa2eaf8a2684885602b600);
+}
+
+#domessaging .errorLayer .footer .button-ok {
+    background-position: 0 0;
+}
+
+#domessaging .errorLayer .footer .button-ok-rollover {
+    background-position: 0 -32px;
+}
+
+#domessaging .successLayer .content .icon {
+    background-image: url(/do_img/global/popups/icon_success.png?__cv=4757057e0fc2cc236801922aba846800);
+}
+
+#domessaging .successLayer .footer .button-ok {
+    background-position: 0 -96px;
+}
+
+#domessaging .successLayer .footer .button-ok-rollover {
+    background-position: 0 -128px;
+}
+
+#domessaging .errorLayer .footer .button-ok, #domessaging .successLayer .footer .button-ok {
+    top: 0px;
+    left: 104px;
+}
+#reCaptcha .button-biggreen {
+    top: 0px;
+    left: 104px;
+}
+#domsg_msgwrite_helpLayer li {
+    list-style-type:  decimal;
+    margin: 0 30px;
+    cursor: pointer;
+}
+
+.recaptcha_theme_red #recaptcha_response_field {
+    background-color: #FFFFFF;
+    color: #000000;
+}

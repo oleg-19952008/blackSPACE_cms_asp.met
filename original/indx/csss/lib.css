@@ -1,0 +1,42 @@
+    xa {
+    font-family: 'segoe script', Times, serif; 
+   text-align:  center;
+	font-size: 18pt; 
+   } 
+     xaa {
+    font-family: 'segoe script', Times, serif; 
+  
+	font-size: 18pt; 
+	 text-align:  center;	     
+     
+    width: 100%;
+    height: 100%; 
+    opacity: 0.5;
+ 
+ 
+    filter: alpha(opacity=90);
+   } 
+    	   .text {
+    text-align:  center;
+   }
+   
+     h1 {
+    font-family: 'segoe script', Times, serif;    
+	font-size: 250%; 
+	} 
+   p {
+    font-family: sans-serif, Arial, Helvetica, sans-serif; 
+    font-size: 11pt;  
+   }
+   
+body {
+    background-image: url('../img/s2.jpg');
+background-position: center center;
+background-repeat: no-repeat; 
+background-attachment: fixed; 
+background-size: cover; 
+-moz-background-size: 100% 100%;     /* Gecko 1.9.2 (Firefox 3.6) */
+-o-background-size: 100% 100%;        /* Opera 9.5 */
+-webkit-background-size: 100% 100%;   /* Safari 3.0 */
+background-size: 100% 100%;           /* Gecko 2.0 (Firefox 4.0) > CSS3 */
+}

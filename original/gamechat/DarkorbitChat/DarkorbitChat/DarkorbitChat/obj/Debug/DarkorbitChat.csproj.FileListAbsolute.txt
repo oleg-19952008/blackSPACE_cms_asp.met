@@ -1,0 +1,17 @@
+C:\Users\User\AppData\Local\Temporary Projects\DarkorbitChat\obj\Debug\DarkorbitChat.csprojResolveAssemblyReference.cache
+C:\Users\User\AppData\Local\Temporary Projects\DarkorbitChat\bin\Debug\DarkorbitChat.exe
+C:\Users\User\AppData\Local\Temporary Projects\DarkorbitChat\bin\Debug\DarkorbitChat.pdb
+C:\Users\User\AppData\Local\Temporary Projects\DarkorbitChat\obj\Debug\DarkorbitChat.exe
+C:\Users\User\AppData\Local\Temporary Projects\DarkorbitChat\obj\Debug\DarkorbitChat.pdb
+C:\Users\User\AppData\Local\Temporary Projects\DarkorbitChat\bin\Debug\mysql.data.dll
+C:\Users\User\Desktop\DarkorbitChat\DarkorbitChat\obj\Debug\DarkorbitChat.exe
+C:\Users\User\Desktop\DarkorbitChat\DarkorbitChat\obj\Debug\DarkorbitChat.pdb
+C:\Users\User\Desktop\DarkorbitChat\DarkorbitChat\bin\Debug\DarkorbitChat.exe
+C:\Users\User\Desktop\DarkorbitChat\DarkorbitChat\bin\Debug\DarkorbitChat.pdb
+C:\Users\User\Desktop\DarkorbitChat\DarkorbitChat\bin\Debug\mysql.data.dll
+C:\Users\User\Desktop\DarkorbitChat\DarkorbitChat\obj\Debug\DarkorbitChat.csprojResolveAssemblyReference.cache
+D:\xampp\htdocs\gamechat\DarkorbitChat\DarkorbitChat\DarkorbitChat\obj\Debug\DarkorbitChat.exe
+D:\xampp\htdocs\gamechat\DarkorbitChat\DarkorbitChat\DarkorbitChat\obj\Debug\DarkorbitChat.pdb
+D:\xampp\htdocs\gamechat\DarkorbitChat\DarkorbitChat\DarkorbitChat\bin\Debug\DarkorbitChat.exe
+D:\xampp\htdocs\gamechat\DarkorbitChat\DarkorbitChat\DarkorbitChat\bin\Debug\DarkorbitChat.pdb
+D:\xampp\htdocs\gamechat\DarkorbitChat\DarkorbitChat\DarkorbitChat\obj\Debug\DarkorbitChat.csprojResolveAssemblyReference.cache

@@ -1,0 +1,1 @@
+<?php $json='null'; echo $json; ?>

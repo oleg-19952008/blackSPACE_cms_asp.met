@@ -1,0 +1,266 @@
+form.jqtransformdone .elem2 label {
+	float:none;
+	padding-bottom:8px;
+	}
+form.jqtransformdone label.long {
+	width:22px;
+	}
+form.jqtransformdone div.rowElem{
+	position:relative;
+	width:340px;
+}
+form.jqtransformdone .textarea_box label {
+	float:none;
+	line-height:1.2em;
+	height:22px;
+	display:block;
+	}
+/* -------------
+ * Inputs
+ * ------------- */
+.jqTransformInputWrapper {
+	background:#fff;
+	height: 25px;
+	padding: 0px;
+	float:left;
+	width:133px !important;
+}
+
+.jqTransformInputInner {
+	background:#000;
+	padding: 0px;
+	margin: 0px;
+}
+
+/*  IE6 */
+* html .jqTransformInputInner div input {
+	padding: 3px 0 0 0;
+	margin: 0 -27px 0 0;
+	margin-left:5px;
+}
+/* Ie7 */
+*+ html .jqTransformInputInner div input {
+	padding: 3px 0 0 0;
+	margin-left:5px;
+}
+
+/*hover*/
+.jqTransformInputWrapper_hover{ background-position: left -25px ;}
+.jqTransformInputWrapper_hover div.jqTransformInputInner{ background-position: right -25px ;}
+
+/*focus*/
+.jqTransformInputWrapper_focus{ background-position: left -50px ;}
+.jqTransformInputWrapper_focus div.jqTransformInputInner{ background-position: right -50px ;}
+
+
+
+.jqTransformSafari .jqTransformInputInner div {
+	position: relative;
+	overflow: hidden;
+	margin:0px 8px;
+}
+.jqTransformSafari .jqTransformInputInner div input {
+	position: absolute;
+	top: -10px;
+	left: -2px;
+	height: 42px; 
+	padding-left: 4px;
+}
+
+/* -------------
+ * Radios
+ * ------------- */
+.jqTransformRadioWrapper {float: left;display:block;margin:2px 0px 0;}
+.jqTransformRadio {
+	background:url(../images/radio.gif) no-repeat center bottom;
+	vertical-align: middle;
+	height: 13px;
+	width: 13px;
+	display:block;/*display: -moz-inline-block;*/
+	margin-right:2px;
+}
+/* -------------
+ * Checkboxes
+ * ------------- */
+span.jqTransformCheckboxWrapper{
+	display:block;float:left;
+	margin-top:5px;
+}
+a.jqTransformCheckbox {
+	background: transparent url(images/checkbox.gif) no-repeat 0 top;
+	vertical-align: middle;
+	height: 19px;
+	width: 18px;
+	display:block;/*display: -moz-inline-block;*/
+}
+
+/* -------------
+ * Checked - Used for both Radio and Checkbox
+ * ------------- */
+a.jqTransformChecked { background-position: 0 top;}
+
+
+/* -------------
+ * Selects
+ * ------------- */
+.jqTransformSelectWrapper {
+	width:159px !important;
+	position:relative;
+	margin-right:9px;
+	height: 20px;
+	background:#fff;
+	float:left;
+	border:solid 1px #d3d3d3;
+}
+#search-form > .rowElem > span {display:block;}
+.twice .jqTransformSelectWrapper {
+	width:91px !important;
+	float:left;
+	}	
+#account-form .state .jqTransformSelectWrapper {
+	width:131px !important;
+	}
+.jqTransformSelectWrapper div span {
+	font-size: 11px;
+	float: none;
+	position: absolute;
+	white-space: nowrap;
+	height: 15px;
+	line-height: 15px;
+	padding: 2px 0 0 8px;
+	overflow: hidden;
+	cursor:pointer;
+	color:#484842;
+	min-width:130px !important;
+}
+
+.jqTransformSelectWrapper  a.jqTransformSelectOpen {
+	display: block;
+	position: absolute;
+	right: 2px;
+	width: 17px;
+	height: 16px;
+	top:2px;
+	background:url(../images/select_marker.gif) 0 0 no-repeat;
+}
+.rowElem .left {
+	float:left;
+	margin-right:10px;
+	}
+#search-form .buttons, #search-form2 .buttons {
+	text-align:right;
+	padding-top:1px;
+	}	
+#search-form .buttons a, #search-form2 .buttons a {
+	font-size:17px;
+	color:#000;
+	text-decoration:none;
+	}	
+#search-form .buttons a:hover, #search-form2 .buttons a:hover {
+	color:#666;
+	}	
+
+.jqTransformSelectWrapper ul {
+	position: absolute;
+	top: 20px; 
+	left: -1px;
+	list-style: none;
+	background-color: #FFF;
+	border: solid 1px #d4d9db;
+	display: none;
+	margin: 0px;
+	padding: 0px;
+	overflow: auto;
+	z-index:10;
+	width:159px !important;
+}
+.rowElem.twice .jqTransformSelectWrapper ul {
+	width:91px !important;
+		}
+
+.jqTransformSelectWrapper ul a {
+	display: block;
+	text-decoration: none;
+	color:#a1adbe;
+	background-color: #FFF;
+	font-size: 11px;
+	line-height:1.23em;
+	padding:3px 0px 4px 9px;
+}
+
+.jqTransformSelectWrapper ul a.selected {
+	background: #fff;
+	color: #a1adbe;
+	padding:3px 0px 4px 9px;
+}
+
+.jqTransformSelectWrapper ul a:hover, .jqTransformSelectWrapper ul a.selected:hover {
+	background:#CCC;
+	color: #fff;
+}
+
+/* -------------
+ * Hidden - used to hide the original form elements
+ * ------------- */
+.jqTransformHidden {display: none;}
+
+a.adv-link {
+	font-size:12px;
+	color:#fff;
+	float:left;
+	padding:0 0 0 10px;
+	margin:6px 0 0 16px;
+	font-family:Tahoma, Geneva, sans-serif;
+}
+.cargo_search.white a.adv-link {color:#1591d4;}
+.search-form input.text {
+	width:178px;
+}
+
+#agent-search-form input.text {
+	width:210px !important;
+}
+
+#agent-search-form .jqTransformSelectWrapper {
+	width:194px !important;
+}
+#agent-search-form .jqTransformSelectWrapper ul {
+	width:194px !important;
+}
+
+#agent-search-form .jqTransformInputWrapper {
+	background: transparent url(images/input_text_left1.gif) no-repeat left top;
+	width:223px !important;
+}
+
+#agent-search-form .jqTransformInputInner {
+	background: transparent url(images/input_text_right1.gif) no-repeat top right;
+}
+
+#agent-search-form .jqTransformSelectWrapper {
+	background: url(images/select_left1.gif) no-repeat top left;
+}
+#agent-search-form .jqTransformSelectWrapper  a.jqTransformSelectOpen {
+	background: url(images/select_right1.gif) no-repeat center center;
+}
+#newsletter-form input.text {
+	width:210px !important;
+}
+#newsletter-form .jqTransformInputWrapper {
+	background: transparent url(images/input_text_left1.gif) no-repeat left top;
+	width:223px !important;
+}
+#newsletter-form .jqTransformInputInner {
+	background: transparent url(images/input_text_right1.gif) no-repeat top right;
+}
+
+#adv-search-form input.text {
+	width:210px !important;
+}
+#adv-search-form .jqTransformInputWrapper {
+	background: transparent url(images/input_text_left1.gif) no-repeat left top;
+	width:223px !important;
+}
+#adv-search-form .jqTransformInputInner {
+	background: transparent url(images/input_text_right1.gif) no-repeat top right;
+}	

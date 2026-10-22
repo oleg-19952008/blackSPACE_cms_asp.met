@@ -1,0 +1,1830 @@
+/* Klassen, die in allen Bereichen benötigt werden*/
+#item_list {
+    height              : 324px;
+    margin-top          : -1;
+}
+
+#item_singleview {
+    width:368px;
+    height:391px;
+    border:1px solid white;
+}
+#item_singleview_head {
+    height:34px;
+    background-image: url(/do_img/global/popup1_headline_bg.jpg?__cv=2c75f4ce54da9577a2046dcb0a15bc00);
+}
+#item_singleview_headline {
+    float:left;
+    padding:10px 0 0 5px;
+}
+#item_singleview_close {
+     float:right;
+}
+#item_singleview_cont {
+    vertical-align:top;
+    height:281px;
+    padding:25px 15px 0 15px;
+    background-image:url(/do_img/de/box1_kaufen_bg.jpg);
+}
+#item_singleview_cont p {
+    margin:16px 0 16px 0;
+}
+#item_singleview_foot {
+    height:47px;
+    background-image:url(/do_img/de/box1_kaufen_foot.jpg);
+    text-align:center;
+    vertical-align:top;
+    padding-top:5px;
+}
+.itemList_singleItem {
+    width:100px;
+    height:100px;
+    background-repeat:no-repeat;
+}
+.itemList_singleItem div {
+     height:104px;
+}
+.itemList_singleItem a {
+    display:block;
+    cursor: pointer;
+    cursor: hand;
+}
+.itemList_singlePrice {
+    margin-top:-18px;
+    height:18px;
+    text-align:center;
+    width:100px;
+}
+
+.item_borders {
+    position            : relative;
+    z-index             : 1;
+}
+.item_hover {
+    background-image: url(/do_img/global/hangar/item-list_hover_104x104.png?__cv=9997aa60e7eb34743539298d6c372200);
+    width               : 104px;
+    height              : 104px;
+    display             : none;
+    margin-left         : -2px;
+    margin-top          : -2px;
+    position            : absolute;
+}
+.item_active {
+    background-image: url(/do_img/global/hangar/item-list_active_104x104.png?__cv=6062b712767b08aa7650cc792a3bae00);
+    width               : 104px;
+    height              : 104px;
+    display             : none;
+    margin-left         : -2px;
+    margin-top          : -2px;
+    position            : absolute;
+}
+.itemList_singleItem a.mouseOver .item_hover {
+    display             : block;
+}
+a.active .item_active {
+    display             : block;
+}
+
+
+#sellBox {
+     padding-bottom:3px;
+}
+.hangarButton {
+    background-image: url(/do_img/global/hangar/item-list_hover_104x104.png?__cv=9997aa60e7eb34743539298d6c372200);
+    width: 200px;
+    height: 19px;
+    cursor: pointer;
+    cursor: hand;
+}
+.hangarButtonCenter {
+    margin: auto;
+}
+
+.hangarButtonLeft {
+    margin-left: 17px;
+    float: left;
+}
+.hangarButtonRight {
+    margin-right: 18px;
+    float: right;
+}
+.hangarButton img {
+    padding-top: 4px;
+}
+
+.subnavText {
+	margin-left: 20px;
+	margin-top: 4px;
+}
+
+/* Booster */
+#large_item_singleview {
+    width:482px;
+    border:1px solid white;
+}
+
+#large_item_singleview_head {
+    height:65px;
+    background-image: url(/do_img/global/popups/popup_middle_top_bg.jpg?__cv=b784d727e2e738d40e3725ccb9b4ca00);
+}
+
+#large_item_singleview_cont {
+    vertical-align:top;
+    min-height:260px;
+    padding:0 25px 0 25px;
+    background-image: url(/do_img/global/popups/popup_middle_cont_bg.jpg?__cv=f1b0eeec6d2faa95103d38e8fe5c6f00);
+}
+* html #large_item_singleview_cont {
+    padding:0 15px 0 15px;
+    height:260px;
+}
+#large_item_singleview_cont p {
+    margin:0 0 5px 0;
+}
+
+#large_item_singleview_foot {
+    height:45px;
+    background-image: url(/do_img/global/popups/popup_middle_foot_bg.jpg?__cv=0f2d3f005796f6c290271c4964680e00);
+    text-align:center;
+    vertical-align:top;
+    padding-top:11px;
+    margin-top:-5px;
+}
+#large_item_singleview_cont table {
+    width:450px;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+#large_item_singleview_cont .v_left {
+    text-align:left;
+}
+#large_item_singleview_cont .v_right {
+    text-align:right;
+}
+.boosterDescription {
+    font-size: 9px;
+}
+
+
+/* Hangar - startscreen */
+#main_overview {
+    width:481px;
+    height:388px;
+    margin:24px 0 0 96px;
+    position:relative;
+    top: 0;
+    left: 0;
+}
+#main_overview_1 {
+    position:absolute;top:80px;left:10px;
+}
+#main_overview_2 {
+     position:absolute;top:115px;left:255px;
+}
+#main_overview_3 {
+     position:absolute;top:300px;left:10px;
+}
+#main_overview_4 {
+     position:absolute;top:300px;left:230px;
+}
+
+/* Hangar - Schiffe */
+#item_singleview_cont table {
+    width:220px;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+#item_singleview_cont .v_left {
+    text-align:left;
+}
+#item_singleview_cont .v_right {
+    text-align:right;
+}
+
+/* Hangar - Drohnen*/
+.noDrones {
+    padding:10px;
+}
+#name {
+    font-weight:bold;
+    margin: 0 3px;
+    padding: 3px;
+    height: 30px;
+}
+#descr {
+     padding:3px 0;
+}
+
+#status {
+     width:218px;
+     text-align:center;
+     padding:3px 0;
+}
+
+#discount {
+    color: #F1C839;
+    font-size: 13px;
+    font-weight: bold;
+    position: absolute;
+    right: 65px;
+    top: 262px;
+}
+
+/* ################## */
+
+#hangarContent {
+    width: 672px;
+    height: 439px;
+    float: left;
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+/* overview */
+#hangarOverviewBox {
+    width: 672px;
+    height: 439px;
+    float: left;
+    /*background-image: url(/do_img/global/hangar/backgroundOverviewBox.jpg?__cv=d8395b9f6d7d22f63c25766424af2200);*/
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#hangarOverviewBox .backgroundShip {
+    width: 481px;
+    height: 388px;
+    position: absolute;
+    left: 65px;
+    top: 26px;
+}
+#hangarOverviewBox .shipDesign1 {
+    background-image: url(/do_img/global/hangar/ships/1.jpg?__cv=e9a744cf39f19060e1f28a820f2e6a00);
+}
+#hangarOverviewBox .shipDesign2 {
+    background-image: url(/do_img/global/hangar/ships/2.jpg?__cv=7c37fa48bf495ff2e432d986786fc600);
+}
+#hangarOverviewBox .shipDesign3 {
+    background-image: url(/do_img/global/hangar/ships/3.jpg?__cv=e901cc23d643e44e9c9bec9964bde300);
+}
+#hangarOverviewBox .shipDesign4 {
+    background-image: url(/do_img/global/hangar/ships/4.jpg?__cv=5163f90f122f738050ad262c53d0fc00);
+}
+#hangarOverviewBox .shipDesign5 {
+    background-image: url(/do_img/global/hangar/ships/5.jpg?__cv=27c72d446546e55b7802fc08eaa30000);
+}
+#hangarOverviewBox .shipDesign6 {
+    background-image: url(/do_img/global/hangar/ships/6.jpg?__cv=c0658404c6b097d33c32ffd5342d2b00);
+}
+#hangarOverviewBox .shipDesign7 {
+    background-image: url(/do_img/global/hangar/ships/7.jpg?__cv=5fb4dcdbbd3046ce4306cb7ef7f53600);
+}
+#hangarOverviewBox .shipDesign8 {
+    background-image: url(/do_img/global/hangar/ships/8.jpg?__cv=8aae2f21202b82bb13e2171676b5da00);
+}
+#hangarOverviewBox .shipDesign9 {
+    background-image: url(/do_img/global/hangar/ships/9.jpg?__cv=a425876b89219f951488e7fdad1a2b00);
+}
+#hangarOverviewBox .shipDesign10 {
+    background-image: url(/do_img/global/hangar/ships/10.jpg?__cv=969e218a77135772cb28658c35ae2500);
+}
+#hangarOverviewBox .shipDesign11 {
+    background-image: url(/do_img/global/hangar/ships/11.jpg);
+}
+#hangarOverviewBox .shipDesign12 {
+    background-image: url(/do_img/global/hangar/ships/12.jpg);
+}
+#hangarOverviewBox .shipDesign13 {
+    background-image: url(/do_img/global/hangar/ships/13.jpg);
+}
+#hangarOverviewBox .shipDesign14 {
+    background-image: url(/do_img/global/hangar/ships/14.jpg);
+}
+#hangarOverviewBox .shipDesign50 {
+    background-image: url(/do_img/global/hangar/ships/50.jpg?__cv=4e626ceda68d07b50eb3a23397ffab00);
+}
+#hangarOverviewBox .shipDesign52 {
+    background-image: url(/do_img/global/hangar/ships/52.jpg?__cv=6b24459205e4d794fc31df239b2b5b00);
+}
+#hangarOverviewBox .shipDesign53 {
+    background-image: url(/do_img/global/hangar/ships/53.jpg?__cv=83387c488efb59b5c71be0e64a38f000);
+}
+#hangarOverviewBox .shipDesign54 {
+    background-image: url(/do_img/global/hangar/ships/54.jpg?__cv=a8e39cdfc9ad62c8ddea7a914bc9a700);
+}
+#hangarOverviewBox .shipDesign56 {
+    background-image: url(/do_img/global/hangar/ships/56.jpg?__cv=a1d49ea8320a10695fbf1bbd47004300);
+}
+#hangarOverviewBox .shipDesign57 {
+    background-image: url(/do_img/global/hangar/ships/57.jpg?__cv=28e7f7188aae2a99d3faaa7c45ac8e00);
+}
+#hangarOverviewBox .shipDesign58 {
+    background-image: url(/do_img/global/hangar/ships/58.jpg?__cv=5a08b2f99d1030e648c8382d29271000);
+}
+#hangarOverviewBox .shipDesign59 {
+    background-image: url(/do_img/global/hangar/ships/59.jpg?__cv=8191528bd8b33600aefce699cce3cc00);
+}
+#hangarOverviewBox .shipDesign60 {
+    background-image: url(/do_img/global/hangar/ships/60.jpg?__cv=fd84b841e243ed6f9019c135c61cbc00);
+}
+#hangarOverviewBox .shipDesign61 {
+    background-image: url(/do_img/global/hangar/ships/61.jpg?__cv=79d958efb6f7e039a1463ba964bab800);
+}
+#hangarOverviewBox .shipDesign62 {
+    background-image: url(/do_img/global/hangar/ships/62.jpg?__cv=2630fdb9ecbbd46e74ace0f9e890e700);
+}
+#hangarOverviewBox .shipDesign63 {
+    background-image: url(/do_img/global/hangar/ships/63.jpg?__cv=09015029f560106a21013a164aff8400);
+}
+#hangarOverviewBox .shipDesign64 {
+    background-image: url(/do_img/global/hangar/ships/64.jpg?__cv=8c0cdd4d8c6815cfb2807083c5d96b00);
+}
+#hangarOverviewBox .shipDesign65 {
+    background-image: url(/do_img/global/hangar/ships/65.jpg?__cv=bb23cd631ae9b99b6f6411ae59302700);
+}
+#hangarOverviewBox .shipDesign66 {
+    background-image: url(/do_img/global/hangar/ships/66.jpg?__cv=f92859de859ffe1aa708b7b201636500);
+}
+#hangarOverviewBox .shipDesign67 {
+    background-image: url(/do_img/global/hangar/ships/67.jpg?__cv=b0cbaeea916ba27d614ece8ba1bc2e00);
+}
+#hangarOverviewBox .shipDesign68 {
+    background-image: url(/do_img/global/hangar/ships/68.jpg?__cv=3755711170bc70b184ea74050e4d7300);
+}
+
+#hangarOverviewBox .backgroundShip .overview_button {
+    position: absolute;
+    top: 22px;
+    width: 106px;
+    height: 22px;
+    background-image: url(/do_img/global/hangar/overview_button.png?__cv=26ab7594edbd30c479aab9051b370a00);
+    font-weight: bold;
+    cursor: pointer;
+}
+#hangarOverviewBox .backgroundShip #overview_button_ship {
+    left: 7px;
+}
+#hangarOverviewBox .backgroundShip #overview_button_drones {
+    left: 120px;
+}
+#hangarOverviewBox .backgroundShip .overview_button div.label {
+    position: absolute;
+    left: 8px;
+    top: 4px;
+    cursor: pointer;
+}
+#hangarOverviewBox .backgroundShip .infoBox {
+    position: absolute;
+    left: 7px;
+    top: 46px;
+    width: 350px;
+    height: 331px;
+}
+#hangarOverviewBox .backgroundShip .infoBox_ship {
+    background-image: url(/do_img/global/hangar/info_ship.png?__cv=b5e686c2d3f0ec31e3f2d5a1970e8b00);
+}
+#hangarOverviewBox .backgroundShip .infoBox_drones {
+    background-image: url(/do_img/global/hangar/info_drones.png?__cv=590b64f81b202d1b4ded6c2258303900);
+}
+#hangarOverviewBox .infoBox .labels .label {
+    position: absolute;
+    left: 8px;
+    font-weight: bold;
+}
+#hangarOverviewBox .infoBox .labels .label a {
+    /*color: #ffffff;
+    text-decoration: none;*/
+}
+#infoBox_statusHangar {
+    position        : absolute;
+    text-align      : center;
+    top             : 170px;
+    left            : 342px;
+    height          : 70px;
+    width           : 370px;
+}
+#labelHitpoints {
+    top: 8px;
+}
+#labelMaxHitpoints {
+    top: 33px;
+}
+#labelLaser {
+    top: 57px;
+}
+#labelAmmunition {
+    top: 81px;
+}
+#labelRockets {
+    top: 105px;
+}
+#labelRepairVouchers {
+    top: 129px;
+}
+#labelSpeedGenerators {
+    top: 169px;
+}
+#labelMaxSpeed {
+    top: 193px;
+}
+#labelShieldGenerators {
+    top: 217px;
+}
+#labelDamageSpreading {
+    top: 241px;
+}
+#labelSpreadingShieldHitpoints {
+    top: 257px;
+    font-weight: normal !important;
+}
+#labelDrones {
+    top: 297px;
+}
+#labelDronesFlexIris {
+    top: 313px;
+    font-weight: normal !important;
+}
+#labelDrone1 {
+    top: 8px;
+}
+#labelDamage1 {
+    top: 24px;
+}
+#labelPoints1 {
+    top: 40px;
+}
+#labelNextLevel1 {
+    top: 56px;
+}
+#labelDrone2 {
+    top: 80px;
+}
+#labelDamage2 {
+    top: 96px;
+}
+#labelPoints2 {
+    top: 112px;
+}
+#labelNextLevel2 {
+    top: 128px;
+}
+#labelDrone3 {
+    top: 152px;
+}
+#labelDamage3 {
+    top: 168px;
+}
+#labelPoints3 {
+    top: 184px;
+}
+#labelNextLevel3 {
+    top: 200px;
+}
+#labelDrone4 {
+    top: 224px;
+}
+#labelDamage4 {
+    top: 240px;
+}
+#labelPoints4 {
+    top: 256px;
+}
+#labelNextLevel4 {
+    top: 272px;
+}
+#labelPetName {
+    top: 8px;
+}
+#labelPetLevel {
+    top: 18px;
+}
+#labelPetXp {
+    top: 18px;
+}
+#labelPetHp {
+    top: 18px;
+}
+
+
+#hangarOverviewBox .infoBox .values .label {
+    position: absolute;
+    left: 172px;
+    font-weight: bold;
+    width: 70px;
+    text-align: right;
+}
+#valueHitpoints {
+    top: 8px;
+}
+#valueMaxHitpoints {
+    top: 33px;
+}
+#valueLaser {
+    top: 57px;
+}
+#valueAmmunition {
+    top: 81px;
+}
+#valueRockets {
+    top: 105px;
+}
+#valueRepairVouchers {
+    top: 129px;
+}
+#valueSpeedGenerators {
+    top: 169px;
+}
+#valueMaxSpeed {
+    top: 193px;
+}
+#valueShieldGenerators {
+    top: 217px;
+}
+#valueDamageSpreading {
+    top: 241px;
+}
+#valueDrones {
+    top: 297px;
+}
+#valueLevel1 {
+    top: 8px;
+}
+#valueDamage1 {
+    top: 24px;
+}
+#valuePoints1 {
+    top: 40px;
+}
+#valueNextLevel1 {
+    top: 56px;
+}
+#valueLevel2 {
+    top: 80px;
+}
+#valueDamage2 {
+    top: 96px;
+}
+#valuePoints2 {
+    top: 112px;
+}
+#valueNextLevel2 {
+    top: 128px;
+}
+#valueLevel3 {
+    top: 152px;
+}
+#valueDamage3 {
+    top: 168px;
+}
+#valuePoints3 {
+    top: 184px;
+}
+#valueNextLevel3 {
+    top: 200px;
+}
+#valueLevel4 {
+    top: 224px;
+}
+#valueDamage4 {
+    top: 240px;
+}
+#valuePoints4 {
+    top: 256px;
+}
+#valueNextLevel4 {
+    top: 272px;
+}
+#valuePetName {
+    top: 8px;
+}
+#valuePetLevel {
+    top: 8px;
+}
+#valuePetXp {
+    top: 18px;
+}
+#valuePetHp {
+    top: 18px;
+}
+
+.labelNextDrones {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ships */
+#hangarItemContainer {
+    width: 672px;
+    height: 439px;
+    float: left;
+    background-image: url(/do_img/global/hangar/backgroundItemContainer.jpg?__cv=6add2c7ba940b9ea58afab7ee67ec700);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#hangarItemContainer #itemBox {
+    position: absolute;
+    left: 66px;
+    top: 12px;
+    width: 246px;
+    height: 324px;
+    overflow: auto;
+}
+.buyableItem {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    float: left;
+    margin-left: 5px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+.buyableItem .price {
+    position: absolute;
+    left: 4px;
+    top: 81px;
+    width: 93px;
+    height: 17px;
+    text-align: center;
+    color: #ffffff;
+    font-weight: bold;
+    cursor: pointer;
+}
+#hangarItemContainer #itemInfo {
+    position: absolute;
+    left: 66px;
+    top: 12px;
+    width: 246px;
+    height: 324px;
+    display: none;
+}
+#hangarItemContainer #itemInfo .header {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 246px;
+    height: 42px;
+    background-image: url(/do_img/global/hangar/itemInfo_header.jpg?__cv=def010bca88571ffb74ef9a5fc6bdf00);
+}
+#hangarItemContainer #itemInfo .header .headline {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+}
+#hangarItemContainer #itemInfo .body {
+    position: absolute;
+    left: 0;
+    top: 42px;
+    width: 246px;
+    height: 262px;
+    background-image: url(/do_img/global/hangar/itemInfo_body.jpg?__cv=cb541b1cc29d0eb3c62de21fc8b59300);
+}
+#hangarItemContainer #itemInfo .footer {
+    position: absolute;
+    left: 0;
+    top: 304px;
+    width: 246px;
+    height: 22px;
+    background-image: url(/do_img/global/hangar/itemInfo_footer.jpg?__cv=bed017f6f8171d07c57bd73ceaf87c00);
+}
+#hangarItemContainer #itemInfo .header .close {
+    position: absolute;
+    left: 217px;
+    top: 5px;
+    width: 23px;
+    height: 22px;
+    cursor: pointer;
+}
+#hangarItemContainer #itemInfo .body .headline {
+    position: absolute;
+    left: 10px;
+    top: 24px;
+    width: 228px;
+    text-align: center;
+    color: #ffffff;
+    font-weight: bold;
+}
+#hangarItemContainer #itemInfo .body .description {
+    position: absolute;
+    left: 10px;
+    top: 56px;
+    width: 228px;
+    text-align: center;
+    color: #ffffff;
+}
+#hangarItemContainer #itemInfo .body table {
+    font-size: 9px;
+    color: #ffffff;
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    width: 219px;
+}
+#hangarItemContainer #itemInfo .body .key {
+    font-weight: bold;
+    text-align: left;
+}
+#hangarItemContainer #itemInfo .body .value {
+    text-align: right;
+}
+#hangarItemContainer #itemInfo .body #itemInfoConfirmation {
+    position: absolute;
+    left: 11px;
+    top: 102px;
+    color: #ffffff;
+    font-size: 11px;
+    width: 225px;
+    text-align: center;
+}
+#hangarItemContainer #itemInfo .body #itemInfoWarning {
+    position: absolute;
+    left: 11px;
+    top: 158px;
+    color: #ffffff;
+    font-size: 9px;
+    width: 225px;
+    text-align: center;
+}
+#hangarItemContainer #itemInfo .body #itemInfoButtonBuy {
+    position: absolute;
+    left: 8px;
+    top: 239px;
+    cursor: pointer;
+}
+#hangarItemContainer #itemInfo .body #itemInfoButtonBid {
+    position: absolute;
+    left: 127px;
+    top: 239px;
+    cursor: pointer;
+}
+
+.backgroundShip .shipNotation .droneNotation {
+    position:absolute;
+    left: 271px;
+    top: 20pX;
+}
+.backgroundShip .shipNotation .shipTitle {
+    margin-top: 2px;
+    margin-left: 1px;
+}
+
+#shipNotation {
+    float: right;
+    margin: -65px 0 0 0;
+    text-align: right;
+}
+
+#shipTitle {
+}
+
+#shipName {
+    margin-bottom: 3px;
+}
+
+#droneNotation {
+    float: right;
+    margin: -43px 10px 0 0;
+    text-align: right;
+}
+
+#droneName {
+    margin-bottom: 3px;
+}
+
+#petNotation {
+    float: right;
+    margin: -43px 10px 0 0;
+    text-align: right;
+}
+
+#petName {
+    margin-bottom: 3px;
+}
+
+#but_repair {
+    position: absolute;
+    left: 360px;
+    top: 230px;
+}
+
+#but_petRepair {
+    position: absolute;
+    left: 360px;
+    top: 77px;
+}
+
+#dock_content {
+    background-image: url(/do_img/global/hangar/bg_shop.jpg?__cv=fd907212d078fbe1319414773362f500);
+    background-repeat   : no-repeat;
+
+    min-height          :400px;
+    height              :auto !important;  /* for modern browser */
+    height              :400px;  /*for IE */
+
+    padding             : 0;
+    top                 : 0;
+}
+
+.overview_image {
+    background-image: url(/do_img/global/hangar/overview/bg_ship.jpg?__cv=2f0b7fa865744a15c103265953d75e00);
+    background-repeat: no-repeat;
+    background-position: 0 22px;
+}
+
+#overview_container {
+    position: relative;
+    top: 0;
+    left: 0;
+    height:390px;
+    width: 772px;
+    float: left;
+}
+
+#overview_navigation {
+    /*width: 280px;*/
+    width: 599px;
+    margin-left: 5px
+}
+
+#overview_content {
+    background-image: url(/do_img/global/hangar/overview/stats_bg.png?__cv=b574234ff9503d2e1341900bf603dd00);
+    background-repeat: no-repeat;
+    width: 279px;
+    height: 358px;
+    margin-top: 2px;
+    margin-left: 5px;
+}
+#overview_content a {
+    color: white;
+}
+#overview_content a:hover {
+    color: #F1C839
+}
+.overview_button_active {
+    background-image: url(/do_img/global/hangar/overview/small_tabs_active.png?__cv=ad09327ac6ffdc2911cffb3017036700);
+    background-repeat: no-repeat;
+}
+
+.overview_button_inactive {
+    background-image: url(/do_img/global/hangar/overview/small_tabs_inactive.png?__cv=fde319f7fd81c0227c63bd159763e200);
+    background-repeat: no-repeat;
+}
+
+#overview_button_ship, #overview_button_drones, #overview_button_pet {
+    float: left;
+    width: 94px;
+    text-align: center;
+    cursor: pointer;
+    height: 23px;
+    line-height: 21px;
+}
+
+#overview_background {
+    overflow: hidden;
+}
+
+
+.overview_seperator {
+    background-image: url(/do_img/global/hangar/overview/tab_line.png?__cv=4ef2cbd04964c9265b06ec9a70bc1200);
+    background-repeat: no-repeat;
+    background-position: bottom;
+}
+
+.overview_line {
+    width: 255px;
+    margin-top: 3px;
+}
+
+.overview_line_highlight {
+    background-image: url(/do_img/global/hangar/overview/text_bg.png?__cv=dcf251706bbe4453994b05a63d1dfa00);
+}
+
+.overview_table {
+    margin-left         : 10px;
+    margin-top          : 5px;
+    width               : 260px;
+    position            : absolute;
+}
+
+.labels {
+    height:12px;
+}
+
+.values {
+    text-align: right;
+    color: #F1C839;
+    height: 12px;
+}
+
+#buy_container {
+    background-image: url(/do_img/global/hangar/buy-item_background_157x394.png?__cv=e213febddc9f7def0f43d1ce71623600);
+    background-repeat: no-repeat;
+    width: 157px;
+    height: 394px;
+    float: right;
+}
+
+
+.purchase {
+    background-image: url(/do_img/global/hangar/buy-item_buy-button_576x48.png?__cv=40008a8ea5c08e772f4d79bfbc872300);
+    background-repeat   : no-repeat;
+    background-position : -144px 0;
+    width               : 142px;
+    height              : 48px;
+    margin-left         : 7px;
+    position            : absolute;
+    cursor              : pointer;
+}
+.purchase.mouseOver {
+    background-position : -288px 0px;
+}
+.purchase.mouseDown {
+    background-position : -432px 0px;
+}
+
+.purchase div {
+    background-repeat   : no-repeat;
+    position            : absolute;
+    width               : 140px;
+    margin-left         : 5px;
+}
+
+#buy_button {
+    margin-top          : 292px;
+}
+
+#subscription_button {
+    margin-top          : 338px;
+    display             : none;
+}
+body.internalDockShop_booster #subscription_button {
+    display             : inline;
+}
+
+#buy_button_text,
+#subscription_button #start {
+    background-position : center 14px;
+    height              : 35px;
+}
+#subscription_button #stop {
+    height              : 40px;
+    background-position : center 9px;
+}
+
+#subscription_button.running #start,
+#subscription_button #stop {
+    display             : none;
+}
+#subscription_button.running #stop,
+#subscription_button #start {
+    display             : block;
+}
+
+#amountSelector {
+    display             : none;
+    margin              : auto;
+    position            : absolute;
+    top                 : 63px;
+    width               : 158px;
+}
+#amountSelector .label {
+    margin-bottom       : 8px;
+    width               : 100%;
+    text-align          : center;
+}
+#amountSelector .amountPreset {
+    margin              : auto;
+}
+#amountSelector #arrow {
+    background-image: url(/do_img/global/hangar/buy-item_amount-arrow_48x32.png?__cv=34bdd49ed6c482fad2eb874871155700);
+    background-position : center 0;
+    background-repeat   : no-repeat;
+    height              : 16px;
+    margin-bottom       : 8px;
+    margin-top          : 5px;
+}
+#amountSelector #five,
+#amountSelector #ten,
+#amountSelector #twenty,
+#amountSelector #hundred,
+#amountSelector #thousand,
+#amountSelector #max {
+    background-image: url(/do_img/global/hangar/buy-item_amount.png?__cv=e41e0326da336bc38db5a1ebe4576e00);
+    background-repeat   : no-repeat;
+    height              : 17px;
+    width               : 59px;
+    display             : none;
+    margin-bottom       : 2px;
+}
+#amountSelector #five {
+    background-position : 0px 0px;
+}
+#amountSelector #five.enabled {
+    background-position : -60px 0px;
+    cursor              : pointer;
+}
+#amountSelector #five.enabled.mouseOver {
+    background-position : -120px 0px;
+}
+#amountSelector #five.enabled.mouseDown {
+    background-position : -180px 0px;
+}
+
+#amountSelector #twenty {
+    background-position : -0px -34px;
+}
+#amountSelector #twenty.enabled {
+    background-position : -60px -34px;
+    cursor              : pointer;
+}
+#amountSelector #twenty.enabled.mouseOver {
+    background-position : -120px -34px;
+}
+#amountSelector #twenty.enabled.mouseDown {
+    background-position : -180px -34px;
+}
+
+
+
+#amountSelector #ten {
+    background-position : 0px -17px;
+}
+#amountSelector #ten.enabled {
+    background-position : -60px -17px;
+    cursor              : pointer;
+}
+#amountSelector #ten.enabled.mouseOver {
+    background-position : -120px -17px;
+}
+#amountSelector #ten.enabled.mouseDown {
+    background-position : -180px -17px;
+}
+#amountSelector #hundred {
+    background-position : 0px -51px;
+}
+#amountSelector #hundred.enabled {
+    background-position : -60px -51px;
+    cursor              : pointer;
+}
+#amountSelector #hundred.enabled.mouseOver {
+    background-position : -120px -51px;
+}
+#amountSelector #hundred.enabled.mouseDown {
+    background-position : -180px -51px;
+}
+#amountSelector #thousand {
+    background-position : 0px -68px;
+}
+#amountSelector #thousand.enabled {
+    background-position : -60px -68px;
+    cursor              : pointer;
+}
+#amountSelector #thousand.enabled.mouseOver {
+    background-position : -120px -68px;
+}
+#amountSelector #thousand.enabled.mouseDown {
+    background-position : -180px -68px;
+}
+#amountSelector #max {
+    background-position : 0px -85px;
+    margin-bottom       : 10px;
+}
+#amountSelector #max.enabled {
+    background-position : -60px -85px;
+    cursor              : pointer;
+}
+#amountSelector #max.enabled.mouseOver {
+    background-position : -120px -85px;
+}
+#amountSelector #max.enabled.mouseDown {
+    background-position : -180px -85px;
+}
+#amountSelector #plus,
+#amountSelector #minus {
+    background-image: url(/do_img/global/hangar/buy-item_plus-minus_100x5.png?__cv=fadcc1ed0bcb149b544fdbdae1979c00);
+    background-repeat   : no-repeat;
+    height              : 23px;
+    width               : 23px;
+    position            : absolute;
+}
+#amountSelector #plus {
+    background-position : 0 -25px;
+    margin-left         : 72px;
+}
+#amountSelector #plus.enabled {
+    background-position : -25px -25px;
+    cursor              : pointer;
+}
+#amountSelector #plus.enabled.mouseOver {
+    background-position : -50px -25px;
+}
+#amountSelector #plus.enabled.mouseDown {
+    background-position : -75px -25px;
+}
+#amountSelector #minus {
+    background-position : 0px 0px;
+    margin-left         : -35px;
+}
+#amountSelector #minus.enabled {
+    background-position : -25px 0px;
+    cursor              : pointer;
+}
+#amountSelector #minus.enabled.mouseOver {
+    background-position : -50px 0px;
+}
+#amountSelector #minus.enabled.mouseDown {
+    background-position : -75px 0px;
+}
+#amountSelector #stepper {
+    position            : absolute;
+    top                 : 130px;
+    left                : 47px;
+}
+#amountSelector #stepper input#selectedAmount {
+    background-color    : #000000;
+    border-width        : 0px;
+    color               : #FFFFFF;
+    height              : 16px;
+    margin-left         : -7px;
+    position            : absolute;
+    text-align          : right;
+    width               : 75px;
+    margin-top          : 5px;
+}
+
+/**
+ * With the NameSelector the user may choose the name for his PET.
+ */
+#nameSelector {
+    display             : none;
+    margin-top          : -65px;
+    margin-left         : 3px;
+    position            : absolute;
+}
+#nameSelector label {
+    margin-top          : 219px;
+    margin-left         : 14px;
+    position            : absolute;
+    width               : 121px;
+    text-align          : center;
+}
+#nameSelector input {
+    position            : absolute;
+    background-color    : #000000;
+    border-width        : 0px;
+    color               : #FFFFFF;
+    width               : 123px;
+    height              : 16px;
+    margin-left         : 14px;
+    margin-top          : 235px;
+    text-align          : center;
+}
+
+/**
+ * With the LevelSelector the user may choose the level of an item.
+ */
+#levelSelector {
+    margin              : auto;
+    position            : absolute;
+    top                 : 103px;
+    width               : 158px;
+    text-align          : center;
+}
+#levelSelector .label {
+    margin              : auto;
+}
+#levelSelector .scrollArrow {
+    margin              : auto;
+    background-position : 0px 0px;
+    background-repeat   : no-repeat;
+    width               : 60px;
+    height              : 12px;
+}
+#levelSelector .scrollArrow.enabled {
+    background-position : -60px 0px;
+    cursor              : pointer;
+}
+#levelSelector .scrollArrow.enabled.mouseOver {
+    background-position : -120px 0px;
+}
+#levelSelector .scrollArrow.enabled.mouseDown {
+    background-position : -180px 0px;
+}
+#levelSelector #levelScrollUp {
+    background-image: url(/do_img/global/hangar/buy-item_level-up_240x12.png?__cv=3e40e5a260a95d6659c12088297cb400);
+}
+#levelSelector #levelScrollDown {
+    background-image: url(/do_img/global/hangar/buy-item_level-down_240x12.png?__cv=8224c9a2d7bcc95d22ce33012a9b6200);
+}
+#levelSelector #levelScrollContainer {
+    overflow            : hidden;
+    height              : 54px;
+    margin-top          : 1px;
+    margin-bottom       : 1px;
+}
+#levelSelector #levelList {
+    height              : 54px;
+}
+#levelSelector #levelList div {
+    margin              : auto;
+}
+#levelSelector #levelList .level {
+    background-repeat   : no-repeat;
+    background-position : 0px 0px;
+    height              : 18px;
+    width               : 60px;
+}
+#levelSelector #levelList .level.enabled {
+    cursor              : pointer;
+    background-position : -60px 0px;
+}
+#levelSelector #levelList .level.enabled.mouseOver {
+    background-position : -120px 0px;
+}
+#levelSelector #levelList .level.enabled.mouseDown,
+#levelSelector #levelList .level.enabled.selected {
+    background-position : -180px 0px;
+}
+#levelSelector #level1  { background-image: url(/do_img/global/hangar/buy-item_level-01_248x17.png?__cv=c57510ba80c4efc8612601fe89128200); }
+#levelSelector #level2  { background-image: url(/do_img/global/hangar/buy-item_level-02_248x17.png?__cv=1e2b87b41b2a3e934dd1c19448cb9000); }
+#levelSelector #level3  { background-image: url(/do_img/global/hangar/buy-item_level-03_248x17.png?__cv=01c1cd1a7f259c2a21314e672bf24700); }
+#levelSelector #level4  { background-image: url(/do_img/global/hangar/buy-item_level-04_248x17.png?__cv=0a0c96c0ab271276989a7d7712c5bd00); }
+#levelSelector #level5  { background-image: url(/do_img/global/hangar/buy-item_level-05_248x17.png?__cv=8e104dba3dd764393d4b1f5bb6cf7a00); }
+#levelSelector #level6  { background-image: url(/do_img/global/hangar/buy-item_level-06_248x17.png?__cv=df284e4077b35f98bc880d891284ba00); }
+#levelSelector #level7  { background-image: url(/do_img/global/hangar/buy-item_level-07_248x17.png?__cv=c08de9e3eea52758101994435cdb9800); }
+#levelSelector #level8  { background-image: url(/do_img/global/hangar/buy-item_level-08_248x17.png?__cv=8cc655e193da2c07bbe6e574a8e4fb00); }
+#levelSelector #level9  { background-image: url(/do_img/global/hangar/buy-item_level-09_248x17.png?__cv=5d40dee31edcef56ace67943e8ba8000); }
+#levelSelector #level10 { background-image: url(/do_img/global/hangar/buy-item_level-10_248x17.png?__cv=71b2105f881ee2c22267cd5a2c732800); }
+
+/**
+ * Name of the item (above name-/amount-/level-selector)
+ */
+#buy_itemName {
+    background-repeat   : no-repeat;
+    background-position : center;
+    height              : 20px;
+    width               : 132px;
+    margin-top          : 10px;
+    margin-left         : 13px;
+    position            : absolute;
+}
+
+.centerAmount {
+    margin:auto;
+}
+
+#sellPrice {
+    background-color: #000000;
+    border: 0 none;
+    color: #FFFFFF;
+    height: 16px;
+    margin-left: 15px;
+    margin-top: 265px;
+    position: absolute;
+    width: 123px;
+    text-align: right;
+}
+
+.item-view {
+    float:left;
+    overflow:hidden;
+    margin: 0 0 0 0;
+    vertical-align:top;
+}
+
+#item_container {
+    float:left;
+    background-image: url(/do_img/global/hangar/item-list_background_222x395.png?__cv=28bb9f75dd06a78efd7133f3f823c000);
+    width: 222px;
+    height: 395px;
+    margin-top: -2px;
+    margin-left: -4px;
+}
+
+#item_container_overlay {
+    top         : 0px;
+    position    : absolute;
+    width       : 222px;
+    height      : 395px;
+    margin-top  : -2px;
+    margin-left : -4px;
+    display     : none;
+}
+
+#item_scroller {
+    overflow: hidden;
+    position : relative;
+    height: 318px;
+    margin-top: 16px;
+    margin-left: 2px;
+}
+
+#item_scroll_up {
+    background-image: url(/do_img/global/hangar/item-list_up_428x21.png?__cv=bfbff5186368d8bafd53a3b17dd96300);
+    width               : 107px;
+    height              : 21px;
+    margin-top          : 2px;
+    margin-left         : 56px;
+}
+
+#item_scroll_down {
+    background-image: url(/do_img/global/hangar/item-list_down_428x21.png?__cv=2b818389078e6dbc0ab8aa7223affe00);
+    width               : 107px;
+    height              : 21px;
+    margin-top          : 16px;
+    margin-left         : 56px;
+}
+
+#item_scroll_up,
+#item_scroll_down {
+    background-repeat   : no-repeat;
+    background-position : 0px 0px;
+}
+#item_scroll_up.enabled,
+#item_scroll_down.enabled {
+    background-position : -107px 0px;
+    cursor              : pointer;
+}
+#item_scroll_up.hover,
+#item_scroll_down.hover {
+    background-position : -214px 0px;
+}
+#item_scroll_up.mouseDown,
+#item_scroll_down.mouseDown {
+    background-position : -321px 0px;
+}
+
+#item_scroll_top {
+    background-image: url(/do_img/global/hangar/item-list_up-all_38x80.png?__cv=2415c4bc24422adbeeb2f6b2bfecba00);
+    width               : 36px;
+    height              : 17px;
+    margin-top          : -19px;
+    margin-left         : 174px;
+}
+
+#item_scroll_bottom {
+    background-image: url(/do_img/global/hangar/item-list_down-all_38x80.png?__cv=661b9e139951736cbf63a0eb38b78700);
+    background-repeat   : no-repeat;
+    width               : 36px;
+    height              : 17px;
+    margin-top          : -22px;
+    margin-left         : 174px;
+}
+
+#item_scroll_top,
+#item_scroll_bottom {
+    background-position : 0px 0px;
+}
+#item_scroll_top.enabled,
+#item_scroll_bottom.enabled {
+    background-position : 0px -20px;
+    cursor              : pointer;
+}
+#item_scroll_top.hover,
+#item_scroll_bottom.hover {
+    background-position : 0px -40px;
+}
+#item_scroll_top.mouseDown,
+#item_scroll_bottom.mouseDown {
+    background-position : 0px -60px;
+}
+
+.items {
+    float: left;
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+
+#preview_container {
+    float:left;
+    width: 206px;;
+    height:206px;
+    margin:0 0 0 0 !important;
+}
+#preview {
+    background-image: url(/do_img/global/hangar/preview_frame_276x264.png?__cv=b8ea40bd90be0a30680c3ed3d9b21400);
+    background-repeat   : no-repeat;
+    float               : left;
+    width               : 276px;
+    height              : 264px;
+    margin              : 0 0 0 -4px !important;
+}
+
+#previewMovie {
+    margin-left: 12px;
+    margin-top: 25px;
+    width: 253px;
+    height: 206px;
+}
+
+#previewBuyButton1 {
+    background-image: url(/do_img/global/hangar/preview_buy_471x38.png?__cv=c0705f9dd24907bb6b45aad556932b00);
+    background-repeat: no-repeat;
+    width: 157px;
+    height:38px;
+    margin-left: 60px;
+    margin-top: 7px;
+}
+
+#info {
+    background-image: url(/do_img/global/hangar/item-info_background_260x127.png?__cv=a52add911fa44882a86dc4fcbc0fee00);
+    background-repeat   : no-repeat;
+    float               : left;
+    width               : 260px;
+    height              : 127px;
+    margin              : 0px 0px 0px 3px !important;
+    overflow-y          : hidden;
+    padding-top         : 1px;
+    padding-bottom      : 1px;
+}
+#info table {
+    width               : 250px;
+    margin              : 0px;
+    border-collapse     : collapse;
+}
+#shipDetails tr.even {
+    background-image: url(/do_img/global/hangar/item-info_background_cycle.png?__cv=9ee7806eb1d0a51263a7a110ba57e300);
+}
+
+#shipDetails tr td {
+    color               : #a4d3ff;
+}
+#shipDetails tr td.label {
+    color               : #6b6b6b;
+}
+#shipDetails tr td.firstColumn {
+    padding-left        : 10px;
+}
+#shipDetails tr td.secondColumn {
+    padding-left        : 10px;
+    white-space         : nowrap;
+}
+#shipDetails tr td#firstColumn_leonov {
+    color: #FFFFFF;
+    text-decoration: underline;
+}
+#shipDetails tr td#firstColumn_leonov:hover {
+    color: #F1C839;
+}
+
+#shipDetails tr td#secondColumn_leonov {
+    color: #FFFFFF;
+    text-decoration: underline;
+}
+
+#shipDetails tr td#secondColumn_leonov:hover {
+    color: #F1C839;
+}
+
+.info_other_value {
+    color               : #bcd3e3;
+}
+
+#scroll-content {
+    padding             : 3px 0 3px 0;
+    margin              : 0 4px 0 5px ;
+    height              : 87px;
+    width               : 250px;
+}
+#scroll-content:focus {
+    outline-width       : 0;
+}
+body.internalDockShop_ship #scroll-content {
+    height             : 125px;
+}
+
+/* use only info */
+#info1 {
+    background-image: url(/do_img/global/hangar/item-info_background_260x127.png?__cv=a52add911fa44882a86dc4fcbc0fee00);
+    background-repeat: no-repeat;
+    float:left;
+    width:260px;
+    height:127px;
+    margin:0 0 0 8px !important;
+    position: relative;
+}
+
+#nav_drones {
+    position: absolute;
+    top: 360px;
+    left: 26px;
+}
+
+#equipment_container {
+    position    : relative;
+    top         : 0;
+    left        : 0;
+    height      : 395px;
+    width       : 770px;
+    float       : left;
+    z-index     : 5;
+}
+
+#mainContentShop {
+    float:left;
+    width:641px;
+    height:394px;
+}
+
+#repair_ship {
+    background-image: url(/do_img/global/hangar/overview/repair_201x53.png?__cv=dc9cf566d3f553942f7390b03e41cd00);
+    background-repeat: no-repeat;
+    width: 201px;
+    height: 56px;
+    cursor: pointer;
+    position:absolute;
+    top: 25px;
+    left: 286px;
+}
+#repairShipLabel {
+
+    background-repeat: no-repeat;
+    float: left;
+    height: 22px;
+    margin-left: 61px;
+    margin-top: 10px;
+    position: relative;
+    width: 129px;
+}
+#repairShipPrice {
+    background-repeat: no-repeat;
+    background-position: 0 1px;
+    float: left;
+    height: 22px;
+    margin-left: 61px;
+    margin-top: 2px;
+    position: relative;
+    width: 129px;
+}
+#repairShipFree {
+    background-repeat: no-repeat;
+    background-position: 0 1px;
+    float: left;
+    height: 22px;
+    margin-left: 61px;
+    margin-top: 5px;
+    position: relative;
+    width: 129px;
+}
+
+
+#repair_pet {
+    background-image: url(/do_img/global/hangar/overview/repair_201x53.png?__cv=dc9cf566d3f553942f7390b03e41cd00);
+    background-repeat: no-repeat;
+    width: 203px;
+    height: 56px;
+    cursor: pointer;
+    position:absolute;
+    top: 25px;
+    left: 286px;
+}
+#repair_pet_disable {
+    background-image: url(/do_img/global/hangar/overview/repair_201x53.png?__cv=dc9cf566d3f553942f7390b03e41cd00);
+    background-position: 0px -180px;;
+    background-repeat: no-repeat;
+    width: 203px;
+    height: 56px;
+    position:absolute;
+    cursor: help;
+    left: -1px;
+}
+#repairPetLabel {
+    background-repeat: no-repeat;
+    float: left;
+    height: 22px;
+    margin-left: 61px;
+    margin-top: 10px;
+    position: relative;
+    width: 129px;
+}
+#repairPetPrice {
+    background-repeat: no-repeat;
+    background-position: 0 1px;
+    float: left;
+    height: 22px;
+    margin-left: 61px;
+    margin-top: 2px;
+    position: relative;
+    width: 129px;
+}
+
+.box-left {
+    margin-top: 5px;
+    margin-left:5px;
+    float:left;
+}
+.box-right {
+    margin-top:5px;
+    margin-left:5px;
+    float:left;
+}
+#infoBox_shipView {
+    position: absolute;
+    top: 140px;
+    left: 404px;
+    width: 360px;
+}
+#infoBox_petView {
+    display: none;
+    position: absolute;
+    top: 122px;
+    left: 395px;
+    width: 380px;
+}
+
+#infoBox_droneView {
+    display: none;
+    position: absolute;
+    top: 118px;
+    left: 410px;
+    width: 370px;
+}
+
+/* ShipYard */
+#overview_shipYard {
+    bottom              : 0;
+    position            : absolute;
+    right               : 0;
+}
+#shipDump {
+    width               : 350px;
+    height              : 116px;
+    background-image: url(/do_img/global/hangar/overview/ship_navigation_ui.png?__cv=c971bf84b7061da665ca00a987520e00);
+    background-repeat   : no-repeat;
+    z-index             : 1;
+    padding-top         : 1px;
+}
+#shipDump .showNext, #shipDump .showPrevious, #shipDump .showNextInactive, #shipDump .showPreviousInactive {
+    position: absolute;
+    top: 78px;
+    width: 34px;
+    height: 29px;
+}
+#shipDump .showPrevious {
+    left: 40px;
+    background-image: url(/do_img/global/hangar/overview/ship_navigation_button_previous_sprite_34x29.png?__cv=87b7e076cb4df2fac609bdd022684400);
+    background-position: 0 -29px;
+    cursor: pointer;
+}
+#shipDump .showPreviousInactive {
+    left: 40px;
+    background-image: url(/do_img/global/hangar/overview/ship_navigation_button_previous_sprite_34x29.png?__cv=87b7e076cb4df2fac609bdd022684400);
+    background-position: 0 0;
+}
+#shipDump .showNext {
+    left: 148px;
+    background-image: url(/do_img/global/hangar/overview/ship_navigation_button_next_sprite_34x29.png?__cv=50c876ec4825ccfa49bbb14bf235a000);
+    background-position: 0 -29px;
+    cursor: pointer;
+}
+#shipDump .showNextInactive {
+    left: 148px;
+    background-image: url(/do_img/global/hangar/overview/ship_navigation_button_next_sprite_34x29.png?__cv=50c876ec4825ccfa49bbb14bf235a000);
+    background-position: 0 0;
+}
+#shipDump .showPrevious:hover, #shipDump .showNext:hover {
+    background-position: 0 -58px;
+}
+#shipDump .showPrevious:active, #shipDump .showNext:active {
+    background-position: 0 -87px;
+}
+
+#buttonActivateShip {
+    position            : absolute;
+    top                 : 84px;
+    left                : 222px;
+    width               : 129px;
+    height              : 34px;
+    line-height         : 34px;
+    text-align          : center;
+    font-weight         : bold;
+    background-image: url(/do_img/global/hangar/overview/ship_navigation_button_right_sprite_129x34.png?__cv=91ba13d3afa33e724aeddc8de439a700);
+    background-repeat   : no-repeat;
+    background-position : 0px 0px;
+}
+#buttonActivateShip.mouseOver {
+    background-position : -129px 0px;
+}
+#buttonActivateShip.mouseDown {
+    background-position : -258px 0px;
+}
+.buttonActiv {
+    color: #FFFFFF;
+    cursor: pointer;
+}
+.buttonInactiv {
+    color: #b5b5b5;
+    cursor: default;
+}
+
+
+.shipyard {
+    float: left;
+    display: none;
+}
+.shipDumpViewLast, .shipDumpViewActual, .shipDumpViewNext {
+    width: 87px;
+    height: 77px;
+    position: absolute;
+}
+.shipDumpViewLast {
+    display: block;
+}
+.shipDumpViewActual {
+    top: 38px;
+    left: 66px;
+    display: block;
+}
+.shipDumpViewNext {
+    top: 0;
+    left: 134px;
+    display: block;
+    opacity: 0.5;
+    filter:alpha(opacity = 50);
+}
+
+.shipDumpViewPrevious {
+    opacity: 0.5;
+    filter:alpha(opacity = 50);
+}
+
+.shipyard_image {
+    width: 87px;
+    height: 77px;
+    background-image: url(/do_img/global/hangar/overview/ship_navigation_selection_sprite_87x77.png?__cv=234d0e6b8259d4f97412ded408884200);
+    margin-right: 20px;
+}
+
+.ship_ship_phoenix {
+    background-position: 0 0;
+}
+.ship_ship_yamato {
+    background-position: -87px 0;
+}
+.ship_ship_leonov {
+    background-position: -174px 0;
+}
+.ship_ship_defcom {
+    background-position: -261px 0;
+}
+.ship_ship_liberator {
+    background-position: -348px 0;
+}
+.ship_ship_piranha {
+    background-position: -435px 0;
+}
+.ship_ship_nostromo {
+    background-position: -522px 0;
+}
+.ship_ship_vengeance {
+    background-position: -609px 0;
+}
+.ship_ship_bigboy {
+    background-position: -696px 0;
+}
+.ship_ship_goliath {
+    background-position: -783px 0;
+}
+.ship_ship_police {
+    background-position: -869px 0;
+}
+
+.ship_ship_citadel {
+    background-position: -1130px 0;
+}
+
+.ship_ship_aegis {
+    background-position: -1043px 0;
+}
+
+.ship_ship_spearhead {
+    background-position: -956px 0;
+}
+/* ShipYard */
+
+
+.shipDescriptionSkill {
+    margin: 5px 0;
+}
+.shipDescriptionSkillHeadline {
+    background-repeat: no-repeat;
+    padding-left: 35px;
+    line-height: 35px;
+}
+
+.shipDescriptionSkillHeadlineText {
+    color: #A4D3FF;
+    padding: 2px 0 2px 5px;
+    background-image: url(/do_img/global/hangar/item-info_ability_background.png?__cv=5033bb8dcac170a16a53974ae9b11700);
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+}
+
+.shipDescrSkill {
+     margin-top: 10px;
+ }
+.shipDescriptionSkillText {
+}
+

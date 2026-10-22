@@ -1,0 +1,23 @@
+#nav                    {    float:left;width:181px;height:439px;background-image: url(/do_img/global/nav_sub_bg.jpg?__cv=df5c94c241d807cb08c115774de70e00);}
+#mainContentDummy       {    float:left;width:677px;height:439px;background-image: url(/do_img/global/bg.jpg?__cv=4b36ee28a996f49a13c713754498b600);}
+#mainContentShop        {    float:left;width:677px;height:439px;background-image: url(/do_img/global/bg_shop.jpg?__cv=a359a58b71b6b51780f5ec0c14960600);}
+#mainContentSlot        {    float:left;width:677px;height:439px;background-image:url(../do_img/global/bg_shopslot.jpg);}
+#mainContentAuction     {    float:left;width:677px;height:439px;background-image: url(/do_img/global/bg_auktion.jpg?__cv=d83f0c468dbe062f5665764862e4f000);}
+#mainContentAuktion     {    float:left;width:677px;height:439px;background-image: url(/do_img/global/bg_auktion.jpg?__cv=d83f0c468dbe062f5665764862e4f000);}
+#mainContentJobs        {    float:left;width:677px;height:439px;background-image: url(/do_img/global/bg_jobs.jpg?__cv=b45f03a842c6c6c396c529f372035500);}
+#mainContentLabor1      {    float:left;width:677px;height:439px;background-image: url(/do_img/global/bg_labor.jpg?__cv=5fe4dcf983b99895b61b14a3a3125000);}
+#mainContentLabor2      {    float:left;width:677px;height:439px;background-image: url(/do_img/global/bg_labor2.jpg?__cv=a18bd601a56ed013163aa688d7a66c00);}
+#mainContentClan1        {    float:left;width:677px;height:439px;background-image: url(/do_img/global/clan/bg_main_noMember.jpg?__cv=9092357053c6c0685ebb75740b622e00);}
+#mainContentClan2        {    float:left;width:677px;height:439px;background-image: url(/do_img/global/clan/bg_main_info.jpg?__cv=1f4f4a7af9d6a9c0ca073f5fef0cb100);}
+#mainContentClan3        {    float:left;width:677px;height:439px;background-image: url(/do_img/global/clan/bg_main_member.jpg?__cv=2a1577c5972d69719f556ddc2481a700);}
+#mainContentClan4        {    float:left;width:677px;height:439px;background-image: url(/do_img/global/clan/bg_mail.jpg?__cv=5b4226ffddfb860bce3256ca304d2400);}
+#mainContentClan5        {    float:left;width:677px;height:439px;background-image: url(/do_img/global/clan/bg_balance.jpg?__cv=a706d5f343d4aa10ce89e26235e38f00);}
+#mainContentClan6        {    float:left;width:677px;height:439px;background-image: url(/do_img/global/clan/bg_diplomacy.jpg?__cv=50785249e3dc58d57cd3438d2156df00);}
+#mainContentClan7        {    float:left;width:677px;height:439px;background-image: url(/do_img/global/bg_clan6.jpg?__cv=e9bbef69d2d51cbe27bb28aebe1c6b00);}
+#mainContentBanking      {    float:left;width:677px;height:439px;background-image: url(/do_img/global/bg_bank.jpg?__cv=a2d2f80066b4495473da1c684c875300);}
+#mainContentBankingExchange  {    float:left;width:677px;height:439px;background-image: url(/do_img/global/bg_bank_exchange.jpg?__cv=63c949a3a72e68511b82816d50933c00);}
+#mainContentBanking1     {    float:left;width:677px;height:439px;background-image:url(../do_img/global/bg_bank1.jpg);}
+#mainContentBanking2     {    float:left;width:677px;height:439px;background-image:url(../do_img/global/bg_bank2.jpg);}
+#mainContentBanking3     {    float:left;width:677px;height:439px;background-image:url(../do_img/global/bg_bank3.jpg);}
+#mainContentBankingSMS   {    float:left;width:677px;height:439px;background-image:url(../do_img/global/bg_bank_sms.jpg);}
+#mainContentBankingTel   {    float:left;width:677px;height:439px;background-image:url(../do_img/global/bg_bank_tel.jpg);}

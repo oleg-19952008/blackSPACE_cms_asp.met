@@ -1,0 +1,28 @@
+  <div id="container">
+            <div class="logo"></div>
+            <div class="slogan">ONE UNIVERSE TO EXPLORE...</div>
+            <div class="register_form">
+            	<div class="error" style="display: none;">
+            	<ul>
+            	</ul>
+            	</div>
+                <form id="signup" action="./index/register/" method="post">
+                    <ul>
+                        <li><input name="signup_username" type="text" placeholder="Username" maxlength="20" /></li>
+                        <li><input name="signup_password" type="password" placeholder="Password" maxlength="20" /></li>
+                        <li><input name="signup_passwordRepeat" type="password" placeholder="Confirm password" maxlength="20" /></li>
+                        <li><input name="signup_email" type="text" placeholder="Email" /></li>
+                        <li>
+                            <select name="signup_company">
+                                <option value="1">MMO</option>
+                                <option value="2">EIC</option>
+                                <option value="3">VRU</option>
+                            </select>
+                        </li>
+                        <li><input name="signup_submit" type="submit" value="Register" /></li>
+                    </ul>
+                </form>
+            </div>
+            <div class="button">JOIN NOW</div>
+            <div class="push"></div>
+        </div>

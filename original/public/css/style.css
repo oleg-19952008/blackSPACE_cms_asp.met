@@ -1,0 +1,273 @@
+html
+{
+	height: 100%;
+}
+
+body
+{
+	margin: 0;
+	background: url('../images/new_background.jpg') no-repeat center center fixed; 
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	height: 100%;
+}
+
+#top_bar
+{
+	background-color: rgba(0, 0, 0, 0.75);
+	height: 50px;
+	width: 100%;
+}
+
+#top_bar .login_form
+{
+	width: 960px;
+	margin: auto;
+}
+
+#top_bar .login_form form
+{
+	padding-left: 520px;
+	padding-top: 10px;
+}
+
+#top_bar .login_form input[type="text"], input[type="password"]
+{
+	background: white;
+	border: none;
+	height: 25px;
+	width: 140px;
+	padding-left: 10px;
+	padding-right: 10px;
+	box-shadow: inset 1px 1px 1px 1px rgb(0, 0, 0);
+	outline: 0;
+}
+
+#top_bar .login_form input[type="submit"]
+{
+	cursor: pointer;
+	background: white;
+	border: 1px solid;
+	border-color: #e27c3b;
+	height: 26px;
+	width: 85px;
+	color: white;
+	font-family: "Myriad pro";
+	text-transform: uppercase;
+	text-shadow: 1px 1px 1px black;
+	background: #e27c3b; /* Old browsers */
+	background: -moz-linear-gradient(top, #e27c3b 0%, #e45900 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e27c3b), color-stop(100%,#e45900)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #e27c3b 0%,#e45900 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #e27c3b 0%,#e45900 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #e27c3b 0%,#e45900 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #e27c3b 0%,#e45900 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e27c3b', endColorstr='#e45900',GradientType=0 ); /* IE6-9 */
+}
+
+
+#container
+{
+	width: 960px;
+	margin: auto;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-top: 50px;
+	min-height: 100%;
+	margin-bottom: -110px;
+}
+
+#container .logo
+{
+	background: url('../images/logo.png');
+	width: 638px;
+	height: 230px;
+	margin: auto;
+}
+
+#container .slogan
+{
+	font-family: "Myriad Pro";
+	font-size: 48px;
+	text-transform: uppercase;
+	color: white;
+	text-align: center;
+	text-shadow: 1px 1px 1px black;
+}
+
+#container .button
+{
+	width: 330px;
+	height: 60px;
+	margin: auto;
+	cursor: pointer;
+	margin-top: 30px;
+	border: 1px solid;
+	border-color: #e27c3b;
+	box-shadow: 1px 1px 1px black;
+	text-align: center;
+	font-family: "Myriad Pro";
+	font-size: 48px;
+	color: white;
+	text-shadow: 1px 1px 1px black;
+	padding-top: 10px;
+
+	background: #e27c3b; /* Old browsers */
+	background: -moz-linear-gradient(top, #e27c3b 0%, #e45900 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e27c3b), color-stop(100%,#e45900)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #e27c3b 0%,#e45900 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #e27c3b 0%,#e45900 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #e27c3b 0%,#e45900 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #e27c3b 0%,#e45900 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e27c3b', endColorstr='#e45900',GradientType=0 ); /* IE6-9 */
+}
+
+#container a
+{
+	text-decoration: none;
+}
+
+#container .register_form
+{
+	width: 335px;
+	margin: auto;
+	margin-top: 10px;
+	display: none;
+}
+
+#container .register_form .error
+{
+	width: 310px;
+	background-color: #831F1F; */
+	box-shadow: 1px 1px 1px black;
+	border: 1px solid rgb(146, 49, 49);
+	color: white;
+	padding: 10px;
+	margin-bottom: 10px;
+	font-family: "Myriad Pro";
+	font-size: 12px;
+}
+
+#container .register_form .error ul
+{
+	list-style: none;
+}
+
+#container .register_form .error li
+{
+	margin: 0;
+	padding: 0;
+}
+
+
+#container .register_form ul
+{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#container .register_form ul li
+{
+	padding-bottom: 5px;
+	padding-top: 5px;
+}
+
+
+
+
+#container .register_form input[type="text"],#container .register_form input[type="password"]
+{
+	background: white;
+	border: none;
+	height: 25px;
+	width: 315px;
+	padding-left: 10px;
+	padding-right: 10px;
+	box-shadow: inset 0.5px 0px 1px rgb(0, 0, 0);
+	outline: 0;
+}
+
+#container .register_form select
+{
+	background: white;
+	border: none;
+	height: 25px;
+	width: 335px;
+	padding-left: 10px;
+	padding-right: 10px;
+	box-shadow: inset 0.5px 0px 1px rgb(0, 0, 0);
+	outline: 0;
+}
+
+#container .register_form input[type="submit"]
+{
+	box-shadow: 1px 1px 1px black;
+	cursor: pointer;
+	background: white;
+	border: 1px solid;
+	border-color: #e27c3b;
+	height: 26px;
+	width: 335px;
+	color: white;
+	font-family: "Myriad pro";
+	text-transform: uppercase;
+	text-shadow: 1px 1px 1px black;
+	background: #e27c3b; /* Old browsers */
+	background: -moz-linear-gradient(top, #e27c3b 0%, #e45900 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e27c3b), color-stop(100%,#e45900)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, #e27c3b 0%,#e45900 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #e27c3b 0%,#e45900 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #e27c3b 0%,#e45900 100%); /* IE10+ */
+	background: linear-gradient(to bottom, #e27c3b 0%,#e45900 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e27c3b', endColorstr='#e45900',GradientType=0 ); /* IE6-9 */
+}
+
+.push
+{
+	height: 180px;
+}
+
+#footer 
+{
+	height: 110px;
+	width: 100%;
+	background-color: rgba(0, 0, 0, 0.75);
+}
+
+#footer .fb_icon
+{
+	background: url('../images/small_fb.png') no-repeat;
+	height: 25px;
+	width: 25px;
+	float: left;
+	margin-top: -5px;
+	padding-right: 10px;
+}
+
+#footer .copyright
+{
+	padding-top: 20px;
+	width: 960px;
+	margin: auto;
+}
+
+#footer .text
+{
+	color: white;
+	font-family: "Myriad Pro";
+	font-size: 10px;
+	text-transform: uppercase;
+	float: left;
+}
+
+#footer .epvp_logo
+{
+	background: url('../images/epvp_logo.png') no-repeat;
+	height: 45px;
+	width: 138px;
+	float: right;
+	margin-top: -10px;
+}

@@ -1,0 +1,83 @@
+body 
+{
+    margin: 0;
+    padding: 0;
+    font-size: 10px;
+    font-family: Verdana, Arial, sans-serif;
+    color: white;
+    background-color: #000000;
+    width: 100%;
+    height: 100%;
+	background: url('../images/background_01.jpg') no-repeat scroll top center #000000;
+}
+
+#container
+{
+	width: 860px;
+	margin-left: 30px;
+    margin: auto;
+}
+
+#header
+{
+    margin-left: -70px;
+}
+
+#mainContent
+{
+    margin-left: -40px;
+}
+
+#left_start
+{
+    float: left;
+    width: 157px;
+    height: 439px;
+    background: url('../images/left_start_09.jpg') no-repeat scroll top center;
+}
+
+#mainContentDonate
+{
+    float: left;
+    width: 679px;
+    height: 440px;
+	background: url('../images/bg_bank.jpg') no-repeat scroll top center;
+	color: #ABABAB;
+}
+
+
+.description
+{
+	background: black;
+	margin-top: 46px;
+	margin-left: 75px;
+	width: 525px;
+	height: 95px;
+	padding: 5px;
+}
+
+.button
+{
+	/*background-color: black;*/
+	margin-top: 170px;
+	margin-left: 75px;
+	font-size: 15px;
+	font-weight: bold;
+	text-align: center;
+	width: 535px;
+}
+
+.button a
+{
+	/*background-color: black;*/
+	cursor: pointer;
+	text-decoration: none;
+	color: #ABABAB;
+}
+
+.button a:hover
+{
+	/*background-color: black;*/
+	text-decoration: underline;
+	color: #ABABAB;
+}

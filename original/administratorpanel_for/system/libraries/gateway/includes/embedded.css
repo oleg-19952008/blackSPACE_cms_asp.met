@@ -1,0 +1,3000 @@
+
+*[dir="ltr"] { direction: ltr; unicode-bidi: embed }
+*[dir="rtl"] { direction: rtl; unicode-bidi: embed }
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    color: #000000;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    line-height: 20px;
+    background: url(https://ssl.bpsecure.com/billing/images/ghostimage.gif?__cv=ad480fd0732d0f6f1a8b06359e3a4200) #000000;
+}
+
+* html body {
+    text-align: center;
+    background-image: none;
+}
+
+#overall {
+    background: url(../images/bg.jpg?__cv=8bb5ef358183b99ec72730aaa6992200) no-repeat center top;
+    width: 100%;
+    height: 680px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    margin: 0px;
+    padding: 0px;
+}
+
+
+#language_resources,
+#image_resources {
+    display: none;
+}
+
+#bodyCenter {
+    width: 817px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+#paymentBoxCenter {
+    position: relative;
+    width: 817px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 139px;
+    text-align: left;
+}
+
+#toolTipLayer {
+    display: none;
+    position: absolute;
+    padding: 5px;
+    border: 1px solid black;
+    background-color: #FFF;
+    z-index: 9002;
+    font-size: 13px;
+    background-position: center center;
+}
+
+.tooltip {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/background.jpg?__cv=db74c76805d91f7b30fdd2463cf41e00);
+}
+
+.PaymentToolTipImage {
+    float:left;margin-bottom: 5px;padding-right: 5px;height:58;width:73;
+}
+
+#ajaxWaitingLayer {
+    display: none;
+    position: absolute;
+    /*z-index: 9001;*/
+}
+
+.ajaxwaiting {
+    width: 100px;
+    height: 100px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/ajaxloader.gif?__cv=14a0936bd54fd18c22b5e7fb86ba2600) ;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 9001;
+}
+
+.methodBox {
+
+}
+
+.ajaxwaitingOverlay {
+    width: 100px;
+    height: 100px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/ajaxloader.gif?__cv=14a0936bd54fd18c22b5e7fb86ba2600) ;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 9090;
+}
+
+#overlayer {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 9000;
+    background-color: #000;
+    opacity: 0.0;
+}
+
+* html #overlay {
+    overflow: hidden;
+}
+
+.overlay_message {
+    height:438px;
+    position: relative;
+    top:-20px;
+    width:625px;
+    z-index:9002;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/background.jpg?__cv=db74c76805d91f7b30fdd2463cf41e00);
+}
+
+.noleft {
+    left:0px;
+    top:20px;
+}
+
+* html .overlay_message {
+    top:0px;
+    margin-top:-18px;
+    height: 530px;
+}
+
+#overlay_page_1 {
+    /*display: none;
+    opacity: 0;*/
+}
+
+* html #overlay_success {
+    position:relative;
+    top:0px;
+}
+
+#overlayHeader, #overlayHeaderL, #overlayHeaderR {
+    float: left;
+}
+
+
+#overlayHeader {
+    width: 566px;
+    height: 72px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/header_02.png?__cv=5557ed47ce2fff060f3bcf35693cb700);
+}
+
+#overlayHeaderL {
+    width: 11px;
+    height: 72px;
+    margin-left: 15px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/header_01.png?__cv=a958b3f9245649873b67cfbfa6439d00);
+}
+
+#overlayHeaderR {
+    width: 16px;
+    height: 72px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/header_03.png?__cv=d38e11def974f6ccde958cf601caa200);
+}
+
+#paymentMethodIcon {
+    float: left;
+    width: 90px;
+    height: 57px;
+    /*background-image: url(../images/embedded/layer/ec_icon.gif);*/
+    margin-top: 5px;
+}
+
+#sslIcon {
+    float: right;
+    width: 42px;
+    height: 53px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/ssl_icon.png?__cv=cc6b8b7a000be79cc89c6ec228eae300);
+    margin-top: 7px;
+}
+
+#verifiedIcon {
+    float: right;
+    width: 164px;
+    height: 45px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/layer/verified.jpg?__cv=ea5aee87dbec0fbc2c167476b8627d00);
+    margin-top: 11px;
+    margin-right: 25px;
+}
+
+#sslText {
+    float: right;
+    text-align: right;
+    margin-top: 14px;
+    margin-right: 10px;
+    width : 420px;
+    height: 50px;
+    line-height:12px;
+    overflow: auto;
+}
+
+#closeOverlayBtn, .closeOverlayBtn {
+    float: right;
+    width: 16px;
+    height: 16px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/layer_close_button.png?__cv=6dc12751e72796dad9cad0501264c600);
+    cursor: pointer;
+    color: #181e14;
+    margin-right: 2px;
+    margin-top: 2px;
+}
+
+#overlay input {
+    width: 20px;
+    border: 1px solid #c8c6c6;
+    background:transparent none repeat scroll 0 0;
+}
+
+.inputGroup {
+    margin-left: 15px;
+    margin-top: 10px;
+    float: left;
+    line-height:12px;
+}
+
+.complete {
+    width: 559px;
+}
+
+.higher {
+    height: 220px;
+}
+
+.heightcomplete {
+    height: 295px;
+}
+
+.heightVoucher {
+    height: 25px;
+}
+
+.heightcompleteWithButtons {
+    height: 255px;
+}
+
+.withoutNoticeHeight {
+    height: 188px;
+}
+
+.minorUserHeight {
+    height: 230px;
+}
+
+.withoutNoticeHeightHeader {
+    height: 175px;
+}
+
+.noticeHeight {
+    height: 36px;
+}
+
+.noticeHeightMore {
+    padding-top: 7px;
+    height: 43px;
+}
+
+.noticeHeightBonus {
+    padding-top: 5px;
+    height: 43px;
+}
+
+.noticeHeightBonusDebit {
+    padding-top: 3px;
+    height: 37px;
+}
+
+.noticeHeightBoku {
+    height: 62px;
+}
+
+.noticeHeightWebbilling {
+    height: 53px;
+}
+
+.noticeHeightBonusKlarna {
+    padding-top: 0px;
+    height: 20px;
+}
+
+.bonusText {
+    color:  red;
+    font-size:  11px;
+}
+
+.noticeHeightSmall {
+    height: 45px;
+}
+
+.promoHeight {
+    height: 40px;
+}
+
+* html .promoHeight {
+    height: 60px;
+}
+
+.normalHeight {
+    height: 127px;
+}
+
+.normalVoucherHeight {
+    height: 65px;
+}
+
+.normalHeightBonus {
+    height: 120px;
+}
+
+.normalHeightBonusSmall {
+    height: 143px;
+}
+
+.normalHeightKlarna {
+    height: 245px;
+}
+
+.normalHeightNoPhone {
+    height: 110px;
+}
+
+.normalHeightPhone {
+    height: 120px;
+}
+
+.normalHeightWebbilling {
+    height: 185px;
+}
+
+.boxSmsOperatorDe {
+    text-align: center;
+}
+
+.webbilling_boxSmsOperatorDe {
+    height: 82px;
+    width: 563px;
+    padding: 7px 0 0;
+}
+
+.webbilling_boxSmsOperator {
+    height: 82px;
+    width: 563px;
+    padding: 7px 0 0;
+}
+
+.webbilling_boxSmsOperatorBoku {
+    height: 40px;
+    width: 563px;
+    padding: 17px 0 0;
+}
+
+.webbilling_boxSmsOperatorBokuPin {
+    height: 40px;
+    width: 563px;
+    padding: 39px 0 0;
+}
+
+.inputGroupItemsUL, .inputGroupItemsUR, .inputGroupItemsTop, .inputGroupItemsL, .inputGroupItems, .inputGroupItemsKlarnaLeft, .inputGroupNotice, .inputGroupItemsR, .inputGroupItemsLL, .inputGroupItemsLR, .inputGroupItemsBottom {
+    float:left;
+}
+
+.inputGroupItemsL, .inputGroupItemsR, .inputGroupNoticeL, .inputGroupNoticeR {
+    width: 7px;
+     /*height: 161px;*/
+}
+
+.inputGroupItemsUL, .inputGroupItemsUR, .inputGroupItemsLL, .inputGroupItemsLR {
+    width: 7px;
+    height: 7px;
+    line-height: 1px;
+    font-size:1px;
+}
+
+.inputGroupItemsTop, .inputGroupItemsBottom {
+    /*width: 580px;*/
+    height: 7px;
+    padding-left: 10px;
+    padding-right: 10px;
+    line-height: 1px;
+    font-size:1px;
+}
+
+
+.inputGroupItemsUL {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_upperLeft.png?__cv=0ecd1ea0114d68798082f4dbe5740c00);
+}
+
+.inputGroupItemsUR {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_upperRight.png?__cv=4136c763417691847a18bc396893d900);
+}
+
+.inputGroupItemsTop {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_top.png?__cv=f76557a0442f5f3dc28a3189a3323f00);
+}
+
+.inputGroupItemsLL {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_lowerLeft.png?__cv=8ff2f7f7f3eae2edb0bd069f91e0e500);
+}
+
+.inputGroupItemsLR {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_lowerRight.png?__cv=b30e44786448207e80d3d402559c7900);
+}
+
+.inputGroupItemsBottom {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_bottom.png?__cv=988112c4b867763fda40616d5bad0400);
+}
+
+.inputGroupItems, .inputGroupItemsKlarnaLeft {
+    padding: 10px;
+    background-color: #FFFEDB;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_center.png?__cv=4108c8381f8d1eb7e16599a607d58200);
+    /*height: 141px;*/
+}
+
+.inputGroupItemsCenterButton {
+    position: relative;
+    left: 100px;
+}
+
+.inputGroupItemsKlarnaLeft {
+    padding: 2px;
+    width: 186px !important;
+}
+
+.btn {
+    cursor: pointer;
+}
+
+* html .inputGroupItems,
+* html .inputGroupItemsKlarnaLeft,
+* html .inputGroupItemsL,
+* html .inputGroupItemsR, {
+    height: 135px !important;
+    overflow: hidden;
+}
+
+.inputGroupNotice {
+    padding-left: 10px;
+    padding-right: 0px;
+    background-color: #FFFEDB;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_center.png?__cv=4108c8381f8d1eb7e16599a607d58200);
+    width: 569px;
+}
+
+.inputGroupNoticeBoku {
+    padding-left: 0px;
+    width: 579px;
+    overflow: auto;
+}
+
+.inputGroupNoticeWebbilling {
+    padding-left: 0px;
+    width: 579px;
+}
+
+* html .inputGroupNotice {
+    padding-left: 0px;
+    width: 560px;
+}
+
+.inputGroupNoticeL {
+    float:left;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_left.png?__cv=9ba744e1c7e10c7cbac4000516cb3b00);
+}
+
+.inputGroupNoticeR {
+    float:left;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_right.png?__cv=60546c966febb32f6189046c23d73400);
+}
+
+.inputGroupItemsL {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_left.png?__cv=9ba744e1c7e10c7cbac4000516cb3b00);
+}
+
+.inputGroupItemsR {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_right.png?__cv=60546c966febb32f6189046c23d73400);
+}
+
+.inputGroupHeader {
+    font-weight: bold;
+    color: #B00000;
+    text-align: left;
+    padding-left:10px;
+}
+
+.font_bold {
+    font-weight: bold;
+}
+
+.sepamandate_left {
+    width: 150px;
+}
+
+.sepaagreement {
+    width: 300px;
+    padding-top: 12px
+}
+
+.inputGroupItems {
+    text-align: left;
+}
+
+.lessMargin {
+    margin-left: 5px;
+}
+
+.middleMargin {
+    margin-left: 105px;
+}
+
+#overlayNotices, .overlayNoticesSmall {
+    /*border: 1px solid #DCC37D;
+    background-color: #FFFEDB;*/
+    padding-top: 1px;
+    margin: 0px 15px 0 15px;
+}
+
+.overlayNoticesSmall {
+    left: 209px;
+    top: 262px;
+    position: absolute;
+}
+
+.overlayBtn {
+    width: 157px;
+    height: 28px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/button.gif?__cv=5dd3a53d80d10941ac7474748b869100);
+    float: left;
+    cursor: pointer;
+    margin-top: 5px;
+    padding-top: 5px;
+    font-size: 16px;
+    line-height: 20px;
+    text-align: center;
+    font-weight: bold;
+
+}
+
+.overlayFailText {
+    margin-left:25px;
+    margin-right:25px;
+    color: white;
+}
+
+.overlayFailText a:link {
+    color: white;
+}
+
+.nextBtnSmall {
+    width: 95px;
+    height: 20px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/button_small.gif?__cv=ee4575e50bfbd9559e391fa6e7c98d00);
+    float: left;
+    cursor: pointer;
+    font-size: 11px;
+    text-align: center;
+    font-weight: bold;
+}
+
+#refillCoinsBtn {
+    position: relative;
+    float: left;
+    margin-left: 95px;
+    width: 157px;
+    height: 28px;
+    cursor: pointer;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/button.gif?__cv=5dd3a53d80d10941ac7474748b869100);
+    background-repeat:no-repeat;
+    font-size: 11px;
+    text-align: center;
+    font-weight: bold;
+    padding-top: 8px;
+}
+
+#promoCodeSubmitBtn {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/code_button.png?__cv=13044ed152ceea190a1ebc0139b8d100);
+    width: 141px;
+    height: 26px;
+    float: right;
+    text-align: center;
+    margin-right: 5px;
+    padding-top: 5px;
+    color: #5d3700;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+#voucherSubmitBtn {
+    float: right;
+    text-align: center;
+    margin-right: 5px;
+    padding-top: 5px;
+    color: #AA9E5B;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.inputVoucher {
+    width: 170px;
+    height: 16px;
+}
+
+#voucherButton {
+    color: #AA9E5B;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+#overlayBackBtn {
+    left: 16px;
+    top: 1px;
+    position: absolute;
+    text-align: center;
+}
+
+#overlayNextBtn {
+    right: 15px;
+    top: 1px;
+    position: absolute;
+    text-align: center;
+}
+
+.shoppingBottom, .actionBottom, .shoppingBottomPhone,
+.shoppingBottomCCComputop, .shoppingBottomBigOverlay,
+.shoppingBottomCCComputopCvc,
+.shoppingBottomChasepaymentechEC {
+    height:38px;
+    left:0;
+    position:absolute;
+    top:320px;
+    width:623px;
+}
+
+.shoppingBottomCCComputop {
+    top: 345px;
+}
+
+.shoppingBottomCCComputopCvc {
+    width: 350px;
+    top: 175px;
+}
+
+.shoppingBottomPhone {
+    top:328px;
+}
+
+
+.shoppingBottomFastPay{
+    color:#FFE565;
+    height:20px;
+    left:180px;
+    position:absolute;
+    top:103px;
+}
+
+.shoppingBottomBigOverlay {
+    top: 395px;
+}
+
+.shoppingBottomChasepaymentechEC {
+    top: 360px;
+}
+
+#fastPayInfo {
+    width: 14px;
+    height: 14px;
+    margin-top: 3px;
+    margin-left: 5px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/fastpay_info.png?__cv=b5a86bf53cf031aba5ce321d95f59900);
+}
+
+
+.fastPayBonusText{
+    color:#008000;
+    height:20px;
+    font-size:12px;
+    font-weight: bold;
+    left:15px;
+    position:absolute;
+    top:103px;
+}
+
+.webbilling_heading, .webbilling_heading_3 {
+    font-size: 18px;
+}
+
+.webbilling_heading_3 {
+    line-height: 20px;
+}
+
+.webbilling_upperStuff {
+    height: 144px;
+}
+
+.webbilling_subheading {
+    color: #615550;
+    font-size: 12px;
+    padding: 0 0 20px 0;
+}
+
+.webbilling_subheading_Boku {
+    color: #615550;
+    font-size: 12px;
+    height: 49px;
+}
+
+.webbilling_subheadingDiv {
+    padding: 0 0 5px;
+}
+
+
+.webbilling_saveNumber {
+    padding: 7px 0 0 0;
+    color: #615550;
+}
+
+.webbilling_saveNumberBoku {
+    padding: 7px 0 0 197px;
+    color: #615550;
+    height: 15px;
+}
+
+.webbilling_numberErrorText {
+    color: red;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 0 0 2px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.webbilling_ErrorText {
+    color: red !important;
+}
+
+.webbilling_description {
+    font-size: 11px;
+    font-weight: bold;
+    padding: 0 0 5px 0;
+}
+
+.webbilling_inputText, .webbilling_selectText {
+    padding: 2px 7px 0 0;
+    font-size: 12px;
+    font-weight: bold;
+    width: 190px;
+    text-align: right;
+}
+
+.webbilling_selectText {
+    color: black;
+}
+
+.webbilling_inputField {
+    width: 152px;
+    height: 16px;
+}
+
+.webbilling_example {
+    text-align: left;
+    color: #615550;
+    padding: 2px 0 0 2px;
+}
+
+.webbilling_inputFieldDiv {
+    padding: 2px 0 0 2px;
+    text-align: left;
+    height: 30px;
+    width: 200px;
+}
+
+.actionBottom {
+    top:390px;
+}
+
+#voucher input {
+    float: left;
+    margin-left: 10px;
+    margin-top: 12px;
+    border: 1px solid #DCC37D;
+    height: 17px;
+    width: 150px;
+}
+
+#overlayStep {
+    font-weight: bold;
+    color: #B00000;
+    text-align: center;
+    width: 600px;
+    margin-top: 15px;
+}
+
+#noticeIcon {
+    display:none;
+    float: left;
+    width: 30px;
+    height: 30px;
+    margin-top: 1px;
+}
+
+#noticeText {
+    float: left;
+    line-height: 12px;
+    margin-top: -1px;
+    margin-left: 10px;
+    width: 530px;
+}
+
+#noticeTextAgreement, #noticeTextAgreementSmall {
+    float: left;
+    line-height: 12px;
+    margin-top: -1px;
+    width: 530px;
+}
+
+#noticeTextAgreementBoku {
+    float: left;
+    line-height: 10px;
+    font-size: 10px;
+    margin-top: -2px;
+}
+
+#noticeTextAgreementSmall {
+    margin-top: -3px;
+}
+
+#noticeTextAgreementWebbilling {
+    float: left;
+    line-height: 11px;
+    font-size: 9px;
+    margin-top: -2px;
+}
+
+* html #noticeText {
+    margin-left: 0px;
+    text-align: left;
+    width: 530px;
+}
+
+#noticeTextSmall, #noticeTextSmallSmall {
+    float: left;
+    line-height: 12px;
+    color: #F00;
+    margin-top: -1px;
+    margin-left: 0px;
+}
+
+#noticeTextSmallSmall {
+    margin-top: -3px;
+}
+
+#promoCode, #directOverlaySelection, #voucher {
+    position: absolute;
+    /*top: 361px;*/
+    margin-left: 15px;
+    margin-top: 7px;
+    width:594px;
+    height:60px;
+    /*border: 1px solid #FFDDAA;*/
+    /*background-color: #FFFEDB;*/
+}
+
+#directOverlaySelection {
+    position: absolute;
+    margin-left: 15px;
+    margin-top: 7px;
+    width:594px;
+    height:60px;
+}
+
+* html #promoCode {
+    margin-left: -300px;
+    width: 574px;
+}
+
+
+#promoCodeHeaderL, #promoCodeHeaderR, #promoCodeQuestion, #promoCodeHeader {
+    height: 20px;
+    float: left;
+    position: absolute;
+    top: -5px;
+}
+
+* html #promoCodeHeaderL {
+    margin-left:-288px;
+}
+
+.promoMain {
+    padding-top: 17px;
+}
+
+#promoCodeHeaderL {
+    width: 6px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/promo_code_header_01.png?__cv=958794afa89a8a74ca6fe30cd5090e00);
+}
+
+.twoBox {
+    width: 260px;
+}
+
+.simpleLeft {
+    width: 170px;
+}
+
+* html .simpleLeft {
+    width: 190px;
+}
+
+.doubleRight {
+    width: 350px;
+}
+
+#promoCodeHeader {
+    right: 6px;
+    font-weight: bold;
+    color: #B00000;
+    text-align: left;
+    padding-left: 10px;
+    width: 573px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/promo_code_header_02.png?__cv=79e167196fc8bd40f6c08471cf292900);
+}
+
+* html #promoCodeHeader {
+    float: left;
+    right:0px;
+    left:5px;
+    width: 563px;
+}
+
+#promoCodeQuestion {
+    right: 10px;
+    width: 21px;
+    cursor:pointer;
+    margin-top: 7px;
+    background-repeat: no-repeat;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/promo_code_header_04.png?__cv=69c94ac7939d696cb474877d01d8c700);
+}
+
+#promoCodeHeaderR {
+    width: 6px;
+    right: 0px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/promo_code_header_03.png?__cv=e3793e01789aab7ce113a1a5b54a9000);
+}
+
+* html #promoCodeQuestion {
+    right:20px;
+}
+
+* html #promoHeaderR {
+    right:10px !important;
+}
+
+#promoCode input {
+    float: left;
+    margin-left: 10px;
+    margin-top: 12px;
+    border: 1px solid #DCC37D;
+    height: 17px;
+    width: 90px;
+}
+
+#promoCodeText {
+    float: left;
+    line-height: 12px;
+    margin-left: 15px;
+    margin-top: 8px;
+    text-align: left;
+}
+
+#info_icon {
+    float:left;
+    width:12px;
+    height:12px;
+    background-image:url(https://ssl.bpsecure.com/billing/images/embedded/layer/icon_info_small.gif?__cv=b46a4d31ff649eb19d358ba3650a2900);
+}
+
+
+#successheaderL, #successheader, #successheaderR, #successheaderShortcode, #successheaderComputopFastpayCvc {
+    float: left;
+    margin-top: 15px;
+}
+
+#successheaderL {
+    width: 10px;
+    height: 30px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/successHeader_01.png?__cv=2ad561d598cb8aa59948b05a4e065a00);
+    margin-left: 15px;
+}
+
+* html #successheaderL {
+    margin-left: 7px;
+}
+
+#successheader, #successheaderShortcode, #successheaderComputopFastpayCvc {
+    color: #B00000;
+    font-weight: bold;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/successHeader_02.png?__cv=0bcba48205e4f2c32790ce6190726400);
+    width: 572px;
+    height: 27px;
+    padding-top: 3px;
+}
+
+#successheaderShortcode {
+    width: 445px;
+}
+
+#successheaderComputopFastpayCvc {
+    width: 300px;
+}
+
+* html #successheader {
+    height: 30px;
+}
+
+#successheaderR {
+    width: 14px;
+    height: 30px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/successHeader_03.png?__cv=45da6a75f5e26fece418777ed3ffc500);
+}
+
+#successSubheader {
+    margin-top: 10px;
+    margin-left: 15px;
+    font-size: 13px;
+}
+
+#successBigPicture {
+    width: 596px;
+    height: 251px;
+    margin-left: 15px;
+    margin-bottom: 5px;
+    margin-top: 15px;
+    color: #B00000;
+    font-size: 13px;
+    text-align:center;
+    overflow: auto;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+}
+
+#successText {
+    height: 195px;
+    font-size: 13px;
+    text-align:center;
+    font-weight: bold;
+    padding-top: 25px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+
+
+#successTextBottom {
+    height:15px;
+    text-decoration: underline;
+}
+
+
+#failText {
+    height: 155px;
+    font-size: 13px;
+    text-align:center;
+    font-weight: bold;
+    padding-top: 25px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.fontMinorUser {
+    font-size: 16px;
+    line-height: 20px;
+}
+
+#successPromoCode {
+    /*color: #004000;*/
+    color: #000000;
+    font-weight: bold;
+}
+
+#successSubscription {
+    color: #004000;
+    font-weight: bold;
+    font-size: 15px;
+    text-align:center;
+    line-height: 18px;
+}
+
+.higherMargin {
+    margin-top: 20px;
+}
+
+.shortCodeMargin {
+    margin-top: -32px;
+}
+
+#miniButtons {
+    width: 14px;
+    height: 24px;
+    margin-left: 10px;
+    margin-top: 16px;
+}
+
+* html #miniButtons {
+    width: 100px;
+}
+
+#successIDs {
+    font-size: 13px;
+    /*margin-top: 4px;*/
+}
+
+#successCloseBtn {
+    margin-top: 10px;
+    margin-right: 15px;
+}
+
+.successCloseBtnShortcode {
+    bottom: 10px;
+    position: absolute;
+    right: 5px;
+    text-align: center;
+}
+
+.shortCodeText {
+    font-size: 13px;
+    margin: 47px 20px;
+}
+
+#successBackBtn {
+    margin-top: 10px;
+    margin-left: 15px;
+}
+
+* html #successCloseBtn {
+    margin-right: 7px;
+    margin-left: 4px;
+}
+
+#content, #VKContent {
+    height: 488px;
+    padding-top: 8px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/background.jpg?__cv=db74c76805d91f7b30fdd2463cf41e00);
+    background-repeat: repeat-x;
+}
+
+#progressBarWrapper {
+    margin-left: 14px;
+}
+
+#supportBtn, #printBtn {
+    width: 24px;
+    height: 24px;
+    margin-left: 5px;
+    float: left;
+    cursor: pointer;
+}
+
+#supportBtn {
+    background-image: url(../images/embedded/layer/support_icon.png);
+}
+
+#printBtn {
+    background-image: url(../images/embedded/layer/print_icon.png);
+}
+
+* html #supportBtn, * html #printBtn {
+    margin-left: 2px;
+}
+
+#bar_0 {
+    width: 131px;
+    background-image: url(../images/embedded/progressBar_1.gif);
+}
+
+#bar_1 {
+    width: 179px;
+    background-image: url(../images/embedded/progressBar_2.gif);
+}
+
+#bar_2 {
+    width: 192px;
+    background-image: url(../images/embedded/progressBar_3.gif);
+}
+
+#bar_3 {
+    width: 182px;
+    background-image: url(../images/embedded/progressBar_4.gif);
+}
+
+#bar_4 {
+    width: 107px;
+    background-image: url(../images/embedded/progressBar_5.gif);
+    background-repeat: no-repeat;
+}
+
+.progressBar {
+    float: left;
+    height: 18px;
+}
+
+#progressDescriptions {
+    font-size: 11px;
+    height: 12px;
+}
+
+#progressDescriptions div {
+    float: left;
+    text-align: center;
+    line-height: 12px;
+}
+
+#description_0 {
+    width: 239px;
+}
+
+#description_1 {
+    width: 126px;
+}
+
+#description_2 {
+    width: 248px;
+}
+
+#description_3 {
+    width: 125px;
+}
+
+#contentLeft,
+#contentRight {
+    float: left;
+    margin: 6px;
+}
+
+#contentLeft {
+    width: 404px;
+}
+
+#contentRight {
+    margin-left: 19px;
+    width: 372px;
+}
+
+#topItems {
+    height: 252px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/topItemsBackground.png?__cv=ab7e100df88ee265411b5c121f2b1800);
+}
+
+#topItemsImage {
+    width: 94px;
+    height: 145px;
+    background-image: url(../images/embedded/pearl_current_offer.gif);
+    background-repeat: no-repeat;
+    margin-top: 3px;
+}
+
+#topItemsHeaderL,
+#topItemsHeaderM,
+#topItemsHeaderR {
+    height: 43px;
+}
+
+#topItemsHeaderL {
+    width: 6px;
+}
+
+#topItemsHeaderIcon {
+    width: 34px;
+    height: 39px;
+    margin-top: 2px;
+}
+
+#topItemsHeaderM {
+    width: 389px;
+}
+
+#topItemsHeaderR {
+    width: 9px;
+}
+
+#topItemsTitle {
+    font-size: 17px;
+    font-weight: bold;
+    text-align: center;
+    width: 350px;
+    margin-top: 10px;
+    color: #800000;
+}
+
+#topItemsPrices table {
+    border: 0 none;
+    font-size: 14px;
+    width: 395px;
+    padding-left: 7px;
+    text-align: right;
+    font-weight: bold;
+}
+
+#topItemsPrices {
+    height: 210px;
+    width: 395px;
+    cursor: default;
+}
+
+.topItemsDirectOverlaySeparator {
+    height: 20px;
+}
+
+.slimTopItemsDirectOverlaySeparator {
+    height: 1px;
+    background-color: #FF8000;
+}
+
+.addToCartBtn {
+    width: 26px;
+    height: 20px;
+    cursor: pointer;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/addToCart_btn.gif?__cv=4b7eded3959d9171f3e0c7ad29d9e900);
+    margin-left: 5px;
+}
+
+.addToCartMobileBtn {
+    width: 26px;
+    height: 20px;
+    cursor: pointer;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/addToCartMobile_btn.gif?__cv=3b666ab0e9ce934826361b31b527cf00);
+    margin-left: 5px;
+    background-repeat: no-repeat;
+}
+
+.addToCartPhoneBtn {
+    width: 26px;
+    height: 20px;
+    cursor: pointer;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/addToCartPhone_btn.gif?__cv=e447c6a3b39beba20f7d62ac529b5400);
+    margin-left: 5px;
+    background-repeat: no-repeat;
+}
+
+.addToCartTerminalBtn {
+    width: 26px;
+    height: 20px;
+    cursor: pointer;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/addToCartTerminal_btn.gif?__cv=998d6e358d5fa827cb598291aae91c00);
+    margin-left: 5px;
+    background-repeat: no-repeat;
+}
+
+#moreOffers {
+    width: 403px;
+    height: 171px;/* 36 closed*/
+    /*margin-top: 103px;*/
+    position: absolute;
+    top: 310px;
+    /*overflow: hidden;*/
+    background-position: left bottom;
+}
+
+* html #moreOffers {
+    top: 455px;
+    width: 403px;
+    background-repeat: no-repeat;
+}
+
+#offersExpanded {
+    height: 144px;
+}
+
+#offersHeaderL,
+#offersHeaderM,
+#offersHeaderR {
+    float:left;
+    padding-top: 5px;
+    height: 24px;
+    margin-top: -3px;
+}
+
+#offersHeaderL {
+    width: 5px;
+}
+
+#offersHeaderM {
+    width: 388px;
+    height: 24px;
+    padding-left: 5px;
+    padding-top: 5px;
+    font-weight: bold;
+    color: #800000;
+    overflow: hidden;
+}
+
+#offersHeaderR {
+    width: 5px;
+}
+
+* html #offersHeaderL,
+* html #offersHeaderM,
+* html #offersHeaderR {
+    float:left;
+    padding-top: 5px;
+    height: 30px;
+    margin-top: 0;
+}
+
+* html #offersHeaderM {
+    width: 393px;
+}
+
+#offersContent {
+    position: relative;
+    overflow: hidden;
+    width: 348px;
+}
+
+#offerItems {
+    margin-top: 20px;
+    width: 10000px;
+}
+#offersArrowLeft,
+#offersArrowRight {
+    width: 23px;
+    height: 52px;
+    margin-top: 44px;
+    cursor: pointer;
+}
+
+#offersArrowLeft {
+    float: left;
+    margin-left: 3px;
+    background-image:url(https://ssl.bpsecure.com/billing/images/embedded/22/pointer_left.png?__cv=10252dae6aac1a6c64e44828118b7300);
+}
+
+#offersArrowRight {
+    float: right;
+    margin-right: 3px;
+    background-image:url(https://ssl.bpsecure.com/billing/images/embedded/22/pointer.png?__cv=26d0ae8a64317614bc21ac9723d7fb00);
+}
+
+.offerItem {
+    width: 87px;
+    height: 97px;
+    float:left;
+}
+
+.offerItemGlow {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/offerItem_glow.png?__cv=f117bbe7b9f6e0ac88c2a3cafe95de00);
+}
+
+.innerOfferItem {
+    width: 74px;
+    height: 83px;
+    margin: 7px 7px 6px 6px;
+}
+
+.offerItems_page {
+    position:relative;
+    float: left;
+}
+
+.offerItemImage {
+    position: relative;
+    width: 74px;
+    height: 61px;
+    text-align: left;
+}
+
+.offerItemText {
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    position: absolute;
+    text-align: center;
+    width: 72px;
+    bottom: 0;
+}
+
+.offerItemReflection {
+    width: 74px;
+    height: 22px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/offer_reflection.gif?__cv=7c9e50f1eeebba4613fc30adf741d400);
+    text-align: center;
+    font-size: 10px;
+    overflow: hidden;
+}
+
+#paymentMethodsContent {
+    position:relative;
+    height: 143px;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    background-position: left top;
+    padding-top: 1.5px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/paymentMethods_bg.gif?__cv=766be7e4be7dc8223539eb05ac0ce300);
+}
+
+#paymentMethodsBox, #paymentMethodsBoxDirectOverlay {
+    position:absolute;
+    margin-left:-20px;
+    top:310px;
+    width:396px;
+}
+
+#paymentMethodsBox{
+    top:310px;
+}
+
+#paymentMethodsBoxDirectOverlay {
+    top:0px;
+    margin-left: 15px;
+    width: 594px;
+}
+
+#paymentMethods {
+    height: 500px;
+}
+
+.directOverlayItemBody {
+    height: 110px;
+
+}
+
+.directOverlayItemBodyWidth {
+    width: 250px;
+}
+
+#methodsHeaderL, #methodsHeaderDirectOverlayL,
+#methodsHeaderM, #methodsHeaderDirectOverlayM,
+#methodsHeaderR, #methodsHeaderDirectOverlayR {
+    float: left;
+    padding-top: 5px;
+    height: 24px;
+    margin-top: 11px;
+}
+
+#methodsHeaderL, #methodsHeaderDirectOverlayL {
+    width: 5px;
+}
+
+#methodsHeaderM, #methodsHeaderDirectOverlayM {
+    width: 381px;
+    padding-left: 5px;
+    font-weight: bold;
+    color: #800000;
+    overflow: hidden;
+}
+
+#methodsHeaderDirectOverlayM {
+    width: 572px;
+}
+
+* html #methodsHeaderL,
+* html #methodsHeaderM,
+* html #methodsHeaderR,
+* html #methodsHeaderDirectOverlayL,
+* html #methodsHeaderDirectOverlayM,
+* html #methodsHeaderDirectOverlayR {
+    margin-top: 1px;
+}
+
+* html #methodsHeaderM {
+    width: 370px;
+}
+
+* html #methodsHeaderDirectOverlayM {
+    width: 566px;
+}
+
+#methodsHeaderR, #methodsHeaderDirectOverlayR {
+    width: 5px;
+}
+
+.methodItem, .methodItemInactive, .methodItemExtra {
+    position: relative;
+    width: 93px;
+    height: 64px;
+    margin: 3px;
+    float: left;
+    text-align: left;
+    cursor: pointer;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/paymentMethod_active.gif?__cv=1243ce9df7c7e2690ea5892f2d654000);
+}
+
+.methodItemExtra {
+    margin-top:73px;
+}
+
+.methodItemFastPayBox {
+    position: relative;
+    width: 290px;
+    height: 134px;
+    margin: 3px;
+    float: left;
+    text-align: left;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/fastPay.jpg?__cv=6156161629e5354c31e5280071657100);
+}
+
+.sepaError {
+    background-color: #FFC0C0 !important;
+    color: #000000;
+}
+
+.sepaBankNameDiv {
+    padding: 6px 1px 0;
+    height: 30px;
+    width: 170px;
+    overflow: hidden;
+}
+
+.methodItemInactive {
+    display: none;
+}
+
+.methodItemButtonUp {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/paymentMethods_up.gif?__cv=3c3bcfe1ff553a347c6772bb7d90ad00);
+}
+
+.methodItemButtonDown {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/paymentMethods_down.gif?__cv=be0b6fdefd46818d20b95390c407c400);
+}
+
+.methodItemEasyClick {
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/button_pm_easyclick.png?__cv=1caaa43c56d8047b7943d1dae8760200);
+}
+
+.fastPay {
+    color:#AA9E5B;
+    margin: 15px;
+    font-size:11px;
+}
+
+.fastPayChoose {
+    margin-bottom: 3px;
+}
+
+.methodItemIcon, .methodItemIconDirectOverlay {
+    width: 93px;
+    height: 64px;
+    background-repeat: no-repeat;
+    background-position: top;
+}
+
+.methodItemIconDirectOverlay {
+    position: absolute;
+    width: 290px;
+    height: 134px;
+}
+
+.methodItemBottomText, .methodItemBottomTextDirectOverlay {
+    color: #FFFFFF;
+    font-size: 10px;
+    position: absolute;
+    text-align: center;
+    width: 93px;
+    bottom: 0px;
+    line-height: 15px;
+}
+
+.methodItemDescriptionDirectOverlay {
+    position: absolute;
+    top: 70px;
+    left: 0px;
+    height: 60px;
+    width: 265px;
+    overflow: auto;
+    font-size: 12px;
+}
+
+.methodItemBottomTextDirectOverlay {
+    width: 265px;
+    height: 60px;
+    top: 52px;
+    left: 0px;
+}
+
+.methodItemMovePrevText,
+.methodItemMoveNextText {
+    color: #000000;
+    font-size: 10px;
+    position: absolute;
+    text-align: center;
+    width: 93px;
+    top: 4px;
+    line-height: 12px;
+}
+
+.methodItemMovePrevText {
+    top: 20px;
+}
+
+.recurringNote {
+    color: red;
+}
+
+#recurringCancelationNote {
+    text-decoration: underline;
+}
+
+.shoppingCartItem {
+    width: 357px;
+    height: 29px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/cartItem_bg.gif?__cv=86b2784cc732849e97ffc0cb8ebf8b00);
+    margin-bottom: 3px;
+    overflow: hidden;
+}
+
+.cartItemSmallIcon,
+.cartItemDescription,
+.cartItemVoucherBonus {
+    float: left;
+}
+
+.cartItemSmallIcon {
+    width: 24px;
+    height: 28px;
+    background-image: url(../images/embedded/startkit_icon_small.gif);
+}
+
+.cartItemDescription {
+    color:#800000;
+    font-weight: bold;
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+.cartItemPrice,
+.cartItemDeleteButton,
+.cartItemDiscount {
+    float: right;
+}
+
+.cartItemDeleteButton {
+    width: 20px;
+    height: 20px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/close_button.gif?__cv=5bf15621665c5c907832b40a11c98900);
+    margin: 5px 5px 0px 0px;
+    cursor: pointer;
+}
+
+.cartItemPrice {
+    margin-top: 3px;
+    margin-right: 10px;
+    font-size: 12px;
+    color:#800000;
+}
+
+.cartItemDiscount {
+    margin-top: 3px;
+    margin-right: 10px;
+    font-size: 12px;
+    color: #F00;
+    text-decoration:line-through;
+}
+
+.cartItemVoucherBonus {
+    margin-top: 5px;
+    margin-left: 10px;
+    font-weight: bold;
+
+}
+
+#shoppingCartTotal {
+    width: 357px;
+    height: 29px;
+    background-image:url(https://ssl.bpsecure.com/billing/images/embedded/22/cartTotal_bg.gif?__cv=0c457982bdbeb1c526c36da9f298f300);
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+#cartTotalText {
+    float: left;
+    margin-left: 33px;
+}
+
+#cartTotalText,
+#cartTotal,
+.eVoucherText {
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 3px;
+}
+
+.eVoucherText {
+    padding-top:7px;
+    padding-left:10px;
+}
+
+#cartTotal {
+    margin-right:34px;
+}
+
+#cartTotal,
+#cartSaved {
+    float: right;
+}
+
+#cartSaved {
+    font-weight: bold;
+    color: #F00;
+    font-size: 14px;
+    margin-top: 3px;
+    margin-right: 10px;
+    display: none;
+    text-decoration:line-through;
+}
+
+#checkoutButton, #voucherButton {
+    cursor: pointer;
+    width: 157px;
+    height: 33px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/button.gif?__cv=5dd3a53d80d10941ac7474748b869100);
+    padding-top: 5px;
+    text-align: center;
+    font-weight: bold;
+    background-repeat:no-repeat;
+    margin-right: 14px;
+    margin-top: 10px;
+}
+
+#checkoutButton {
+    float: right;
+}
+
+#footer, #footerLeft {
+    color: #FFF;
+    text-align: center;
+    padding-top: 5px;
+    font-size: 11px;
+}
+
+/**
+ * common classes
+ */
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.clear {
+    clear: both;
+}
+
+.hidden {
+    visibility: hidden;
+    display: none;
+}
+
+.invisible {
+    visibility: hidden;
+    opacity: 0.0;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.red {
+    color: #F00;
+}
+
+.strike {
+    text-decoration:line-through;
+}
+
+.agreeInput, .agreeInputSmall, .agreeInputVerySmall {
+    margin-top:12px;
+    margin-right:10px;
+    height:15px;
+}
+
+.agreeInputSmall, .agreeInputVerySmall {
+    margin-top:4px;
+    padding-top:2px;
+}
+
+.agreeInputVerySmall {
+    margin-right:2px;
+    padding-left: 1px;
+}
+
+.marginright {
+    margin-right: 10px;
+}
+
+.window_debit_personaldata, .window_buildpay_klarna_personaldata {
+    height: 150px;
+    left: 4px;
+    line-height: 14px;
+    margin-top:-5px;
+    /*position: absolute;
+    top: 28px;*/
+    width: 170px;
+}
+
+.window_buildpay_klarna_personaldata {
+    height: 266px;
+    width: 186px;
+}
+
+.window_debit_personaldata_left, .window_debit_personaldata_left_no_phone,
+.window_buildpay_klarna_personaldata_left,
+.window_buildpay_pproSofortueberw_personaldata_left {
+    height: 150px;
+    left: 4px;
+    line-height: 14px;
+    padding-right:15px;
+    padding-left:5px;
+    margin-top:-6px;
+    /*position: absolute;
+    top: 28px;*/
+    width: 152px;
+}
+
+.window_debit_personaldata_left_no_phone {
+    line-height: 18px;
+}
+
+.window_buildpay_klarna_personaldata_left {
+    width: 162px;
+    padding-left: 2px;
+    padding-right: 8px;
+    margin-top:-12px;
+}
+
+.window_buildpay_pproSofortueberw_personaldata_left {
+    padding-left: 2px;
+    padding-right: 8px;
+    margin-top: 0px;
+    width: 152px;
+    line-height: 20px;
+}
+
+.window_debit_personaldata_right, .window_debit_personaldata_right_no_phone,
+.window_buildpay_klarna_personaldata_right,
+.window_buildpay_pproSofortueberw_personaldata_right {
+    height: 150px;
+    left: 4px;
+    line-height: 14px;
+    padding-right:5px;
+    padding-left:15px;
+    margin-top:-6px;
+    width: 152px;
+}
+
+.window_debit_personaldata_right_no_phone {
+    line-height: 18px;
+}
+
+.window_buildpay_klarna_personaldata_right {
+    width: 162px;
+    height: 136px;
+    padding-right: 2px;
+    padding-left: 8px;
+}
+
+.window_buildpay_pproSofortueberw_personaldata_right {
+    padding-right: 2px;
+    padding-left: 8px;
+    margin-top: 0px;
+    width: 152px;
+    line-height: 20px;
+}
+
+* html .window_debit_personaldata_left,
+* html .window_debit_personaldata_right {
+    width: 170px;
+    overflow:hidden;
+}
+
+.center {
+    text-align: center;
+}
+
+.epinInputDiv {
+    left:12px;
+    position:absolute;
+    width:600px;
+}
+
+.typo_12 {
+    -x-system-font:none;
+    font-family:Verdana,Geneva,Arial,Helvetica,sans-serif;
+    font-size:12px;
+    font-size-adjust:none;
+    font-stretch:normal;
+    font-style:normal;
+    font-variant:normal;
+    font-weight:normal;
+    line-height:14px;
+}
+
+.valign {
+    vertical-align:middle;
+}
+
+.attention {
+	color:#F00;
+}
+
+.deleteCC {
+    position: absolute;
+    right: 35px;
+    top: 285px;
+    text-align:right;
+    width:530px;
+    height:20px;
+    line-height: 14px;
+}
+
+.window_buildpay_cc_iframeOgone {
+    width: 600px;
+    height: 240px;
+    position: absolute;
+    left: 15px;
+    top: 90px;
+    z-index: 1;
+}
+
+.window_buildpay_cc_iframeComputop {
+    width: 590px;
+    height: 250px;
+    position: absolute;
+    left: 15px;
+    top: 90px;
+    z-index: 1;
+}
+
+.window_buildpay_cc_iframeComputopCvc {
+    width: 325px;
+    height: 120px;
+    position: absolute;
+    left: 15px;
+    top: 60px;
+    z-index: 1;
+}
+
+.window_buildpay_cc_iframe_background, .window_buildpay_cc_iframeCvc_background {
+    position: absolute;
+    left: 15px;
+    width: 590px;
+    height: 230px;
+    background-color : white;
+    opacity: .4;
+    filter: alpha(opacity=40);
+}
+
+.window_buildpay_cc_iframeCvc_background {
+    width: 325px;
+    height: 120px;
+    top: 60px;
+}
+
+.window_shopping_fullframe {
+    width: 570px;
+    height: 425px;
+    position: absolute;
+    left:27px;
+    top: 7px;
+    z-index: 1;
+}
+
+.window_content_overlayinfo {
+    overflow: auto;
+    height: 314px;
+    left: 28px;
+    line-height: 13px;
+    padding-right: 5px;
+    position: absolute;
+    top: 108px;
+    width: 570px;
+    z-index: 1;
+}
+
+.success_subscriptions {
+    padding-left:5px;
+    width:565px;
+    background: transparent url(https://ssl.bpsecure.com/billing/images/ghostimage.gif?__cv=ad480fd0732d0f6f1a8b06359e3a4200) no-repeat center;
+}
+
+.window_content_divide {
+    height: 64px;
+    overflow: auto;
+}
+
+.window_content_divide_embedded {
+    height: 64px;
+    overflow: auto;
+}
+
+.window_content_divide_up {
+    height: 120px;
+    overflow: auto;
+}
+
+.align_left {
+    text-align: left;
+}
+
+.align_right {
+    text-align: right;
+}
+
+.table_content {
+    border: 1px solid #CCCCCC;
+}
+
+.table_header {
+    background-color:#EEEEEE;
+    border:1px solid #CCCCCC;
+}
+
+.overlay_info_message {
+    position:absolute;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/background.jpg?__cv=db74c76805d91f7b30fdd2463cf41e00);
+    border:1px solid black;
+    width:625px;
+    font-size:11px;
+    height:438px;
+    top: 170px;
+    z-index:9102;
+}
+
+#overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+.smallOverlay, .bigOverlay, .promoOverlay, .middleOverlay, .kongregateOverlay, .orangeOverlay, .cccomputopThreeOverlay,
+.terrabankOverlay, .directOverlaySelectionOverlay, .voucherOverlay, .zeevexOverlay,
+.billtomobileOverlay, .paymentezOverlay, .chasepaymentechECOverlay,
+.cccomputopFastpayCvcOverlay, .iFrame_scriptpay_wildtangentOverlay,
+.iFrame_scriptpay_vkontakteOverlay, .iFrame_scriptpay_odnoklassnikiOverlay,
+.iFrame_scriptpay_naszaklasaOverlay, .iFrame_scriptpay_ramblerOverlay,
+.iFrame_scriptpay_tuentiOverlay, .scriptpayAdditionalOverlay,
+.iFrame_scriptpay_bigfishOverlay, .mopayOverlay, .webbillingBokuOverlay,
+.iFrame_scriptpay_aolOverlay, .allopassISPOverlay, .bitcoinOverlay {
+    position: absolute;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/background.jpg?__cv=db74c76805d91f7b30fdd2463cf41e00);
+    border: 1px solid black;
+    width: 625px;
+    font-size: 11px;
+    overflow: hidden;
+    opacity: 0;
+    display: none;
+    z-index: 9001;
+    height: 372px;
+    background-position: center center;
+    margin: -186px 0 0 -313px;
+}
+
+.paymentezOverlay{
+	height:580px;
+	width:710px;
+    margin: -190px 0 0 -355px;
+}
+
+.billtomobileOverlay {
+    height: 430px;
+    margin: -215px 0 0 -313px;
+}
+
+.mopayOverlay {
+    height: 430px;
+}
+
+.webbillingBokuOverlay {
+    height: 475px;
+    overflow: auto;
+}
+
+.bigOverlay {
+    height: 438px;
+    margin: -219px 0 0 -313px;
+}
+
+.middleOverlay {
+    height: 380px;
+    margin: -190px 0 0 -313px;
+}
+
+.promoOverlay {
+    height: 105px;
+    margin: -53px 0 0 -313px;
+}
+
+.voucherOverlay {
+    height: 140px;
+    margin: -70px 0 0 -313px;
+}
+
+.kongregateOverlay {
+    height: 550px;
+    width: 820px;
+    margin: -225px 0 0 -410px;
+}
+
+.orangeOverlay {
+    height: 365px;
+    width: 605px;
+    margin: -183px 0 0 -303px;
+}
+
+.basit_chooseDiv {
+    padding: 3px 0 0;
+}
+
+.basit_detailDiv {
+    padding: 5p 0 0 0;
+    height: 70px;
+    width: 158px;
+    overflow: hidden;
+}
+
+.basit_chooseOptionDiv {
+    padding: 14px 0 0;
+}
+
+.allopassISPOverlay {
+    width: 700px;
+    height: 485px;
+    margin: -215px 0 0 -350px;
+}
+
+.bitcoinOverlay {
+    width: 700px;
+    height: 485px;
+    margin: -200px 0 0 -350px;
+}
+
+.transBig {
+    filter: alpha(opacity=25);
+    -moz-opacity: 0.25;
+    opacity: 0.25;
+}
+
+.pinDivider {
+    margin: 3px 5px 0 5px;
+}
+
+.iFrame_scriptpay_wildtangentOverlay {
+    height: 480px;
+    width: 805px;
+    margin: -240px 0 0 -403px;
+}
+
+.iFrame_scriptpay_vkontakteOverlay {
+    height: 370px;
+    width: 630px;
+    margin: -185px 0 0 -315px;
+}
+
+.iFrame_scriptpay_odnoklassnikiOverlay {
+   height:370px;
+   width: 630px;
+   margin: -185px 0 0 -315px;
+}
+
+.iFrame_scriptpay_tuentiOverlay {
+   height:370px;
+   width: 630px;
+   margin: -185px 0 0 -315px;
+}
+
+.iFrame_scriptpay_naszaklasaOverlay {
+   height: 0px;
+   width: 0px;
+   top: -2000px;
+   display: none;
+}
+
+.iFrame_scriptpay_bigfishOverlay {
+   height: 0px;
+   width: 0px;
+   top: -2000px;
+   display: none;
+}
+
+.iFrame_scriptpay_ramblerOverlay {
+    height: 507px;
+    width: 615px;
+    margin: -253px 0 0 -307px;
+}
+
+.iFrame_scriptpay_aolOverlay {
+   height:270px;
+   width: 500px;
+   margin: -185px 0 0 -315px;
+}
+
+.scriptpay_aol_textbox {
+    left: 25px;
+    position: relative;
+    top: 50px;
+    width: 400px;
+}
+
+.scriptpayAdditionalOverlay {
+    height: 280px;
+    margin: -140px 0 0 -313px;
+    display: block;
+}
+
+.chasepaymentechECOverlay {
+    height: 412px;
+    margin: -206px 0 0 -313px;
+}
+
+.terrabankOverlay {
+    height: 495px;
+    width: 553px;
+    margin: -248px 0 0 -277px;
+}
+
+.gate2PlayOverlay {
+    height: 517px;
+    width: 703px;
+    margin: -265px 0 0 -352px;
+}
+
+.cccomputopThreeOverlay {
+    height: 394px;
+    margin: -197px 0 0 -313px;
+}
+
+.cccomputopFastpayCvcOverlay {
+    width: 380px;
+    height: 250px;
+    margin: -125px 0 0 -190px;
+}
+
+.cccomputopFastpayCvcPosition {
+    left: 10px;
+    position: relative;
+    width: 360px;
+}
+
+.directOverlaySelectionOverlay {
+    height: 200px;
+    width: 620px;
+    margin: -100px 0 0 -310px;
+    font-size: 15px;
+}
+
+
+.promoCodeSucessText {
+    padding-top: 12px;
+    text-align:center;
+    font-size:14px;
+    color: #004000;
+    font-weight: bold;
+}
+
+.premium_headline {
+    font-weight:bold;
+    height:12px;
+    /*left:8px;
+    position:absolute;
+    top:114px;*/
+    text-align:left;
+    width:500px;
+    z-index:3;
+}
+
+.premium_headline_benefit {
+    padding-left:2px;
+    width:146px;
+}
+
+.premium_row {
+    border-left: 1px solid #cfcfcf;
+    border-right: 1px solid #cfcfcf;
+    border-bottom: 1px solid #cfcfcf;
+}
+
+.premium_headline_description {
+    padding-left:2px;
+}
+
+.premium_label {
+    width: 136px;
+    padding: 4px;
+    /*padding-left: 4px;*/
+    border-right: 1px solid #cfcfcf;
+}
+
+.premium_border_top{
+    border-top: 1px solid #cfcfcf;
+}
+
+.premium_description {
+    width: 340px;
+    padding: 4px;
+    /*padding-left: 4px;*/
+    margin-left:-1px;
+    border-left: 1px solid #cfcfcf;
+}
+
+.window_overlay_wait {
+    background:transparent;
+    height:150px;
+    left:55px;
+    overflow:auto;
+    padding:8px 4px 4px;
+    position:absolute;
+    text-align:center;
+    top:100px;
+    width:504px;
+    z-index:3;
+}
+
+.window_overlay_wait_overlayAdditionals {
+    background: #FFFFFF;
+    border: 1px solid #CCCCCC;
+}
+
+.checkoutButtonDiv, .voucherButtonDiv {
+    height: 55px;
+}
+
+.voucherButtonDiv {
+    width: 185px;
+    text-align:center;
+    font-size:13px;
+    color: #FF0000;
+    font-weight: bold;
+}
+
+.eVoucher {
+    padding: 5px;
+}
+
+.smsShortcodeChangeNotice {
+    position: absolute;
+    top: 112px;
+    width: 500px;
+    height: 140px;
+    background-image: url(https://ssl.bpsecure.com/billing/images/embedded/22/layer/input_center.png?__cv=4108c8381f8d1eb7e16599a607d58200);
+    border: 1px solid white;
+    background-position: center center;
+    left: 62px;
+    z-index: 1;
+}
+
+/**
+ * ie6 fixes
+ */
+
+* html .overlay_info_message {
+   left:520px;
+}
+
+* html #paymentMethodsBox {
+    width: 380px;
+    margin-left:-12px;
+    margin-top: 23px !important;
+}
+
+* html #paymentMethods {
+    width: 410px;
+    margin-left: 0px;
+}
+
+* html #methodsTitleBar {
+    width: 396px;
+    margin-top: 0px;
+    height: 28px;
+}
+
+* html #paymentMethodsContent {
+    height: 146px;
+}
+
+* html .offerItem {
+    margin: 0px 7px 0px 4px;
+}
+
+* html #offersTitleBar {
+    width: 403px;
+    height: 29px;
+}
+
+* html #contentLeft,
+* html #contentRight {
+    margin: 7px 6px 7px 7px;
+}
+
+* html #content {
+    height: 490px;
+    margin-left: 4px;
+}
+
+
+* html #overlayBackBtn {
+    margin-left: 7px;
+}
+
+* html #promoCodeSubmitBtn {
+    height: 31px;
+}
+
+* html .overlayBtn {
+    height: 33px;
+}
+
+* html .inputGroupItems {
+    padding: 5px 10px 6px 10px;
+}
+
+* html .inputGroup {
+    margin-left: 7px;
+    margin-top: 5px;
+}
+
+* html #overlayHeaderL {
+    margin-left: 7px;
+}
+
+* html .methodItem {
+    margin-top: 3px !important;
+    margin-bottom: 3px !important;
+}
+
+* html .methodItem,
+* html .methodItemInactive {
+    margin: 1px;
+}
+
+* html #cartTotalText {
+    margin-left: 15px;
+}
+
+* html #cartTotal {
+    margin-right:17px;
+}
+
+.oldprice {
+color: #F00;
+text-decoration:line-through;
+}
+
+.newprice {
+}
+
+.savepercentprice {
+    font-weight: normal;
+    font-style: normal;
+    font-size: 9pt;
+    width: 80px;
+    height: 20px;
+    text-align: left;
+    overflow: hidden;
+}
+
+.itemSelectionSubheadline {
+    font-weight: normal;
+    font-style: normal;
+    font-size: 8pt;
+    padding-left: 5px;
+
+}
+
+.slimItemSelectionSubheadline {
+    font-weight: normal;
+    font-style: normal;
+    font-size: 8pt;
+    padding-left: 5px;
+
+}
+
+.progressText_activ {
+color: #F00;
+}
+
+.progressText_inactiv {
+color:#000000;
+}
+
+
+.button_currencyswap {
+    position: absolute;
+    left: 320px;
+    width: 64px;
+    height: 40px;
+    top: 18px;
+}
+
+
+.input_currencyswap {
+    position: absolute;
+    top: 15px;
+    left: 5px;
+    width: 300px;
+    height: 64px;
+}
+
+#voucherErrorText {
+    float: left;
+    line-height: 15px;
+    color: red;
+    margin-left: 10px;
+    /*padding-top: 2px;*/
+    font-size: 13px;
+    font-weight: bold;
+}
+
+#methodsHeaderL,
+#methodsHeaderM,
+#methodsHeaderR {
+    margin-top: -3px;
+}
+
+#overlayCvcField {
+    position: absolute;
+    right: 0px;
+    right: 20px;
+    top: 12px;
+    width: 200px;
+    height: 16px;
+    text-align: right;
+}
+
+.overlaySelectionSmsPhone {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+
+.overlaySelectionSmsPhoneDiv {
+    position: relative;
+    width: 295px;
+    height: 155px;
+    float: left;
+}
+
+
+DIV#smsPaymentBox {
+    position:relative;
+    padding:4px 4px 0px 4px;
+    margin:0px;
+    position: relative;
+    width: 104px;
+    height: 70px;
+    text-align: center;
+    border: 3px solid #000;
+    background-color: #FFF;
+    font-family: Frutiger,Arial,sanserif;
+    color: #000;
+}
+DIV#smsShortCodeBox {
+    position:relative;
+    margin: 0px;
+    padding: 0px;
+    height: 45px;
+    font-size: 36px;
+    text-align: center;
+    background-color: #000;
+    color: #FFF;
+}
+DIV#smsShortCodeBox DIV {
+    position:relative;
+    margin:0px;
+    padding:16px 0px 0px 0px;
+    background-color: #000;
+}
+DIV#smsShortCodeBox DIV {
+    margin:0px 0px 5px 0px;
+    background-color: #000;
+}
+DIV#smsPriceBox {
+    position:relative;
+    margin:3px 0px 0px 0px;
+    padding:0px 0px 0px 0px;
+    font-size: 12px;
+    background-color: #FFF;
+    color: #000;
+}
+DIV#smsLegalNote {
+    margin-top: 10px;
+    height: 110px;
+    font-size: 10px;
+    display: none;
+    overflow: auto;
+}
+
+.paymentMethodBonus {
+    height: 30px;
+    width: 51px;
+    position: relative;
+    left: 41px;
+    top: 0px;
+    font-size: 10px;
+    font-weight: normal;
+    letter-spacing: -1px;
+    color: #000000;
+    text-align: center;
+    padding-top: 0px;
+}
+
+.paymentMethodBonusText {
+}
+
+.accountBonusInfotext {
+    margin-top: 10px;
+    font-weight: normal;
+    color: red;
+    clear: both;
+}
+
+.faqLink {
+    cursor: pointer;
+}
+
+DIV#fastpayBox2 {
+	position:relative;
+}
+DIV#fastpayBox2 DIV.fastpayRecurringInfo {
+	position:relative;
+	height:250px;
+	padding:0px 30px;
+    font-size:12px;
+    font-weight:normal;
+    line-height:1.4em;
+}
+DIV#fastpayBox2 DIV#fastPayBtnBox {
+	position:absolute;
+	top:300px;
+	left:30px;
+	width:565px;
+}
+
+.fontsubscriptionExpires {
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.boxSmsOperatorDe {
+    position: absolute;
+    height: 82px;
+    width: 563px;
+    top: 260px;
+    left: 30px;
+}
+
+.chasepaymentechECMainDiv {
+    width: 600px;
+    height: 270px;
+    margin-left: 12px;
+    background-image: url(../images/embedded/eCheck_bg.png);
+}
+
+.chasepaymentechECAddressBox, .chasepaymentechECDateBox,
+.chasepaymentechBigpointBox, .chasepaymentechPriceCurrencyBox,
+.chasepaymentechItemDescBox, .chasepaymentechBRTNBox, .chasepaymentechDDABox {
+    position: absolute;
+    font-size: 13px;
+    color: #000000;
+}
+
+.chasepaymentechECAddressBox {
+    margin-left: 27px;
+    margin-top: 14px;
+    width: 250px;
+    height: 60px;
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+.chasepaymentechECDateBox {
+    margin-left: 410px;
+    margin-top: 52px;
+    width: 90px;
+    height: 15px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.chasepaymentechBigpointBox {
+    margin-left: 210px;
+    margin-top: 92px;
+    width: 120px;
+    height: 15px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.chasepaymentechPriceCurrencyBox {
+    margin-left: 350px;
+    margin-top: 122px;
+    width: 145px;
+    height: 15px;
+    text-align: right;
+    font-weight: bold;
+}
+
+.chasepaymentechItemDescBox {
+    margin-left: 95px;
+    margin-top: 191px;
+    width: 245px;
+    height: 15px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.chasepaymentechBRTNBox {
+    margin-left: 35px;
+    margin-top: 225px;
+    width: 115px;
+    height: 15px;
+}
+
+.chasepaymentechDDABox {
+    margin-left: 195px;
+    margin-top: 225px;
+    width: 135px;
+    height: 15px;
+}
+
+.chasepaymentechInputTransparent {
+    position: absolute !important;
+    border: none !important;
+    background: transparent !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    color: #000000 !important;
+    text-align: center !important;
+}
+
+.chasepaymentechInputError {
+    position: absolute !important;
+    border: none !important;
+    background-color: #FFC0C0 !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    color: #000000 !important;
+    text-align: center !important;
+}
+
+.footerCountryFlag {
+    position: relative;
+    top: -3px;
+}
+
+TABLE#topItemsTable IMG, DIV#shoppingCartItems IMG, DIV#shoppingCartTotal IMG {
+	vertical-align:top;
+}
+
+DIV#shoppingCartItems IMG, DIV#shoppingCartTotal IMG {
+	margin-top:2px;
+}
+
+a.abortSettleLink:link {
+    color: #FF0000;
+    text-decoration: underline;
+}
+
+a.abortSettleLink:visited {
+    color: #FF0000;
+    text-decoration: underline;
+}
+
+a.abortSettleLink:hover {
+    color: #FF0000;
+    text-decoration: underline; ;
+}
+
+.gmgcardTemplateBox, .incommTemplateBox{
+    position: relative;
+    width:100%;
+    top:60px;
+}
+
+.gmgcardTextBox, .incommTextBox{
+    position: relative;
+    width:100%;
+    text-align: center;
+}
+
+.gmgcardNumberBox, .incommNumberBox {
+    position: relative;
+    width:100%;
+    padding-top: 10px;
+    text-align: center;
+}
+
+.gmgcardNumberInput, .incommNumberInput {
+    width: 150px !important;
+    height: 16px;
+}
+
+
+.computopFastpayCvcContent {
+    width: 325px;
+}
+
+.window_amazon_data, .window_paypalDigital_data {
+    height: 150px;
+    left: 4px;
+    line-height: 14px;
+    width: 450px;
+    padding-left: 50px;
+}
+
+.agreementTwoLines {
+    padding-top: 5px;
+}
+
+#deletePersonalData a:link {
+    color: red;
+    text-decoration: underline;
+}
+
+
+a.importantLink2 {
+    color: red;
+    text-decoration: none;
+}
+
+#specialIt a:link  {
+    color: #ff4242;
+    text-decoration: underline;
+}
+
+a.importantLink:link, a.importantLink:visited, a.importantLink:active {
+    color: red;
+    text-decoration: underline;
+}
+
+a.importantLink:hover {
+    color: #ff4242;
+    text-decoration: underline;
+}
+
+.epinSpecialFont {
+    font-weight: bold;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #000000;
+}
+
+.epinSubmitCheckButton {
+    margin-left: 10px;
+    margin-right: 10px;
+    vertical-align: bottom;
+    cursor: pointer;
+}
+
+.fontColor_error {
+    color: red;
+}
+
+.fontColor_success {
+    color: green;
+}
+
+.paddingTopBottomFive {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.marginLeftFive {
+    margin-left: 5px;
+}
+
+.success_method_hint {
+    background: #FFFFFF;
+    width: 100%;
+    border: 1px solid red;
+}
+
+
+.sovendusBox {
+    padding-top: 50px;
+}
+
+
+

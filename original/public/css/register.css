@@ -1,0 +1,46 @@
+.singup_errorMessage {
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 10px;
+clear: both;
+text-align: left;
+color: white;
+padding: 0 10px 0 10px;
+line-height: 1;
+margin-top: 10px;
+margin-bottom: 10px;
+}
+
+
+
+
+/* -------------------------------------- Colorbox  --------------------------------------------------------- */
+#colorbox, #cboxOverlay, #cboxWrapper{position:absolute; top:0; left:0; z-index:9999; }
+#cboxOverlay{position:fixed; width:100%; height:100%;}
+#cboxMiddleLeft, #cboxBottomLeft{clear:left;}
+#cboxContent{position:relative;}
+#cboxLoadedContent{overflow:auto;}
+#cboxLoadedContent iframe{display:block; width:100%; height:100%; border:0;}
+#cboxTitle{margin:0;}
+#cboxLoadingOverlay, #cboxLoadingGraphic{position:absolute; top:0; left:0; width:100%;}
+#cboxPrevious, #cboxNext, #cboxClose, #cboxSlideshow{cursor:pointer;}
+#cboxPrevious, #cboxNext { top: 218px;}
+#cboxOverlay{background:#000000; opacity:0.5 !important; filter: alpha(opacity=50) !important;}
+#colorbox{}
+#cboxTopLeft{width:10px; height:10px; background: url(../images/colorbox/colorbox-corners.png) no-repeat top left;}
+#cboxTopRight{width:10px; height:10px; background: url(../images/colorbox/colorbox-corners.png) no-repeat top right;}
+#cboxBottomLeft{width:10px; height:10px; background: url(../images/colorbox/colorbox-corners.png) no-repeat bottom left;}
+#cboxBottomRight{width:10px; height:10px; background: url(../images/colorbox/colorbox-corners.png) no-repeat bottom right;}
+#cboxMiddleLeft{width:10px; background: url(../images/colorbox/colorbox-bg_h.png) left top repeat-y;}
+#cboxMiddleRight{width:10px; background: url(../images/colorbox/colorbox-bg_h.png) right top repeat-y;}
+#cboxTopCenter{height:10px; background: url(../images/colorbox/colorbox-bg_v.png) 0 0 repeat-x;}
+#cboxBottomCenter{height:10px; background: url(../images/colorbox/colorbox-bg_v.png) 0 -70px repeat-x;}
+#cboxContent{background: url(../images/colorbox/colorbox-bg_color.jpg) transparent;}
+#cboxLoadedContent{}
+#cboxTitle{position:absolute; bottom:4px; left:0; text-align:center; width:100%; color:#949494;}
+#cboxCurrent{display:none !important;}
+#cboxSlideshow{position:absolute; bottom:4px; right:30px; color:#0092ef;}
+#cboxPrevious{position:absolute; left: -71px;  background: url(../images/colorbox/colorbox-button.png) no-repeat; width:55px; height:90px;; text-indent:-9999px; border: 0;}
+#cboxNext{position:absolute; right: -71px; background: url(../images/colorbox/colorbox-button.png) no-repeat -55px 0; width:55px; height:90px;; text-indent:-9999px; border: 0;}
+#cboxLoadingOverlay{background: url(../images/colorbox/colorbox-corners.png) no-repeat center center;}
+#cboxLoadingGraphic{background: url(../images/colorbox/colorbox-preloader.gif) no-repeat center center;}
+#cboxClose{position:absolute; top:-31px; right:-34px; background: url(../images/colorbox/colorbox-button.png) no-repeat -111px -50px; width:40px; height:40px; text-indent:-9999px; border: 0;}

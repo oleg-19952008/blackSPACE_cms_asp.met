@@ -1,0 +1,97 @@
+@charset "utf-8";
+/* CSS Document */
+
+.cartItemDescription {
+color:#8cffff;
+}
+
+#topItemsTitle {
+color:#35AFF5;
+}
+
+#offersHeaderM {
+color:#35AFF5;
+}
+
+#cartTotalText, #cartTotal {
+color:#35aff5;
+}
+
+.overlayBtn {
+    color:#35aff5;
+}
+
+.oldprice {
+color:#35aff5;
+}
+
+#checkoutButton {
+color:#35aff5;
+}
+
+#cartSaved {
+color:#35aff5;
+}
+
+.progressText_activ {
+color:#Fafafa;
+}
+
+.cartItemDiscount {
+color:#FAFAFA;
+}
+
+.cartItemPrice {
+color:#8cffff;
+}
+
+#methodsHeaderM {
+color:#35aff5;
+}
+
+.methodItemMovePrevText, .methodItemMoveNextText {
+color:#BEBEBE;
+}
+
+#sslText {
+color:#35aff5;
+}
+
+#overlayNextBtn {
+color:#35aff5;
+}
+
+.inputGroupHeader {
+color:#FAFAFA;
+}
+
+#overlayStep {
+color:#135e8c;
+}
+
+#overlayBackBtn {
+color:#35aff5;
+}
+
+#successCloseBtn {
+color:#35aff5;
+}
+
+#successheader {
+color:#35aff5;
+}
+
+input, select, #overlay input {
+  border: 1px solid #000000;
+  font-size: 11px; 
+}
+
+#successBackBtn {
+    color: #35AFF5;
+}
+
+#failText a:link,
+#failText a:hover {
+    color: #B00000;
+    text-decoration: underline;
+}

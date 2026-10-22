@@ -1,0 +1,17 @@
+body {
+      /*background-image: url('../img/s2.jpg');
+ background-size: 100%px*/
+ 	background: url('http://35.164.68.199/indx/img/s2.jpg') no-repeat     ;
+     	/*-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;*/
+	/*background-size: ce  contain;*/
+    /*height:50em ;
+    width :auto;*/
+  color: #5f5f61;
+ 
+   	background-size: cover;
+
+ 
+ 
+}

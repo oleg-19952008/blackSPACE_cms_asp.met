@@ -1,0 +1,58 @@
+html, body {
+    height: 100%;
+}
+body {
+    background-color:#000;
+}
+
+#logout_bg {
+    height:100%;
+    background-image: url(/do_img/global/logout/bg.jpg?__cv=67f2be83f0fc6f30abf864f1942b2a00);
+    background-color: #000000;
+    background-repeat: no-repeat;
+    background-position: center top;
+}
+
+#logout_container {
+    width: 827px;
+    margin: auto;
+}
+#logout_container_top {
+    width: 827px;
+    height: 144px;
+    background-image: url(/do_img/global/logout/container_bg_top.png?__cv=4aa4da9cc5516d0aca0651e5256abd00);
+    margin-top: 50px;
+
+}#logout_container_content {
+    width: 827px;
+    min-height: 250px;
+    background-image: url(/do_img/global/logout/container_bg_content.png?__cv=2d062b483ab6d67c5909aed10729c800);
+}
+#logout_container_bottom {
+    width: 827px;
+    height: 57px;
+    background-image: url(/do_img/global/logout/container_bg_bottom.png?__cv=db906788f215c2fc2773bea12157da00);
+    background-repeat: no-repeat;
+
+}
+.logoutContainer:nth-child(1) {
+    width: 729px;
+    height: 35px;
+    line-height: 35px;
+    margin: auto;
+    background-image: url(/do_img/global/logout/container_bg_content_message.png?__cv=960f6fa0103e8ea163b7d02679a5da00);
+    color: white;
+}
+.logoutContainer:nth-child(2) {
+    margin: 10px 0;
+}
+.buttonGameLink, .buttonPortalLink {
+    width: 195px;
+    height: 21px;
+    line-height: 21px;
+    border: 0px;
+    cursor: pointer;
+    background: url(/do_img/global/logout/container_button_bg.png?__cv=d0a3c6db911687776725055db62f9a00);
+    color: #ffffff;
+    font-size: 12px;
+}

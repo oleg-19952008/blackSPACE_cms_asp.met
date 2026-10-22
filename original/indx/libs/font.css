@@ -1,0 +1,37 @@
+body {
+    font-family: 'Trebuchet MS', 'Segoe UI', Calibri, 'Trebuchet MS', Helvetica, Arial, sans-serif;
+}
+     xa 
+         {
+    font-family: 'segoe script', Times, serif; 
+   text-align:  center;
+	font-size: 18pt; 
+   } 
+     xaa {
+    font-family: 'segoe script', Times, serif; 
+  
+	font-size: 18pt; 
+	 text-align:  center;	     
+     
+    width: 100%;
+    height: 100%; 
+    opacity: 0.5;
+ 
+ 
+    filter: alpha(opacity=90);
+   } 
+    	   .text {
+    text-align:  center;
+   }
+   
+     h1 {
+    font-family: 'segoe script', Times, serif;    
+	font-size: 250%; 
+	} 
+   p {
+    font-family: sans-serif, Arial, Helvetica, sans-serif; 
+    font-size: 11pt;  
+   }
+   
+ 
+ 

@@ -1,0 +1,136 @@
+body 
+{
+    margin: 0;
+    padding: 0;
+    font-size: 10px;
+    font-family: Verdana, Arial, sans-serif;
+    color: white;
+    background-color: #000000;
+    width: 100%;
+    height: 100%;
+	background: url('../images/background_03.jpg') no-repeat scroll top center #000000;
+}
+
+#container
+{
+	width: 860px;
+	margin-left: 30px;
+    margin: auto;
+}
+
+#header
+{
+    margin-left: -70px;
+}
+
+#mainContent
+{
+    margin-left: -40px;
+}
+
+
+/* #left_menu
+{
+    float: left;
+    margin-left: -22px;
+    width: 182px;
+    height: 439px;
+    background: url('../images/nav_sub_bg.jpg') no-repeat scroll top center;
+}
+ */
+#left_menu ul
+{
+	width: 130px;
+	padding: 0;
+	margin-left: 45px;
+	margin-top: 25px;
+	list-style: none;
+}
+
+/* #left_menu ul li */
+{/* 
+	background: url('http://darkorbit-22.level3.bpcdn.net/do_img/global/bg_subnav_standard.gif') no-repeat;
+	padding-left: 25px;
+} */
+
+/* #left_menu ul li:hover
+{
+	background: url('http://darkorbit-22.level3.bpcdn.net/do_img/global/bg_subnav_hover.gif') no-repeat;
+}
+ */
+#mainContentShips
+{
+    float: left;
+    width: 677px;
+    height: 439px;
+	background: url('../images/bg_shop2.jpg') no-repeat scroll top center;
+	color: #ABABAB;
+}
+
+.ShipsList
+{
+	float: left;
+	margin-left: 70px;
+	width: 245px;
+	height: 320px;
+	margin-top: 15px;
+	font-family: Verdana;
+	font-size: 10px;
+}
+
+.ShipsList table
+{
+	font-family: Verdana;
+	font-size: 10px;
+}
+
+.ShipsList table td
+{
+	padding-left: 5px;
+	padding-bottom: 5px;
+}
+
+.ShipsList table img:hover
+{
+	outline: 1px solid white;
+	cursor: pointer;
+}
+
+.ShipsList .scroll-panel
+{
+    height: 320px;
+}
+
+.ContentPreview
+{
+	float: left;
+	margin-left: 50px;
+	margin-top: 10px;
+	width: 255px;
+	height: 200px;
+}
+
+.price
+{
+	position: absolute;
+	margin-top: -16px;
+	margin-left: 10px;
+	width: 80px;
+	text-align: center;
+}
+
+.ShipDesc
+{
+	float: left;
+	width: 235px;
+	height: 127px;
+	margin-top: 65px;
+	margin-left: 60px;
+}
+
+.ShipDesc table
+{
+	font-family: Verdana;
+	font-size: 10px;
+	color: #434a52;
+}

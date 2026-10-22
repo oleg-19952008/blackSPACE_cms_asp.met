@@ -1,0 +1,14 @@
+#bottom_ads
+{
+    float: left;
+    margin-left: 5%;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+#right_ads
+{
+    margin-left: 820px;
+    margin-top: -160px;
+    position: absolute;
+}
