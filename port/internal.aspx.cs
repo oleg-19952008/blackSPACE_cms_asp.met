@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
@@ -112,10 +114,310 @@ namespace DarkSpace
                 case "internalSkylab":
                     HandleInternalSkylab(users, request);
                     break;
-                // TODO (фаза B): internalStart/Gates/JPA/Payment/HoF (B3), internalBalance (B4),
-                // internalHistory (B5), internalDock* (B6/B10), internalAuction (B7),
-                // internalBoard/Messaging (B8), internalUserDataChange (B9), Shop/inventory (B10).
+
+                // ---- B3 (PORTING-PLAN.md): indexInternal.es.php lines 66–160 ----
+                case "internalStart":
+                    RenderInternalPage("internalStart", "/css/cdn/internalStart.css");
+                    break;
+                case "internalGalaxyGates":
+                    // В оригинале ветка internalGalaxyGates продублирована (строки 78–89 и
+                    // 116–126) — недостижимый второй copy-port не нужен: поведение идентично.
+                    RenderInternalPage("internalGalaxyGates", "/css/cdn/internalGalaxyGates.css");
+                    break;
+                case "internalJPA":
+                    RenderInternalPage("internalJPA", "/css/cdn/internalGalaxyGates.css");
+                    break;
+                case "internalJPA-list":
+                    RenderInternalPage("internalJPA-list", "/css/cdn/internalGalaxyGates.css");
+                    break;
+                case "internalPayment":
+                    RenderInternalPage("internalPayment", "/css/cdn/internalPayment.css");
+                    break;
+                case "internalHallofFame":
+                    HandleInternalHallofFame(users, request);
+                    break;
+
+                // TODO (фаза B): internalBalance (B4), internalHistory (B5),
+                // internalDock* (B6/B10), internalAuction (B7), internalBoard/Messaging (B8),
+                // internalUserDataChange (B9), Shop/inventory (B10).
             }
+        }
+
+        /// <summary>
+        /// Каркас страницы INTERNAL как в require GLOBALS 'internalDoc.php' + css-link +
+        /// sajax/xajax/headerEndJS/internalMenu/internalHeader + FILES 'INDEXINTERNAL/&lt;body&gt;_Body.php'.
+        /// Шаблоны GLOBALS/INDEXINTERNAL — фаза C (PORTING-PLAN): здесь отдаём статический
+        /// HTML-каркас из port/templates/INDEXINTERNAL/&lt;body&gt;.html (если есть) либо
+        /// минимальную оболочку с заголовком действия.
+        /// </summary>
+        private void RenderInternalPage(string bodyName, string cssHref)
+        {
+            Response.Write("<link rel=\"stylesheet\" media=\"all\" href=\"" + HttpUtility.HtmlAttributeEncode(cssHref) + "\" />");
+            string html = LoadTemplate(bodyName);
+            if (html != null)
+            {
+                Response.Write(html);
+                return;
+            }
+            var panel = new HtmlGenericControl("div");
+            panel.Attributes["id"] = bodyName + "Panel";
+            panel.InnerHtml = "<h3>" + HttpUtility.HtmlEncode(bodyName) + "</h3>" +
+                              "<p>Template pending phase C (templates/INDEXINTERNAL/" + HttpUtility.HtmlEncode(bodyName) + ".html).</p>";
+            phContent.Controls.Add(panel);
+        }
+
+        private static string LoadTemplate(string bodyName)
+        {
+            // whitelist имени файла от path traversal (имена задаются только кодом выше)
+            if (!Regex.IsMatch(bodyName, "^[A-Za-z0-9_-]+$")) return null;
+            string path = HttpContext.Current.Server.MapPath("~/templates/INDEXINTERNAL/" + bodyName + ".html");
+            return File.Exists(path) ? File.ReadAllText(path) : null;
+        }
+
+        /// <summary>
+        /// Port of indexInternal.es.php lines 138–160 (action=internalHallofFame) plus the
+        /// PHP preambles of the six view templates (Files/en_US/INDEXINTERNAL/internalHallofFame*_Body.php).
+        /// Uses ready Rank (A5) and Base.GetRank/GetRankByRNK. HTML-шаблоны body-файлов —
+        /// фаза C; здесь портирована серверная логика выборки рангов и smoke-рендер таблиц.
+        /// </summary>
+        private void HandleInternalHallofFame(Users users, HttpRequest request)
+        {
+            long uid = PlayerLog.ToLong(users.DataRow["ID"]);
+            long pid = PlayerLog.ToLong(users.DataRow["playerID"]);
+            long fid = PlayerLog.ToLong(users.DataRow["factionId"]);
+
+            var @base = new Base();
+            @base.SetId(uid, pid);
+            var rnk = new Rank();
+
+            Response.Write("<link rel=\"stylesheet\" media=\"all\" href=\"/css/cdn/internalHallofFame.css\" />");
+
+            string view = request.QueryString["view"];
+            var sb = new System.Text.StringBuilder();
+
+            if (view == "dailyRank")
+            {
+                // internalHallofFame_dailyRank_Body.php preamble (lines 1–10)
+                var rank = @base.GetRank(uid, pid);                       // $rank = $base->GetRank(...)
+                var mRy = rnk.GetMyRanking(pid);                          // $mRy = $rnk->getMyRanking(...)
+                var pwn = rnk.GetAllPlayers(pid);                         // $pwn = $rnk->getAllPlayers(...)
+                var npc = rnk.GetNpcKill(pid);                            // $npc = $rnk->getNpcKill(...)
+                var player = rnk.GePlayerKills(pid);                      // $player = $rnk->gePlayerKills(...)
+
+                long rankNum = rank != null ? PlayerLog.ToLong(Rank.Get(rank, "rank")) : 0;
+
+                sb.Append("<h3>YOUR RANK</h3>");
+                sb.Append("<div>You are a <strong>" + HttpUtility.HtmlEncode(@base.GetRankByRnk(rankNum)) + "</strong>.</div>");
+                var p0 = pwn.Count > 0 ? pwn[0] : null;
+                sb.Append("<div>Ranking points: " + NumFmt(D(p0, "total")) + "</div>");
+                sb.Append("<ul>");
+                sb.Append("<li>Experience points: " + NumFmt(D(p0, "exp") * 100000) + " / 100,000</li>");
+                sb.Append("<li>Honor points: " + NumFmt(D(p0, "honor") * 100) + " / 100</li>");
+                sb.Append("<li>Player shot points: " + NumFmt(D(p0, "playerkills") / 3) + " x 3</li>");
+                sb.Append("<li>Your level: " + NumFmt(D(p0, "level") / 100) + " x 100</li>");
+                sb.Append("<li>Days since registration: " + NumFmt(D(p0, "days") / 6) + " x 6</li>");
+                sb.Append("<li>NPC shot points: " + NumFmt(D(p0, "npckills") * 2) + " / 2</li>");
+                sb.Append("<li>Your ship type (" + HttpUtility.HtmlEncode(rnk.ShipNameFromNumber((int)(D(p0, "shipId") / 1000))) + "): "
+                          + NumFmt(D(p0, "shipId") / 1000) + " x 1,000</li>");
+                sb.Append("</ul>");
+
+                // PHP: if($rank['rank']>=20) ... else getApprox('>') ... ; затем getApprox('<')
+                if (rankNum >= 20)
+                {
+                    sb.Append("<p>You have the highest rank possible: <strong>" + HttpUtility.HtmlEncode(@base.GetRankByRnk(rankNum))
+                              + "</strong> or <strong>Administrator</strong></p>");
+                }
+                else
+                {
+                    object approxUp = rnk.GetApprox((long)D(p0, "total"), ">", rankNum, fid);
+                    sb.Append("<p>You need approx. " + HttpUtility.HtmlEncode(Convert.ToString(approxUp, CultureInfo.InvariantCulture))
+                              + " rank points to reach the next rank of <strong>"
+                              + HttpUtility.HtmlEncode(@base.GetRankByRnk(rankNum + 1)) + "</strong>.</p>");
+                }
+                object approxDown = rnk.GetApprox((long)D(p0, "total"), "<", rankNum, fid);
+                sb.Append("<p>The rank directly below yours is that of <strong>"
+                          + HttpUtility.HtmlEncode(@base.GetRankByRnk(rankNum - 1)) + "</strong>. Pilots with this rank have approx. "
+                          + HttpUtility.HtmlEncode(Convert.ToString(approxDown, CultureInfo.InvariantCulture)) + " rank points.</p>");
+
+                // Таблица NPC-убийств: foreach ($npc['playerNPC'] as $key => $am) { $kne = substr($key,3); ... }
+                sb.Append(RenderKillTable(npc, 3, skipShipKeys: false));
+                // Таблица PvP: пропуск ключей ship11/ship12/ship13 как в оригинале, substr($key,4)
+                sb.Append(RenderKillTable(player, 4, skipShipKeys: true));
+            }
+            else if (view == "User" || view == "Faction" || view == "home_exp" || view == "home_honor")
+            {
+                // Общие преамбулы этих шаблонов (строки 1–8 каждого файла):
+                var rank = @base.GetRank(uid, pid);          // unused in exp/honor bodies but queried in PHP
+                var top = rnk.GetAllRankingPlayers();        // $top = $rnk->getAllRankingPlayers();
+                var pager = new RankPager();                 // paginate()/getRange()/... живут в RankPager (A5.3)
+                pager.SetTotalOfResults(rnk.LastCount);      // PHP $this->count feeds the private pager
+                pager.SetUrl("?action=internalHallofFame&view=User"); // во всех шаблонах — один и тот же URL (quirk)
+                int cuPage = pager.GetCurrentPage();
+                int range = pager.GetRange();
+                int total = pager.GetTotalOfResults();
+                int tPage = (int)pager.GetTotalOfPages();
+
+                if (view == "home_exp")
+                {
+                    sb.Append("<h3>TOP EXPERIENCE HOME</h3><table class=\"hof_ranking_table\"><tbody>")
+                      .Append(rnk.UrExp()).Append("</tbody></table>");
+                }
+                else if (view == "home_honor")
+                {
+                    sb.Append("<h3>TOP HONOR HOME</h3><table class=\"hof_ranking_table\"><tbody>")
+                      .Append(rnk.UrHnr()).Append("</tbody></table>");
+                }
+                else if (view == "Faction")
+                {
+                    sb.Append("<h3>COMPANIES</h3><table id=\"hof_faction_table\" class=\"hof_ranking_table\"><tr>")
+                      .Append("<td class=\"rank_name\">Members</td>")
+                      .Append("<td class=\"rank_points\">" + CrOrDash(rnk, 1) + "</td>")
+                      .Append("<td class=\"rank_points\">" + CrOrDash(rnk, 2) + "</td>")
+                      .Append("<td class=\"rank_points\">" + CrOrDash(rnk, 3) + "</td></tr></table>");
+                    // Статические строки Ranking/Experience/Honor/Players/Aliens destroyed из
+                    // internalHallofFame_Faction_Body.php (захардкожены в оригинале) — фаза C.
+                    // переменные преамбулы ($rank/$range/$cuPage/$total/$tPage) в этом view не используются — GC-подсказка:
+                    GC.KeepAlive(rank); GC.KeepAlive(range); GC.KeepAlive(cuPage); GC.KeepAlive(total); GC.KeepAlive(tPage);
+                }
+                else // view == "User" — листинг топ-игроков с пагинацией (quirks сохранены)
+                {
+                    sb.Append("<h3>TOP USER</h3><table class=\"hof_ranking_table\"><tbody>");
+                    if (total != 0)
+                    {
+                        int start, end;
+                        if (cuPage == 1)
+                        {
+                            start = 0;
+                            end = total < range ? total : range;
+                        }
+                        else
+                        {
+                            start = (cuPage - 1) * range;
+                            end = cuPage != tPage ? cuPage * range : total;
+                        }
+                        for (int i = start; i < end; i++)
+                        {
+                            var row = top[i];
+                            sb.Append("<tr>")
+                              .Append("<td class=\"rank_position_font\">" + HttpUtility.HtmlEncode(Rank.Get(row, "overallRank")) + "</td>")
+                              .Append("<td class=\"rank_name_font\" title=\"" + HttpUtility.HtmlAttributeEncode(Rank.Get(row, "Name")) + "\">"
+                                      + HttpUtility.HtmlEncode(Rank.Get(row, "Name")) + "</td>")
+                              .Append("<td class=\"rank_name_font\">" + HttpUtility.HtmlEncode(@base.GetRankByRnk(PlayerLog.ToLong(Rank.Get(row, "rank")))) + "</td>")
+                              .Append("<td class=\"rank_points_font\">" + NumFmtStr(Rank.Get(row, "rankpoints")) + "</td>")
+                              .Append("</tr>");
+                        }
+                    }
+                    else
+                    {
+                        sb.Append("<li class=\"no_items even\">This search produced no results.</li>");
+                    }
+                    sb.Append("</tbody></table>");
+                    sb.Append("<div id=\"hof_pagination\">" + pager.Paginate() + "</div>");
+                }
+            }
+            else
+            {
+                // internalHallofFame_Body.php preamble (default view, lines 1–7)
+                var rank = @base.GetRank(uid, pid);
+                var top5 = rnk.GetAllRankingPlayers(5);   // вызывается дважды, как в PHP ($top1 и $top5)
+                var mRy = rnk.GetMyRanking(pid);
+                var myRanking = mRy.Count > 0 ? mRy[0] : null;
+                long overallRank = myRanking != null ? PlayerLog.ToLong(Rank.Get(myRanking, "overallRank")) : 0;
+                var be = rnk.GetRankBesideMe(overallRank);
+
+                sb.Append("<h3>HALL OF FAME</h3>");
+                sb.Append("<table class=\"hof_ranking_table\"><tbody>");
+                foreach (var v in top5)
+                {
+                    sb.Append("<tr><td class=\"rank_position\">" + HttpUtility.HtmlEncode(Rank.Get(v, "overallRank")) + ".</td>")
+                      .Append("<td class=\"rank_name\">" + HttpUtility.HtmlEncode(Rank.Get(v, "Name")) + "</td>")
+                      .Append("<td class=\"rank_points\">" + NumFmtStr(Rank.Get(v, "rankpoints")) + "</td></tr>");
+                }
+                sb.Append("</tbody></table>");
+                sb.Append("<table class=\"hof_ranking_table\"><tbody>");
+                foreach (var v in be)
+                {
+                    string cls = PlayerLog.ToLong(Rank.Get(v, "playerID")) == pid ? " class=\"rank_myRank\"" : "";
+                    sb.Append("<tr" + cls + "><td class=\"rank_position\">" + NumFmtStr(Rank.Get(v, "overallRank")) + "</td>")
+                      .Append("<td class=\"rank_name\">" + HttpUtility.HtmlEncode(Rank.Get(v, "Name")) + "</td>")
+                      .Append("<td class=\"rank_points\">" + NumFmtStr(Rank.Get(v, "rankpoints")) + "</td></tr>");
+                }
+                sb.Append("</tbody></table>");
+                GC.KeepAlive(rank); // $rank запрашивается в преамбуле шаблона, но в markup default-view не используется
+            }
+
+            string tpl = LoadTemplate("internalHallofFame_" + (string.IsNullOrEmpty(view) ? "main" : view));
+            var panel = new HtmlGenericControl("div");
+            panel.Attributes["id"] = "hallOfFame";
+            panel.InnerHtml = tpl ?? sb.ToString();
+            phContent.Controls.Add(panel);
+        }
+
+        /// <summary>Таблица убийств dailyRank: kill-таблицы rank::getNpcKill/gePlayerKills →
+        /// $arg['playerNPC'] × $arg['npcINFO'][substr($key,$n)]['rankPoints']. Чётность строк и
+        /// порядок подсветки различаются для npc/player таблиц — как в оригинале.</summary>
+        private static string RenderKillTable(RankKillArg arg, int substrFrom, bool skipShipKeys)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.Append("<table class=\"hof_shooting_table\"><tbody>");
+            if (arg == null || arg.PlayerNpc == null) { sb.Append("</tbody></table>"); return sb.ToString(); }
+            int io = 1;
+            foreach (var kv in arg.PlayerNpc)
+            {
+                if (skipShipKeys && (kv.Key == "ship11" || kv.Key == "ship12" || kv.Key == "ship13"))
+                    continue; // пустая ветка if в original
+                string kne = kv.Key.Length > substrFrom ? kv.Key.Substring(substrFrom) : "";
+                string cl = skipShipKeys
+                    ? (io % 2 == 0 ? "none" : "hof_highlighted")     // player-таблица: оригинал инвертирует чётность
+                    : (io % 2 == 0 ? "hof_highlighted" : "none");    // npc-таблица
+                Dictionary<string, string> info;
+                string name = "", rankPoints = "";
+                if (arg.NpcInfo != null && arg.NpcInfo.TryGetValue(kne, out info))
+                {
+                    name = Rank.Get(info, "Name");
+                    rankPoints = Rank.Get(info, "rankPoints");
+                }
+                double am = PlayerLog.ToDouble(kv.Value);
+                double points = am * PlayerLog.ToDouble(rankPoints);
+                sb.Append("<tr class=\"" + cl + "\">")
+                  .Append("<td class=\"rank_name_font\">" + HttpUtility.HtmlEncode(name) + "</td>")
+                  .Append("<td class=\"rank_points_font\">" + HttpUtility.HtmlEncode(rankPoints) + "</td>")
+                  .Append("<td class=\"rank_points_font\">" + HttpUtility.HtmlEncode(kv.Value) + "</td>")
+                  .Append("<td class=\"rank_points_font\">" + NumFmt(points) + "</td></tr>");
+                io++;
+            }
+            if (skipShipKeys)
+            {
+                // Финальная строка PvP-таблицы («Kills according to most recent calculation»)
+                sb.Append("<tr class=\"hof_highlighted\"><td class=\"rank_name_font\">Kills according to most recent calculation</td>"
+                          + "<td class=\"rank_points_font\">1</td><td class=\"rank_points_font\">0</td><td class=\"rank_points_font\">0</td></tr>");
+            }
+            sb.Append("</tbody></table>");
+            return sb.ToString();
+        }
+
+        // PHP-паритет: $row[$key] при отсутствии/NULL -> 0 (isset-семантика)
+        private static double D(IDictionary<string, object> row, string key)
+        {
+            object o; return row != null && row.TryGetValue(key, out o) ? PlayerLog.ToDouble(o) : 0.0;
+        }
+
+        private static string CrOrDash(Rank rnk, long fid)
+        {
+            long? n = rnk.CrAllplayers(fid);
+            return n.HasValue ? NumFmt(n.Value) : ""; // PHP echo null → пусто
+        }
+
+        /// <summary>PHP number_format($x) — group by thousands, 0 decimals (round half away from 0).</summary>
+        private static string NumFmt(double x)
+        {
+            return Math.Round(x, MidpointRounding.AwayFromZero).ToString("#,##0", CultureInfo.InvariantCulture);
+        }
+
+        private static string NumFmtStr(string value)
+        {
+            double d;
+            return double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out d) ? NumFmt(d) : value;
         }
 
         /// <summary>
