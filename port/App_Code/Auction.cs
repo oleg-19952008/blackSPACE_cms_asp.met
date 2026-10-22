@@ -282,7 +282,7 @@ namespace DarkSpace
                 @"SELECT * FROM server_1_auction_hour
                   INNER JOIN server_shop_items ON server_1_auction_hour.ItemName=server_shop_items.lootId
                   WHERE server_1_auction_hour.ItemName=@lootid ORDER BY server_1_auction_hour.autoID ASC",
-                ("@lootid", lootid));
+                Tuple.Create<string, object>("@lootid", lootid));
             return rows.Count > 0 ? rows[0] : null;
         }
 
@@ -292,7 +292,7 @@ namespace DarkSpace
                 @"SELECT * FROM server_1_auction_daily
                   INNER JOIN server_shop_items ON server_1_auction_daily.ItemName=server_shop_items.lootId
                   WHERE server_1_auction_daily.ItemName=@lootid ORDER BY server_1_auction_daily.autoID ASC",
-                ("@lootid", lootid));
+                Tuple.Create<string, object>("@lootid", lootid));
             return rows.Count > 0 ? rows[0] : null;
         }
 
@@ -467,7 +467,7 @@ namespace DarkSpace
             using (var con = DB.GetInstance())
             {
                 CreateDrone(con, itemId, "uridium", lootid, pid, uid);
-                if (hid != null && hid != false)
+                if (hid != null && !Convert.ToBoolean(hid))
                     CreateConfig(con, itemId, pid, uid, Convert.ToInt64(hid));
             }
         }
@@ -622,7 +622,7 @@ namespace DarkSpace
             return new Dictionary<string, string> { { "log_message", logMessage }, { "type", type } };
         }
 
-        internal static List<Dictionary<string, string>> QueryRows(string sql, params (string, object)[] ps)
+        internal static List<Dictionary<string, string>> QueryRows(string sql, params Tuple<string, object>[] ps)
         {
             var result = new List<Dictionary<string, string>>();
             using (var con = DB.GetInstance())

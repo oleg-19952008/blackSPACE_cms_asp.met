@@ -87,8 +87,8 @@ namespace DarkSpace
             foreach (var kv in vItem)
             {
                 string key = kv.Key;
-                dynamic value = kv.Value;
-                long am = PlayerLog.ToLong(Convert.ToString((object)value.a));
+                var value = (IDictionary<string, object>)kv.Value;
+                long am = PlayerLog.ToLong(GetStr(value, "a"));
 
                 if (key == "uridium")
                 {
@@ -104,8 +104,8 @@ namespace DarkSpace
                 }
                 else
                 {
-                    long interactive = PlayerLog.ToLong(Convert.ToString((object)value.i));
-                    long e = PlayerLog.ToLong(Convert.ToString((object)((IDictionary<string, object>)value).ContainsKey("e") ? (object)value.e : null));
+                    long interactive = PlayerLog.ToLong(GetStr(value, "i"));
+                    long e = PlayerLog.ToLong(value.ContainsKey("e") ? GetStr(value, "e") : null);
 
                     if (interactive == 1)
                     {
@@ -219,6 +219,13 @@ namespace DarkSpace
         private static Dictionary<string, string> Msg(string logMessage, string type)
         {
             return new Dictionary<string, string> { { "log_message", logMessage }, { "type", type } };
+        }
+
+        private static string GetStr(IDictionary<string, object> d, string key)
+        {
+            object o;
+            if (!d.TryGetValue(key, out o) || o == null) return null;
+            return Convert.ToString(o, System.Globalization.CultureInfo.InvariantCulture);
         }
     }
 }

@@ -19,11 +19,13 @@ namespace DarkSpace
         /// <summary>
         /// Users->checkSession(): SELECT users + server_1_players by sessionId & email.
         /// Parameterized (PHP used raw string interpolation).
+        /// Returns the user ID (users.ID) or 0 when not logged in / row missing,
+        /// mirroring the PHP callers' use of $this-&gt;DataRow['ID'].
         /// </summary>
-        public void CheckSession(HttpSessionState session)
+        public long CheckSession(HttpSessionState session)
         {
             DataRow = null;
-            if (!SessionManager.IsLoggedIn(session)) return;
+            if (!SessionManager.IsLoggedIn(session)) return 0;
 
             using (var mysql = DB.GetMySQLi())
             using (var cmd = new MySqlCommand(
@@ -46,6 +48,10 @@ namespace DarkSpace
                     }
                 }
             }
+
+            if (DataRow == null) return 0;
+            object id;
+            return DataRow.TryGetValue("ID", out id) ? PlayerLog.ToLong(id) : 0;
         }
     }
 
@@ -66,6 +72,11 @@ namespace DarkSpace
         public object this[string key]
         {
             get { object v; return _values.TryGetValue(key, out v) ? v : null; }
+        }
+
+        public bool TryGetValue(string key, out object value)
+        {
+            return _values.TryGetValue(key, out value);
         }
 
         public long ToInt64(string key)

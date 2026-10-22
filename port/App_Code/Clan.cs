@@ -85,7 +85,7 @@ namespace DarkSpace
         /// <summary>clan::deleteClan($clanID) — kicks members, wipes joins+diplomacy, deletes row.</summary>
         public bool DeleteClan(long clanId)
         {
-            var row = FirstRow("SELECT * FROM server_1_clan WHERE clanID=@cid", ("@cid", clanId));
+            var row = FirstRow("SELECT * FROM server_1_clan WHERE clanID=@cid", Kv("@cid", clanId));
             if (row == null) return false;
             foreach (var id in SplitMembers(row["members"]))
             {
@@ -99,7 +99,7 @@ namespace DarkSpace
         /// <summary>clan::getUser() — factionId + honor of the current player.</summary>
         private Dictionary<string, string> GetUserPlayer()
         {
-            return FirstRow("SELECT factionId, honor FROM server_1_players WHERE playerID=@pid", ("@pid", _pid));
+            return FirstRow("SELECT factionId, honor FROM server_1_players WHERE playerID=@pid", Kv("@pid", _pid));
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace DarkSpace
         /// </summary>
         public string ClanVoid(string lookup)
         {
-            var rows = Query("SELECT * FROM server_1_clan WHERE clanName LIKE @sr", ("@sr", "%" + lookup + "%"));
+            var rows = Query("SELECT * FROM server_1_clan WHERE clanName LIKE @sr", Kv("@sr", "%" + lookup + "%"));
             var daten = new Dictionary<string, object>();
             for (int k = 0; k < rows.Count; k++)
             {
@@ -260,16 +260,14 @@ namespace DarkSpace
         public List<Dictionary<string, string>> GetClans(string lookup, string url)
         {
             _url = url ?? "";
-            List<(string, object)> ps = null;
-            (string, object)[] psArr = null;
+            KeyValuePair<string, object>[] psArr = null;
             if (lookup != null)
             {
                 string term = lookup.Trim('\'');
-                ps = new List<(string, object)> { ("@rs", "%" + term + "%") };
-                psArr = ps.ToArray();
+                psArr = new[] { Kv("@rs", "%" + term + "%") };
             }
             var rows = psArr != null
-                ? Query("SELECT * FROM server_1_clan WHERE clanName LIKE @rs AND visible=1", psArr)
+                ? Query("SELECT * FROM server_1_clan WHERE clanName LIKE @rs AND visible=1",  psArr)
                 : Query("SELECT * FROM server_1_clan WHERE visible=1");
             // PHP usort($clans, 'cust_sort') with $_GET['sort'] is applied by the
             // template layer (PhpTemplateRenderer, plan C3), not here.
@@ -303,7 +301,7 @@ namespace DarkSpace
         /// <summary>clan::deleteMember($cid,$pid) — remove member from the pipe-list and players.clanId.</summary>
         public bool DeleteMember(long cid, long pid)
         {
-            var row = FirstRow("SELECT * FROM server_1_clan WHERE clanID=@cid", ("@cid", cid));
+            var row = FirstRow("SELECT * FROM server_1_clan WHERE clanID=@cid", Kv("@cid", cid));
             if (row == null) return false;
             string arl = JsonUtil.Str(row, "members");
             if (!arl.Contains("|")) return false;   // PHP: single-member clan → return false
@@ -325,7 +323,7 @@ namespace DarkSpace
 
         private void RunNewInfo(long cid, long pid)
         {
-            var row = FirstRow("SELECT * FROM server_1_clan WHERE clanID=@cid", ("@cid", cid));
+            var row = FirstRow("SELECT * FROM server_1_clan WHERE clanID=@cid", Kv("@cid", cid));
             if (row != null) IndentNewMember(cid, pid, JsonUtil.Str(row, "members"));
         }
 
@@ -404,7 +402,7 @@ namespace DarkSpace
             {
                 var rows = Query(
                     "SELECT * FROM server_1_players INNER JOIN users ON server_1_players.userID=users.ID " +
-                    "WHERE server_1_players.playerID=@pid", ("@pid", ParsePid(val)));
+                    "WHERE server_1_players.playerID=@pid", Kv("@pid", ParsePid(val)));
                 if (rows.Count > 0) result.Add(rows[0]);
             }
             return result;
@@ -424,7 +422,7 @@ namespace DarkSpace
             {
                 var rows = Query(
                     "SELECT * FROM server_1_players INNER JOIN users ON server_1_players.userID=users.ID " +
-                    "WHERE server_1_players.playerID=@pid", ("@pid", PlayerLog.ToLong(JsonUtil.Str(val, "playerID"))));
+                    "WHERE server_1_players.playerID=@pid", Kv("@pid", PlayerLog.ToLong(JsonUtil.Str(val, "playerID"))));
                 var merged = new Dictionary<string, string>(val, StringComparer.OrdinalIgnoreCase);
                 if (rows.Count > 0)
                     foreach (var kv in rows[0])
@@ -437,7 +435,7 @@ namespace DarkSpace
         /// <summary>clan::getApplicants($cID) — join rows enriched with player/user data.</summary>
         public List<Dictionary<string, string>> GetApplicants(long cId)
         {
-            var rows = Query("SELECT * FROM server_1_clan_join WHERE clanID=@cid", ("@cid", cId));
+            var rows = Query("SELECT * FROM server_1_clan_join WHERE clanID=@cid", Kv("@cid", cId));
             return GetApplicantNames(rows);
         }
 
@@ -445,15 +443,14 @@ namespace DarkSpace
         public bool GetPending(long id)
         {
             var rows = Query(
-                "SELECT * FROM server_1_clan_join WHERE clanID=@cid AND playerID=@pid",
-                ("@cid", id), ("@pid", _pid));
+                "SELECT * FROM server_1_clan_join WHERE clanID=@cid AND playerID=@pid", Kv("@cid", id), Kv("@pid", _pid));
             return rows.Count != 0;
         }
 
         /// <summary>clan::getMyNewClan($tag) + regMyClan — bind founder to the freshly inserted clan.</summary>
         private bool RegMyClanByTag(string tag)
         {
-            var rows = Query("SELECT * FROM server_1_clan WHERE tagName=@tag", ("@tag", tag));
+            var rows = Query("SELECT * FROM server_1_clan WHERE tagName=@tag", Kv("@tag", tag));
             if (rows.Count == 0) return false;       // PHP would fatal on $result[0]; treat as failure
             using (var con = DB.GetInstance())
             using (var cmd = new MySqlCommand("UPDATE server_1_players SET clanId=@cid WHERE playerID=@pid", con))
@@ -509,8 +506,7 @@ namespace DarkSpace
 
             // PHP: WHERE clanName = ? || tagName = ? || leader = ?  (|| = OR in MySQL)
             var existing = Query(
-                "SELECT * FROM server_1_clan WHERE clanName=@name OR tagName=@tag OR leader=@pid",
-                ("@name", name), ("@tag", tag), ("@pid", _pid));
+                "SELECT * FROM server_1_clan WHERE clanName=@name OR tagName=@tag OR leader=@pid", Kv("@name", name), Kv("@tag", tag), Kv("@pid", _pid));
             if (existing.Count != 0)
                 return "The clan name or Tag already Exists";
 
@@ -521,7 +517,7 @@ namespace DarkSpace
         /// <summary>clan::getMyClan($id) — players.clanId of the given player (0 when none).</summary>
         public long GetMyClan(long id)
         {
-            var row = FirstRow("SELECT clanId FROM server_1_players WHERE playerID=@id", ("@id", id));
+            var row = FirstRow("SELECT clanId FROM server_1_players WHERE playerID=@id", Kv("@id", id));
             return row != null ? PlayerLog.ToLong(JsonUtil.Str(row, "clanId")) : 0;
         }
 
@@ -530,7 +526,7 @@ namespace DarkSpace
         {
             var row = FirstRow(
                 "SELECT * FROM server_1_players INNER JOIN users ON server_1_players.userID=users.ID " +
-                "WHERE server_1_players.playerID=@id", ("@id", id));
+                "WHERE server_1_players.playerID=@id", Kv("@id", id));
             return row != null ? JsonUtil.Str(row, "Name") : "";
         }
 
@@ -572,14 +568,14 @@ namespace DarkSpace
         /// <summary>clan::getClanName($id).</summary>
         public string GetClanName(long id)
         {
-            var row = FirstRow("SELECT * FROM server_1_clan WHERE clanID=@id", ("@id", id));
+            var row = FirstRow("SELECT * FROM server_1_clan WHERE clanID=@id", Kv("@id", id));
             return row != null ? JsonUtil.Str(row, "clanName") : "";
         }
 
         /// <summary>clan::getClanTag($id). (PHP bound ':ID' while the placeholder was ':mD' — fixed.)</summary>
         public string GetClanTag(long id)
         {
-            var row = FirstRow("SELECT * FROM server_1_clan WHERE clanID=@id", ("@id", id));
+            var row = FirstRow("SELECT * FROM server_1_clan WHERE clanID=@id", Kv("@id", id));
             return row != null ? JsonUtil.Str(row, "tagName") : "";
         }
 
@@ -588,8 +584,7 @@ namespace DarkSpace
         {
             if (myCid == tCid) return false;
             var existing = Query(
-                "SELECT * FROM server_1_clan_diplomacy WHERE (fromID=@mCID AND toID=@tCID) OR (fromID=@tCID AND toID=@mCID)",
-                ("@mCID", myCid), ("@tCID", tCid));
+                "SELECT * FROM server_1_clan_diplomacy WHERE (fromID=@mCID AND toID=@tCID) OR (fromID=@tCID AND toID=@mCID)", Kv("@mCID", myCid), Kv("@tCID", tCid));
             if (existing.Count != 0) return false;
             return PostDiplomacy(myCid, tCid, type, dec);
         }
@@ -600,65 +595,61 @@ namespace DarkSpace
             if (type == 3)
             {
                 string col = myId == tId ? "request=1" : "request2=1";
-                return Exec("UPDATE server_1_clan_diplomacy SET " + col + ", message=@m WHERE autoID=@aid",
-                    ("@m", message), ("@aid", autoId));
+                return Exec("UPDATE server_1_clan_diplomacy SET " + col + ", message=@m WHERE autoID=@aid", Kv("@m", message), Kv("@aid", autoId));
             }
-            return Exec("DELETE FROM server_1_clan_diplomacy WHERE autoID=@aid", ("@aid", autoId));
+            return Exec("DELETE FROM server_1_clan_diplomacy WHERE autoID=@aid", Kv("@aid", autoId));
         }
 
         /// <summary>clan::acceptRequest(...) — type 3 (end of war) deletes the row; others set accepted=1.</summary>
         public bool AcceptRequest(long autoId, int type)
         {
             if (type == 3)
-                return Exec("DELETE FROM server_1_clan_diplomacy WHERE autoID=@aid", ("@aid", autoId));
-            return Exec("UPDATE server_1_clan_diplomacy SET accepted=1 WHERE autoID=@aid", ("@aid", autoId));
+                return Exec("DELETE FROM server_1_clan_diplomacy WHERE autoID=@aid", Kv("@aid", autoId));
+            return Exec("UPDATE server_1_clan_diplomacy SET accepted=1 WHERE autoID=@aid", Kv("@aid", autoId));
         }
 
         /// <summary>clan::declineRequest(...).</summary>
         public bool DeclineRequest(long autoId, int type)
         {
             if (type != 3)
-                return Exec("DELETE FROM server_1_clan_diplomacy WHERE autoID=@aid", ("@aid", autoId));
-            return Exec("UPDATE server_1_clan_diplomacy SET request=0, request2=0 WHERE autoID=@aid", ("@aid", autoId));
+                return Exec("DELETE FROM server_1_clan_diplomacy WHERE autoID=@aid", Kv("@aid", autoId));
+            return Exec("UPDATE server_1_clan_diplomacy SET request=0, request2=0 WHERE autoID=@aid", Kv("@aid", autoId));
         }
 
         /// <summary>clan::cancelRequest(...).</summary>
         public bool CancelRequest(long autoId, int type, long myId, long tId)
         {
             if (type != 3)
-                return Exec("DELETE FROM server_1_clan_diplomacy WHERE autoID=@aid", ("@aid", autoId));
+                return Exec("DELETE FROM server_1_clan_diplomacy WHERE autoID=@aid", Kv("@aid", autoId));
             string col = myId == tId ? "request2=0" : "request=0";
-            return Exec("UPDATE server_1_clan_diplomacy SET " + col + " WHERE autoID=@aid", ("@aid", autoId));
+            return Exec("UPDATE server_1_clan_diplomacy SET " + col + " WHERE autoID=@aid", Kv("@aid", autoId));
         }
 
         /// <summary>clan::getAcceptedDiplomacy($id).</summary>
         public List<Dictionary<string, string>> GetAcceptedDiplomacy(long id)
         {
             return Query(
-                "SELECT * FROM server_1_clan_diplomacy WHERE (fromID=@mCID AND accepted=1) OR (toID=@mCID AND accepted=1)",
-                ("@mCID", id));
+                "SELECT * FROM server_1_clan_diplomacy WHERE (fromID=@mCID AND accepted=1) OR (toID=@mCID AND accepted=1)", Kv("@mCID", id));
         }
 
         /// <summary>clan::getPendingDiplomacy($id) — incoming requests (PHP used `&&`/`||` precedence verbatim; parentheses keep it readable, truth table unchanged).</summary>
         public List<Dictionary<string, string>> GetPendingDiplomacy(long id)
         {
             return Query(
-                "SELECT * FROM server_1_clan_diplomacy WHERE (toID=@mCID AND accepted=0) OR (toID=@mCID AND request2=1) OR (fromID=@mCID AND request=1) ORDER BY fromID DESC",
-                ("@mCID", id));
+                "SELECT * FROM server_1_clan_diplomacy WHERE (toID=@mCID AND accepted=0) OR (toID=@mCID AND request2=1) OR (fromID=@mCID AND request=1) ORDER BY fromID DESC", Kv("@mCID", id));
         }
 
         /// <summary>clan::getMyPendingDiplomacy($id) — outgoing requests.</summary>
         public List<Dictionary<string, string>> GetMyPendingDiplomacy(long id)
         {
             return Query(
-                "SELECT * FROM server_1_clan_diplomacy WHERE (fromID=@mCID AND accepted=0) OR (toID=@mCID AND request=1) OR (fromID=@mCID AND request2=1) ORDER BY fromID DESC",
-                ("@mCID", id));
+                "SELECT * FROM server_1_clan_diplomacy WHERE (fromID=@mCID AND accepted=0) OR (toID=@mCID AND request=1) OR (fromID=@mCID AND request2=1) ORDER BY fromID DESC", Kv("@mCID", id));
         }
 
         /// <summary>clan::getClan($id) — clan row(s) by id (PHP returned fetchAll; templates use [0]).</summary>
         public List<Dictionary<string, string>> GetClan(long id)
         {
-            var rows = Query("SELECT * FROM server_1_clan WHERE clanID=@id", ("@id", id));
+            var rows = Query("SELECT * FROM server_1_clan WHERE clanID=@id", Kv("@id", id));
             _count = rows.Count;
             return rows;
         }
@@ -774,6 +765,12 @@ namespace DarkSpace
         // Internal helpers (PDO FETCH_ASSOC parity)
         // ------------------------------------------------------------------
 
+        /// <summary>C#6-compatible parameter pair for Query/FirstRow/Exec.</summary>
+        private static KeyValuePair<string, object> Kv(string name, object value)
+        {
+            return new KeyValuePair<string, object>(name, value);
+        }
+
         private static Dictionary<string, string> Msg(string type, string logMessage)
         {
             return new Dictionary<string, string> { { "log_message", logMessage }, { "type", type } };
@@ -805,13 +802,13 @@ namespace DarkSpace
             return members.Contains("|") ? members.Split('|').ToList() : new List<string> { members };
         }
 
-        private static List<Dictionary<string, string>> Query(string sql, params (string Name, object Value)[] ps)
+        private static List<Dictionary<string, string>> Query(string sql, params KeyValuePair<string, object>[] ps)
         {
             var result = new List<Dictionary<string, string>>();
             using (var con = DB.GetInstance())
             using (var cmd = new MySqlCommand(sql, con))
             {
-                foreach (var p in ps) cmd.Parameters.AddWithValue(p.Name, p.Value);
+                foreach (var p in ps) cmd.Parameters.AddWithValue(p.Key, p.Value);
                 using (var rdr = cmd.ExecuteReader())
                 {
                     while (rdr.Read())
@@ -826,22 +823,20 @@ namespace DarkSpace
             return result;
         }
 
-        private static Dictionary<string, string> FirstRow(string sql, params (string Name, object Value)[] ps)
+        private static Dictionary<string, string> FirstRow(string sql, params KeyValuePair<string, object>[] ps)
         {
-            // Cast through the untyped tuple: mcs treats `(string,object)` and
-            // `(string Name, object Value)` as distinct constructed types.
-            var rows = Query(sql, Array.ConvertAll(ps, t => ((string, object))t));
+            var rows = Query(sql,  ps);
             return rows.Count > 0 ? rows[0] : null;
         }
 
-        private static bool Exec(string sql, params (string Name, object Value)[] ps)
+        private static bool Exec(string sql, params KeyValuePair<string, object>[] ps)
         {
             try
             {
                 using (var con = DB.GetInstance())
                 using (var cmd = new MySqlCommand(sql, con))
                 {
-                    foreach (var p in ps) cmd.Parameters.AddWithValue(p.Name, p.Value);
+                    foreach (var p in ps) cmd.Parameters.AddWithValue(p.Key, p.Value);
                     cmd.ExecuteNonQuery();
                     return true;
                 }

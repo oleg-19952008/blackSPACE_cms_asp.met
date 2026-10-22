@@ -143,8 +143,7 @@ namespace DarkSpace
                     "{\"userid\":" + pid.ToString(CultureInfo.InvariantCulture) +
                     ",\"email\":\"" + email + "\"}"));
 
-                var unity = new Unity();
-                unity.MailSystemSend(
+                UnityMailer.MailSystem(
                     header: new Dictionary<string, string>
                     {
                         { "mailfrom", "no-reply@127.0.0.1" },
@@ -161,6 +160,7 @@ namespace DarkSpace
                     },
                     recivers: new List<string> { email });
 
+                var unity = new Unity();
                 unity.RegisterNewAccount(pid);
                 unity.UpdateAccount(pid);
                 unity.RegAmmo(pid);
