@@ -1906,18 +1906,260 @@ namespace DarkSpace
         }
 
         // ------------------------------------------------------------------
-        // Заглушки методов, подключаемых следующими кусками A3.6, чтобы
-        // init() компилировался уже сейчас. Каждый следующий коммит заменяет
-        // реализацию портом из Class.inventory.php.
+        // A3.6: конфиг-генераторы и hangar/item-сборка (Class.inventory.php
+        // 1535-1736). Ответы — Dictionary<string,object>, сериализуются через
+        // JsonUtil в init(); ключи приводятся к строкам, как делает json_encode.
         // ------------------------------------------------------------------
-        private List<Dictionary<string, object>> HangarGenerator()
+
+        /// <summary>private getdrone($pram) — состояние дрона из server_1_player_drones, иначе null.</summary>
+        private Dictionary<string, object> GetDroneRow(Dictionary<string, string> pram)
         {
-            throw new NotImplementedException("A3.6: hangarGenerator (Class.inventory.php:1619)");
+            string lootid = GetStr(pram, "lootid");
+            if (!_lootids.Contains(lootid)) _lootids.Add(lootid);
+            long keying = _lootids.IndexOf(lootid); // array_search первого вхождения
+            var result = Query("SELECT * FROM `server_1_player_drones` WHERE item_sale_id=@item_sale_id && playerID=@playerID",
+                               Kv("@item_sale_id", GetStr(pram, "id")), Kv("@playerID", _pid));
+            if (result.Count == 0) return null; // PHP: empty → return; (null)
+            var row = result[0];
+            return new Dictionary<string, object>
+            {
+                { "I", GetStr(pram, "id") },
+                { "L", keying },
+                { "LV", ParseLong(GetStr(row, "drone_level")) },
+                { "HP", GetStr(row, "drone_hp") + "%" },
+                { "EF", GetStr(row, "drone_effect") },
+                { "SP", ParseLong(GetStr(row, "drone_sp")) },
+                { "DE", GetStr(row, "drone_design") },
+                { "DL", ParseLong(GetStr(row, "drone_dl")) },
+                { "SL", ParseLong(GetStr(row, "drone_sl")) },
+                { "repair", ParseLong(GetStr(row, "drone_repair")) },
+                { "currencly", GetStr(row, "drone_currency") },
+            };
         }
 
+        /// <summary>private allDesigns($base) — lootid по LIKE base[0]_base[1]%.</summary>
+        private List<string> AllDesigns(string[] baseParts)
+        {
+            string like = baseParts[0] + "_" + baseParts[1] + "%";
+            var rows = Query("SELECT lootid FROM server_1_player_all_items WHERE lootid LIKE @like && playerID=@playerID",
+                             Kv("@like", like), Kv("@playerID", _pid));
+            var m = new List<string>();
+            foreach (var r in rows) m.Add(GetStr(r, "lootid"));
+            return m;
+        }
+
+        /// <summary>private droneconfigsGenerator($hid, $conf) — EQ дронов раскладки; Eq со строкой "non" если пусто.</summary>
+        private Eq DroneConfigsGenerator(object hid, object conf)
+        {
+            var result = Query("SELECT * FROM `server_1_hangar_config_drones` WHERE `playerID`= @playerID && `hangarID`=@hangarID",
+                               Kv("@playerID", _pid), Kv("@hangarID", hid));
+            if (IsEmpty(result)) return new Eq("non"); // PHP: return "non"
+            var drones = new Dictionary<string, object>();
+            bool first = conf.ToString() == "1";
+            string eqCol = first ? "EQ" : "EQ2";
+            string desCol = first ? "design" : "design2";
+            foreach (var value in result)
+            {
+                var eqInner = new Dictionary<string, object>();
+                var d = new Dictionary<string, object> { { "EQ", eqInner } };
+                drones[GetStr(value, "item_id")] = d;
+                string eqv = GetStr(value, eqCol);
+                if (eqv != "")
+                {
+                    eqInner["default"] = eqv.Contains("|")
+                        ? (object)eqv.Split('|').Cast<object>().ToList()
+                        : new List<object> { eqv };
+                }
+                string desv = GetStr(value, desCol);
+                if (desv != "") eqInner["design"] = new List<object> { desv };
+            }
+            return new Eq(drones);
+        }
+
+        /// <summary>private petconfigsGenerator($hid, $conf) — EQ пета раскладки (lasers/generators/gears/protocols).</summary>
+        private Eq PetConfigsGenerator(object hid, object conf)
+        {
+            var result = Query("SELECT * FROM `server_1_hangar_config_pet10` WHERE `playerID`= @playerID && `hangarID`=@hangarID && `configNum`=@configNum",
+                               Kv("@playerID", _pid), Kv("@hangarID", hid), Kv("@configNum", conf));
+            var eqDict = new Dictionary<string, object>();
+            var pet = new Dictionary<string, object> { { "EQ", eqDict } };
+            foreach (var value in result)
+            {
+                SplitCol(value, "lasers", eqDict);
+                SplitCol(value, "generators", eqDict);
+                SplitCol(value, "gears", eqDict);
+                SplitCol(value, "protocols", eqDict);
+            }
+            return new Eq(pet);
+        }
+
+        /// <summary>private hangarGeneral($hangarId) — корабль/пет/дроны ангара + модели/дизайны.</summary>
+        private Dictionary<string, object> HangarGeneral(object hangarId)
+        {
+            var result = Query(@"SELECT * FROM server_1_player_hangar_general_ship
+                                 INNER JOIN server_shop_items ON server_1_player_hangar_general_ship.ship_selected_model = server_shop_items.lootId
+                                 WHERE server_1_player_hangar_general_ship.playerID = @playerID",
+                               Kv("@playerID", _pid));
+            if (result.Count == 0) return null; // PHP: $result[0] на пустом → fatal/warning; возвращаем null
+            var row = result[0];
+            var ship = new Dictionary<string, object>
+            {
+                { "I", ParseLong(GetStr(row, "ship_internal_id")) },
+                { "HP", GetStr(row, "ship_hp") },
+            };
+            _lootids.Add(GetStr(row, "lootId"));
+            long keying = _lootids.Count - 1; // max(array_keys(lootids))
+            ship["L"] = keying;
+            ship["SM"] = GetStr(row, "lootId");
+            ship["M"] = AllDesigns(GetStr(row, "lootId").Split('_'));
+            var general = new Dictionary<string, object> { { "ship", ship } };
+
+            var petId = IfExistsPet("pet_pet10");
+            if (!IsEmpty(petId))
+            {
+                var pet = GetPetRow(petId);
+                general["pet"] = pet != null ? pet.Dyn : null;
+                _hasPet = 1;
+            }
+
+            var drones = IfExistsDrone();
+            if (!IsEmpty(drones))
+            {
+                var list = new List<object>();
+                foreach (var value in drones)
+                {
+                    var space = GetDroneRow(value);
+                    if (!IsEmpty(space)) list.Add(space);
+                }
+                general["drones"] = list;
+            }
+            return general;
+        }
+
+        /// <summary>public hangarGenerator() — список ангаров с general/config{1,2}.</summary>
+        private List<Dictionary<string, object>> HangarGenerator()
+        {
+            var result = Query(@"SELECT CASE WHEN hangar_is_active = 1 THEN 'TRUE' ELSE 'FALSE' END AS active, hangarID, name,
+                                        CASE WHEN hangar_is_selected = 1 THEN 'TRUE' ELSE 'FALSE' END AS selected
+                                 FROM server_1_hangar WHERE playerID = @playerID",
+                               Kv("@playerID", _pid));
+            foreach (var value in result)
+            {
+                var h = new Dictionary<string, object>
+                {
+                    { "hangarID", GetStr(value, "hangarID") },
+                    { "name", GetStr(value, "name") },
+                    { "hangar_is_active", GetStr(value, "active") == "TRUE" },
+                    { "hangar_is_selected", GetStr(value, "selected") == "TRUE" },
+                };
+                object hid = GetStr(value, "hangarID");
+                h["general"] = HangarGeneral(hid);
+                var config = new Dictionary<string, object>();
+                for (int c = 1; c <= 2; c++)
+                {
+                    var cfg = new Dictionary<string, object>
+                    {
+                        { "ship", ShipConfigsGenerator(hid, c).Dyn },
+                    };
+                    var dc = DroneConfigsGenerator(hid, c);
+                    if (!(dc.Dyn is string)) cfg["drones"] = dc.Dyn; // PHP: == "non" → пропуск
+                    if (_hasPet == 1) cfg["pet"] = PetConfigsGenerator(hid, c).Dyn;
+                    config[c.ToString(CultureInfo.InvariantCulture)] = cfg;
+                }
+                h["config"] = config;
+                _hangars.Add(h);
+            }
+            return _hangars;
+        }
+
+        /// <summary>public itemLootIdGenerator() — заполнение _items/_itemInfo/_lootids из инвентаря игрока.</summary>
         private void ItemLootIdGenerator()
         {
-            throw new NotImplementedException("A3.6: itemLootIdGenerator (Class.inventory.php:1659)");
+            var result = Query(@"SELECT * FROM server_1_player_all_items
+                                 INNER JOIN server_shop_items ON server_1_player_all_items.lootid = server_shop_items.lootid
+                                 WHERE server_1_player_all_items.playerID = @playerID
+                                 ORDER BY server_1_player_all_items.lootid DESC",
+                               Kv("@playerID", _pid));
+            long i = 0;
+            foreach (var value in result)
+            {
+                string lootid = GetStr(value, "lootid");
+                if (!_lootids.Contains(lootid)) _lootids.Add(lootid);
+                long L = _lootids.IndexOf(lootid); // array_search
+                if (ParseLong(GetStr(value, "interactive")) == 0)
+                {
+                    var item = new Dictionary<string, object>
+                    {
+                        { "I", GetStr(value, "id") },
+                        { "LV", ParseLong(GetStr(value, "LV")) },
+                        { "L", L },
+                    };
+                    long type = ParseLong(GetStr(value, "type"));
+                    if (type == 22 || type == 21 || type == 23 || type == 24 || type == 17) item["S"] = 0L;
+                    else { item["S"] = i; i++; }
+                    long q = ParseLong(GetStr(value, "Q"));
+                    if (q > 1) item["Q"] = q;
+                    long charge = ParseLong(GetStr(value, "charge"));
+                    if (charge != 0)
+                    {
+                        item["properties"] = new Dictionary<string, object>
+                        {
+                            { "durability", GetStr(value, "charge") },
+                            { "active", "0" },
+                        };
+                        item["CH"] = "Charges: " + GetStr(value, "charge");
+                    }
+                    _items.Add(item);
+                }
+                bool found = false;
+                foreach (var data in _itemInfo)
+                {
+                    if (Str(data["name"]) == GetStr(value, "name")) { found = true; break; }
+                    found = false;
+                }
+                if (!found)
+                {
+                    var info = new Dictionary<string, object>
+                    {
+                        { "L", L },
+                        { "name", GetStr(value, "name") },
+                        { "T", ParseLong(GetStr(value, "type")) },
+                        { "C", GetStr(value, "C") },
+                    };
+                    string nm = GetStr(value, "name");
+                    if (nm == "Aegis" || nm == "Spearhead" || nm == "Citadel") info["FD"] = GetFacInfo();
+                    string props = GetStr(value, "properties");
+                    if (props != "" && props != "0")
+                    {
+                        var pro = DecodeBase64Json(props);
+                        if (pro != null)
+                        {
+                            info["rename"] = pro.ContainsKey("rename") ? ParseLong(Str(pro["rename"])) : 0L;
+                            info["costWeaponSlot"] = pro.ContainsKey("costWeaponSlot") ? Str(pro["costWeaponSlot"]) : "";
+                            info["costGeneratorSlot"] = pro.ContainsKey("costGeneratorSlot") ? Str(pro["costGeneratorSlot"]) : "";
+                            info["costGearSlot"] = pro.ContainsKey("costGearSlot") ? Str(pro["costGearSlot"]) : "";
+                            info["costProtocolSlot"] = pro.ContainsKey("costProtocolSlot") ? Str(pro["costProtocolSlot"]) : "";
+                        }
+                    }
+                    var levels = new List<object>();
+                    var levi = DecodeBase64Json(GetStr(value, "levels"));
+                    if (levi != null) foreach (var kv in levi) levels.Add(kv.Value);
+                    info["levels"] = levels;
+                    _itemInfo.Add(info);
+                }
+            }
+        }
+
+        /// <summary>PHP json_decode(base64_decode($s)) — tolerant: не-base64/null при ошибке.</summary>
+        private static Dictionary<string, object> DecodeBase64Json(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return null;
+            try
+            {
+                var json = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(s));
+                return JsonUtil.DecodeObject(json);
+            }
+            catch (Exception) { return null; }
         }
     }
 }
