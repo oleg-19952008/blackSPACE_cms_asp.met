@@ -135,22 +135,23 @@ internalDoc, internalDocEnd, internalHeader, internalMenu, sajax, xajax (8 фа�
 
 ---
 
-## Фаза C — Шаблоны Body ⬜ (не начата — главное узкое место на сегодня)
+## Фаза C — Шаблоны Body 🔶 (начата: C1 + PilotSheet из C6 перенесены; схема подтверждена)
 
 Рендерятся диспетчером через `PhpTemplateRenderer.RenderShell`; идут за своими ветками B.
-Каталог `templates/legacy/en_US/INDEXINTERNAL/` в порту не создан (есть только GLOBAL и INDEX).
-Body-рендер сейчас — заглушка «Template pending phase C» (`PhpTemplateRenderer.cs:108`); без неё ветки B3–B10 нельзя закрыть
-по критериям приёмки. Каждый файл = один кусок (HTML+PHP-вставки → `.html`-шаблон с токенами `{...}`
-+ кодоген в `PhpTemplateRenderer`):
+Каталог `templates/legacy/en_US/INDEXINTERNAL/` создан; схема подтверждена на C1: чистый HTML-шаблон
+(verbatim из оригинала, PHP-вставки → токены `{{TOKEN}}`, positionальные require GLOBALS → токены
+`{{HELP_NEWS_INCLUDE}}`/`{{HEADER_INTERN_INCLUDE}}`, заполняются через `FillFragment`) + токен-префиксы
+в C# (`HandleInternalStart` и пр.). Остальные Body-рендеры — заглушка «Template pending phase C»
+(`PhpTemplateRenderer.cs:108`).
 
-| Приоритет | Шаблон (`FILES/INDEXINTERNAL/`) | Строк | Привязка |
-|---|---|---|---|
-| C1 | `internalStart_Body.php` | 685 | B3 |
-| C2 | `CompanyChoose_Header/_Body.php` | ~200 | B1 |
-| C3 | `internalClan_Body.php`, `internalNewClan_Body.php`, `internalNewClanDetails_Body.php`, `internalClanList_Body.php` | ~1900 | B5 |
-| C4 | `internalSkylab_Body.php` | 1601 | B7 (крупнейший живой шаблон — резать по таб-секциям: overview/modules/resources/upgrades) |
-| C5 | `internalDock_Body.php` + `internalDock{Ships,Ammo,Laser,Drones,Generator,Booster,Specials,Equipment,ShipModel,PetGear,PetProtocols}_Body.php` | ~7000 суммарно | B10, по одному файлу за коммит |
-| C6 | `internalAuction_Body.php`, `internalBoard.php`, `internalPilotSheet_Body.php`, `internalMessaging_Body.php`, `internalBalance_Body.php`, `internalEvoucher_Body.php`, `internalHistory_Body.php`, `internalPayment*_Body.php`, `internalHallofFame_*` (5 файлов), `internalGalaxyGates_Body.php`, `internalJPA*_Body.php`, `internalNanoTechFactory_Body.php`, `internalClanAdministrate/ChangeFirm/Diplomacy/Member_Body.php`, `internalUserDataChange_Body.php`, `internalItemUpgradeSystem_Body.php` | 300–970 каждый | соответствующие B3–B9 |
+| Приоритет | Шаблон (`FILES/INDEXINTERNAL/`) | Строк | Привязка | Статус |
+|---|---|---|---|---|
+| C1 | `internalStart_Body.php` | 685 | B3 | ✅ перенесён (`internalStart_Body.html`, 439 стр., 28 токенов; + GLOBALS internalHelpLayer/internalNews/internalHeaderIntern) |
+| C2 | `CompanyChoose_Header/_Body.php` | ~200 | B1 | ⬜ |
+| C3 | `internalClan_Body.php`, `internalNewClan_Body.php`, `internalNewClanDetails_Body.php`, `internalClanList_Body.php` | ~1900 | B5 | ⬜ |
+| C4 | `internalSkylab_Body.php` | 1601 | B7 (резать по таб-секциям: overview/modules/resources/upgrades; зависит от остатка A — Skylab.pretty_time) | ⬜ |
+| C5 | `internalDock_Body.php` + `internalDock{Ships,Ammo,Laser,Drones,Generator,Booster,Specials,Equipment,ShipModel,PetGear,PetProtocols}_Body.php` | ~7000 суммарно | B10, по одному файлу за коммит | ⬜ |
+| C6 | `internalAuction_Body.php`, `internalBoard.php`, ~~`internalPilotSheet_Body.php`~~ ✅, `internalMessaging_Body.php`, `internalBalance_Body.php`, `internalEvoucher_Body.php`, `internalHistory_Body.php`, `internalPayment*_Body.php`, `internalHallofFame_*` (5 файлов), `internalGalaxyGates_Body.php`, `internalJPA*_Body.php`, `internalNanoTechFactory_Body.php`, `internalClanAdministrate/ChangeFirm/Diplomacy/Member_Body.php`, `internalUserDataChange_Body.php`, `internalItemUpgradeSystem_Body.php` | 300–970 каждый | соответствующие B3–B9 | 🔶 PilotSheet ✅ (`internalPilotSheet_Body.html`, 889 стр.; `HandlePilotSheetVars` — порт преамбулы GetRank/getMyRanking/getMyClan + STATION/CLAN_NAME/MYRANKING/EMAIL; credits.php вырезан — нет в наборе GLOBALS); остальные ⬜ |
 | C-исключения | `internalHandelClosed_Body.php` (6758 — закрытый раздел, не портировать), `_NE_ISPOLZUETSJA/**`, файлы с суффиксами `— копия`, `- Copy`, `_old`, `internaltest.php`, `internalMaptest.php`, `internalDockEquipment_Bod2y.php`, `internalDockLaser_Body2.php`, `internalGalaxyGates_Body1.php` | — | удалить из плана |
 
 ---
@@ -161,9 +162,9 @@ Body-рендер сейчас — заглушка «Template pending phase C»
 2. ~~B1 + B2 (RenderShell/PhpTemplateRenderer + GLOBALS-фрагменты)~~ — ✅ выполнены
 3. ~~B3–B10 логика веток~~ — ✅ все ~45 ветвей реализованы через RenderShell; закрытие веток
    (статус ✅) возможно только вместе с их Body-шаблонами из фазы C
-4. **C-шаблоны — текущий приоритет №1** (C1 internalStart_Body → C4 internalSkylab_Body →
-   C5 Dock → C3/C6 остальное); ветка B считается готовой только с рендером; доделать 2 TODO
-   в `Internal.cshtml.cs` (CompanyChoose_Body, internalSkylab_Body)
+4. **C-шаблоны — текущий приоритет №1** (~~C1 internalStart_Body~~ ✅, ~~internalPilotSheet_Body~~ ✅ →
+   далее C4 internalSkylab_Body → C5 Dock → C3/C6 остальное); ветка B считается готовой только с рендером;
+   доделать 2 TODO в `Internal.cshtml.cs` (CompanyChoose_Body, internalSkylab_Body)
 5. ~~A7 (xajax/sajax handlers)~~ ✅; клиентские bootstrap в оболочке — ✅ (B2); осталось: остаток A
    (Users.changeUsername/checkName/ChangeNow для B6, Skylab.pretty_time для C4) и B11 smoke-прогон всех action
 6. MIGRATION.md / README.md: обновлять статусы Часть 2/3 по факту merge каждого куска

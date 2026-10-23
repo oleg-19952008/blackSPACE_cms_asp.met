@@ -27,6 +27,13 @@ namespace DarkSpace
         /// <summary>Тестовый хук: явный корень шаблонов вместо BaseDirectory.</summary>
         public static string RootOverride;
 
+        /// <summary>
+        /// Доп. GLOBALS-фрагменты, вставляемые между internalHeader.php и Body-шаблоном
+        /// (в оригинале это require FILES.'GLOBAL/internalHelpLayer.php' и т.п. внутри
+        /// веток диспетчера). Задаётся веткой диспетчера перед RenderShell, очищается после.
+        /// </summary>
+        public static List<string> ExtraHeaderFragments = new List<string>();
+
         /// <summary>Корень GLOBALS-фрагментов (FILES/Lang/GLOBAL в терминах Init.php).</summary>
         public static string GlobalsRoot
         {
@@ -92,6 +99,8 @@ namespace DarkSpace
             AppendFragment(sb, "headerEndJS.php", ctx);
             AppendFragment(sb, "internalMenu.php", ctx);
             AppendFragment(sb, "internalHeader.php", ctx);
+            foreach (var frag in ExtraHeaderFragments)
+                AppendFragment(sb, frag, ctx);
             sb.Append(RenderBody(users, bodyTemplate, ctx));
             AppendFragment(sb, "ads.php", ctx);   // ads.php пустой в оригинале — no-op
             return sb.ToString();
@@ -129,7 +138,7 @@ namespace DarkSpace
             sb.Append(Fill(raw, ctx));
         }
 
-        private static string LoadRaw(string root, string safeName)
+        public static string LoadRaw(string root, string safeName)
         {
             if (!Regex.IsMatch(safeName ?? "", @"^[A-Za-z0-9_-]+$")) return null; // path-traversal guard
             string key = root + "|" + safeName;

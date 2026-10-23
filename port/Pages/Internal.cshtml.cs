@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -121,7 +122,7 @@ namespace DarkSpace.Pages
             switch (action)
             {
                 case "internalStart":
-                    Shell("internalStart_Body", "/css/cdn/internalStart.css");
+                    HandleInternalStart(users, request);   // фаза C1: порт преамбулы internalStart_Body.php
                     return;
                 case "internalGalaxyGates":
                     // В оригинале ветка продублирована (78–89 и 116–126) — поведение идентично.
@@ -226,7 +227,7 @@ namespace DarkSpace.Pages
             if (action == "internalPilotSheet")
             {
                 if (HandlePilotSheetChangeUsername(users, request)) return; // PHP exit внутри ветки
-                Shell("internalPilotSheet_Body", "/css/cdn/internalPilotSheet.css");
+                HandlePilotSheetVars(users);   // фаза C: порт PHP-преамбулы internalPilotSheet_Body.php
                 return;
             }
             if (action == "internalUserDataChange")
@@ -649,6 +650,286 @@ namespace DarkSpace.Pages
                            string logMessage = null, string logType = null)
         {
             Write(PhpTemplateRenderer.RenderShell(_users, bodyTemplate, cssHref, vars, logMessage, logType));
+        }
+
+        /// <summary>
+        /// C1: порт PHP-преамбула internalStart_Body.php (строки 8–16 шаблона + daily bonus +
+        /// positionальные require internalHelpLayer/internalNews/internalHeaderIntern).
+        /// </summary>
+        private void HandleInternalStart(Users users, HttpRequest request)
+        {
+            long uid = PlayerLog.ToLong(users.DataRow["ID"]);
+            long pid = PlayerLog.ToLong(users.DataRow["playerID"]);
+
+            var @base = new Base(); @base.SetId(uid, pid);                    // $base->setId (в Process() уже делался — повторяем как в оригинале для headerIntern)
+            var clan = new Clan(); clan.SetId(uid, pid);                      // $clan->setId(...)
+            long clanid = clan.GetMyClan(pid);                                // $clanid = $clan->getMyClan($pid)
+            var rnk = new Rank();
+            var top10 = rnk.GetAllRankingPlayers(9);                          // $rnk->getAllRankingPlayers(9)
+            var mRy = rnk.GetMyRanking(pid);                                  // $rnk->getMyRanking($pid)
+            var myRanking = mRy.Count > 0 ? mRy[0] : new Dictionary<string, string>();
+            var newsC = new News(); newsC.Init();                             // $newsC = new news(); $newsC->init();
+            var rank = @base.GetRank(uid, pid);                               // $rank = $base->GetRank(...)
+
+            // Daily-Login-Box: if(!isset($_GET['acceptDailyLoginBonus'])) $_GET[...]=0;
+            string acceptRaw = Query(request, "acceptDailyLoginBonus");
+            long accept = 0; long.TryParse(acceptRaw ?? "0", out accept);
+            var dailyBonus = new DailyBonus();
+            dailyBonus.SetId(uid);
+            dailyBonus.ExecuteB(HttpContext.Session);
+            var bd = dailyBonus.GetData();
+
+            // internalHeaderIntern.php преамбула: $hid=$base->HangarId(); $base->getShips();
+            // $unity->setId+levelCorrection(); $rank=$base->GetRank(...) — результат уже в @base/rank.
+            object shipnObj = @base.Shipn;
+            string shipn = shipnObj == null ? "" : Convert.ToString(shipnObj, CultureInfo.InvariantCulture);
+
+            string FactionCls(string fidStr) { return fidStr == "1" ? "mmo" : (fidStr == "2" ? "eic" : "vru"); }
+            string userFaction = users.DataRow != null ? Str(users, "factionId") : "";
+
+            string RankVal(string key)
+            {
+                string v; return rank != null && rank.TryGetValue(key, out v) ? v : "";
+            }
+
+            // $top10 foreach ($Odd = array(1,3,5,7,9); in_array($k,$Odd) → rankingOdd else non)
+            var odd = new HashSet<int> { 1, 3, 5, 7, 9 };
+            var rows = new StringBuilder();
+            for (int k = 0; k < top10.Count; k++)
+            {
+                var v = top10[k];
+                string cls = odd.Contains(k) ? "rankingOdd" : "non";
+                string name = HtmlEncode(Rank.Get(v, "Name"));
+                string fac = FactionCls(Rank.Get(v, "factionId"));
+                rows.Append("<tr class=\"").Append(cls).Append("\">\n")
+                    .Append("                                                    <td showuser=\"1uQwW\" title=\"").Append(name)
+                    .Append(" - click for details\" style=\"cursor: pointer\">\n        ").Append(name)
+                    .Append("\n                                                    </td>\n")
+                    .Append("                                                    <td>\n                                                        <img src=\"./do_img/global/logos/logo_")
+                    .Append(fac).Append("_mini.png?__cv=e8c00bbe2bd8bf9c0480374ca09f8800\" alt=\"vru\" width=\"7\" height=\"8\">\n                                                    </td>\n")
+                    .Append("                                                    <td title=\"").Append(k + 1).Append("\" style=\"cursor: pointer\">").Append(k + 1).Append("</td>\n")
+                    .Append("                                                    <td>").Append(HtmlEncode(Rank.Get(v, "rankpoints"))).Append("</td>\n")
+                    .Append("                                                </tr>\n");
+            }
+
+            // top clans: mysqli_query("SELECT * FROM server_1_clan ORDER BY rankpoints DESC LIMIT 10"), parity is_int($r/2)→none else rankingOdd
+            var clans = TopClansQuery();
+            var crows = new StringBuilder();
+            int r = 1;
+            foreach (var cr in clans)
+            {
+                string cls = (r % 2 == 0) ? "none" : "rankingOdd";
+                crows.Append("<tr class=\"").Append(cls).Append("\">\n")
+                     .Append("                                            <td class=\"clan_name_qtip\" title=\"").Append(HtmlAttr(Rank.Get(cr, "clanName"))).Append("\">\n")
+                     .Append("                                                <a href=\"/indexInternal.es?action=internalNewClanDetails&amp;clanId=").Append(HtmlEncode(Rank.Get(cr, "clanID"))).Append("\">\n")
+                     .Append("                                                    [").Append(HtmlEncode(Rank.Get(cr, "tagName"))).Append("]\n")
+                     .Append("                                                </a>\n")
+                     .Append("                                            </td>\n")
+                     .Append("                                            <td>").Append(r).Append("</td>\n")
+                     .Append("                                            <td>").Append(HtmlEncode(Rank.Get(cr, "rankpoints"))).Append("</td>\n")
+                     .Append("                                        </tr>\n");
+                r++;
+            }
+
+            // daily bonus layer (if($_GET['acceptDailyLoginBonus'] != 1 && $dailyBonus->getState() == "yes"))
+            string dailyLayer = "";
+            if (accept != 1 && dailyBonus.GetState() == "yes")
+                dailyLayer = BuildDailyBonusLayer(bd);
+
+            // internalHeaderIntern.php токены
+            string clanBtn = clanid == 0
+                ? "<a class=\"header_std_btn header_lft_std\" id=\"clan_btn\" href=\"/indexInternal.es.php?action=internalNewClan\">\n                    <img src=\"/text?t=КЛАН&w=4&s=10&color=lightestBlue&b=darkblue\" alt=\"\" />\n                </a>"
+                : "<a class=\"header_std_btn header_lft_std\" id=\"clan_btn\" href=\"/indexInternal.es.php?action=internalClan\">\n                    <img src=\"/text?t=КЛАН&w=4&s=10&color=lightestBlue&b=darkblue\" alt=\"\" />\n                </a>";
+            bool premium = Unity.Cpt(users.DataRow != null ? Str(users, "premium") : null);
+            string premiumDiv = premium
+                ? "<div id=\"header_is_premium\"></div>"
+                : "<div id=\"ip_placeholder\"></div>";
+
+            var vars = new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "NAME", HtmlEncode(Str(users, "Name")) },
+                { "PLAYERID", pid.ToString(CultureInfo.InvariantCulture) },
+                { "UID", uid.ToString(CultureInfo.InvariantCulture) },
+                { "LEVEL", HtmlEncode(Str(users, "level")) },
+                { "HONOR", NumFmtStr(Str(users, "honor")) },
+                { "EXP", NumFmtStr(Str(users, "exp")) },
+                { "CREDITS", NumFmtStr(Str(users, "credits")) },
+                { "URI", NumFmtStr(Str(users, "uri")) },
+                { "FACTIONCLS", FactionCls(userFaction) },
+                { "FACTIONLABEL", userFaction == "1" ? "MMO" : (userFaction == "2" ? "EIC" : "VRU") },
+                { "CLAN_NAME", clanid == 0 ? "---" : HtmlEncode(clan.GetClanName(clanid)) },
+                { "RANK_NUM", HtmlEncode(RankVal("rank")) },
+                { "RANK_NAME", HtmlEncode(RankVal("name")) },
+                { "ADMIN_LINK", RankVal("rank") == "21"
+                    ? "<a id=\"userButtonLeft\" class=\"userHomeButton\" href=\"/administratorpanel_for\" target=\"_blank\">\n                                                Админка\n                                            </a>"
+                    : "" },
+                { "SERVER_TIME", DateTime.Now.ToString("h:mm", CultureInfo.InvariantCulture) },   // date('h:i')
+                { "SERVER_DATE", DateTime.Now.ToString("dd-MM-yyyy", CultureInfo.InvariantCulture) }, // date('d-m-Y')
+                { "TOP10_ROWS", rows.ToString() },
+                { "MYRANK_POS", HtmlEncode(GetOr(myRanking, "overallRank")) },
+                { "MYRANK_POINTS", HtmlEncode(GetOr(myRanking, "rankpoints")) },
+                { "MYRANK_FACTION", FactionCls(GetOr(myRanking, "factionId")) },
+                { "TOP_CLANS_ROWS", crows.ToString() },
+                { "NEWS_JSARRAY", newsC.Get("jsarray") },
+                { "NEWS_JSARRAY2", newsC.Get("jsarray2") },
+                { "NEWS_IMAGES", newsC.Get("images") },
+                { "NEWS_ICONS", newsC.Get("icons") },
+                { "NEWS_TEXTS", newsC.Get("news") },
+                { "DAILY_BONUS_LAYER", dailyLayer },
+                { "SHIPN", HtmlEncode(shipn) },
+                { "CLAN_BTN", clanBtn },
+                { "PREMIUM_DIV", premiumDiv },
+            };
+
+            // positionальные require из шаблона (см. {{HELP_NEWS_INCLUDE}} / {{HEADER_INTERN_INCLUDE}})
+            vars["HELP_NEWS_INCLUDE"] = FillFragment("internalHelpLayer", vars) + FillFragment("internalNews", vars);
+            vars["HEADER_INTERN_INCLUDE"] = FillFragment("internalHeaderIntern", vars);
+
+            Shell("internalStart_Body", "/css/cdn/internalStart.css", vars);
+        }
+
+        /// <summary>
+        /// C: порт PHP-преамбулы internalPilotSheet_Body.php (строки 1–5): GetRank, getMyRanking[0],
+        /// clan setId/getMyClan; плюс токены шаблона (STATION — строгое === как в оригинале).
+        /// </summary>
+        private void HandlePilotSheetVars(Users users)
+        {
+            long uid = PlayerLog.ToLong(users.DataRow["ID"]);
+            long pid = PlayerLog.ToLong(users.DataRow["playerID"]);
+
+            var @base = new Base();
+            var rank = @base.GetRank(uid, pid);                      // $rank = $base->GetRank(...)
+            var rnk = new Rank();
+            var mRy = rnk.GetMyRanking(pid);                         // $mRy = $rnk->getMyRanking(...)
+            var myRanking = mRy.Count > 0 ? mRy[0] : new Dictionary<string, string>();
+            var clan = new Clan(); clan.SetId(uid, pid);
+            long clanid = clan.GetMyClan(pid);                       // $clanid = $clan->getMyClan(...)
+
+            string RankVal(string key)
+            {
+                string v; return rank != null && rank.TryGetValue(key, out v) ? v : "";
+            }
+
+            var vars = new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "NAME", HtmlEncode(Str(users, "Name")) },
+                { "EMAIL", HtmlEncode(Str(users, "Email")) },
+                { "RANK_NUM", HtmlEncode(RankVal("rank")) },
+                { "RANK_NAME", HtmlEncode(RankVal("name")) },
+                { "MYRANKING", NumFmtStr(GetOr(myRanking, "overallRank")) },   // number_format(...)
+                { "CLAN_NAME", clanid == 0 ? "Not available" : HtmlEncode(clan.GetClanName(clanid)) },
+                // ($factionId === '1') ? 'Mars' : (($factionId === '2') ? 'Earth' : 'Venus') — строковое ===
+                { "STATION", Str(users, "factionId") == "1" ? "Mars" : (Str(users, "factionId") == "2" ? "Earth" : "Venus") },
+            };
+
+            // общие токены headerIntern (SHIPN/LEVEL/HONOR/... заполняет RenderShell/vars частично;
+            // для PilotSheet преамбула headerIntern не портирована полностью — минимальный набор как в C1)
+            object shipnObj = @base.Shipn;
+            vars["SHIPN"] = shipnObj == null ? "" : Convert.ToString(shipnObj, CultureInfo.InvariantCulture);
+            vars["PLAYERID"] = pid.ToString(CultureInfo.InvariantCulture);
+            vars["UID"] = uid.ToString(CultureInfo.InvariantCulture);
+            vars["LEVEL"] = HtmlEncode(Str(users, "level"));
+            vars["HONOR"] = NumFmtStr(Str(users, "honor"));
+            vars["EXP"] = NumFmtStr(Str(users, "exp"));
+            vars["CREDITS"] = NumFmtStr(Str(users, "credits"));
+            vars["URI"] = NumFmtStr(Str(users, "uri"));
+            vars["FACTIONCLS"] = Str(users, "factionId") == "1" ? "mmo" : (Str(users, "factionId") == "2" ? "eic" : "vru");
+            vars["CLAN_BTN"] = "<a class=\"header_std_btn header_lft_std\" id=\"clan_btn\" href=\"/indexInternal.es.php?action="
+                               + (clanid == 0 ? "internalNewClan" : "internalClan") + "\">\n                    "
+                               + "<img src=\"/text?t=КЛАН&w=4&s=10&color=lightestBlue&b=darkblue\" alt=\"\" />\n                </a>";
+            bool premium = Unity.Cpt(Str(users, "premium"));
+            vars["PREMIUM_DIV"] = premium ? "<div id=\"header_is_premium\"></div>" : "<div id=\"ip_placeholder\"></div>";
+
+            vars["HELP_NEWS_INCLUDE"] = FillFragment("internalHelpLayer", vars) + FillFragment("internalNews", vars);
+            vars["HEADER_INTERN_INCLUDE"] = FillFragment("internalHeaderIntern", vars);
+
+            Shell("internalPilotSheet_Body", "/css/cdn/internalPilotSheet.css", vars);
+        }
+
+        /// <summary>require GLOBALS.&lt;name&gt;.php с подстановкой тех же vars, что и Body-шаблон.</summary>
+        private static string FillFragment(string name, IDictionary<string, string> vars)
+        {
+            string raw = PhpTemplateRenderer.LoadRaw(PhpTemplateRenderer.GlobalsRoot, name);
+            return raw == null ? "" : PhpTemplateRenderer.Fill(raw, vars);
+        }
+
+        /// <summary>$clanc = "SELECT * FROM server_1_clan ORDER BY rankpoints DESC LIMIT 10" (straight mysqli_query в шаблоне).</summary>
+        private static List<Dictionary<string, string>> TopClansQuery()
+        {
+            var result = new List<Dictionary<string, string>>();
+            using (var con = DB.GetInstance())
+            using (var cmd = new MySqlCommand("SELECT * FROM server_1_clan ORDER BY rankpoints DESC LIMIT 10", con))
+            using (var rdr = cmd.ExecuteReader())
+            {
+                while (rdr.Read()) result.Add(Unity.RowToDict(rdr));
+            }
+            return result;
+        }
+
+        /// <summary>HTML дневного бонуса из internalStart_Body.php (слой #dailyLogin), echo $dailyBonusd[...] → значения ExecuteB().</summary>
+        private static string BuildDailyBonusLayer(Dictionary<string, string> bd)
+        {
+            Func<string, string> B = k => { string v; return bd != null && bd.TryGetValue(k, out v) ? v : ""; };
+            return @"        <style type=""text/css"" media=""screen"">    @import ""./css/cdn/layer_dailyLogin.css</style>
+        <div id=""dailyLogin"" style=""top: 35px; left: 359.5px;"">
+                <div id=""dl_headline""><strong>Дневной бонус</strong></div>
+                <div id=""dl_infoBox"">
+                        <div id=""dl_infoBox_headline""><strong>С возвращением, пилот!</strong></div>
+                        <div id=""dl_infoBox_content"">" + HtmlEncode(B("headline")) + @"</div>
+                </div>
+                <div id=""dl_boni"">
+                        <div id=""dl_progressbar_bonus_" + B("progressbar") + @"""></div>
+                        <div id=""dl_boniBox"" onclick=""do_redirect('indexInternal.es?action=internalDock&amp;tpl=internalDockAmmo&amp;hdl=1', false)"">
+                                <div class=""dl_boniState_" + B("boxstate_1") + @""">
+                                        <div class=""dl_boni_1"">
+                                                <div class=""dl_boni_headline"">День 1</div>
+                                                " + B("boxstate_1_icon") + @"
+                                                <div class=""dl_boni_content dl_boni_content_1"">50,000 кредитов<br>100 ракет PLT-2026<br>5 доп. зарядов энергии</div>
+                                        </div>
+                                </div>
+                        </div>
+            <div id=""dl_boniBox"" onclick=""do_redirect('indexInternal.es?action=internalDock&amp;tpl=internalDockAmmo&amp;hdl=1', false)"">
+                                <div class=""dl_boniState_" + B("boxstate_2") + @""">
+                                        <div class=""dl_boni_2"">
+                                                <div class=""dl_boni_headline"">День 2</div>
+                                                " + B("boxstate_2_icon") + @"
+                                                <div class=""dl_boni_content dl_boni_content_2"">750 боеприпасов  MCB-25<br>85,000 кредитов<br>5 доп. зарядов энергии</div>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id=""dl_boniBox"" onclick=""do_redirect('indexInternal.es?action=internalDock&amp;tpl=internalDockSpecials&amp;hdl=1', false)"">
+                                <div class=""dl_boniState_" + B("boxstate_3") + @""">
+                                        <div class=""dl_boni_3"">
+                                                <div class=""dl_boni_headline"">День 3</div>
+                                                " + B("boxstate_3_icon") + @"
+                                                <div class=""dl_boni_content dl_boni_content_3"">150 ракет PLT-2021<br>3 купона на телепортацию<br>5 доп. зарядов энергии</div>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id=""dl_boniBox"" onclick=""do_redirect('indexInternal.es?action=internalDock&amp;tpl=internalDockAmmo&amp;hdl=1', false)"">
+                                <div class=""dl_boniState_" + B("boxstate_4") + @""">
+                                        <div class=""dl_boni_5"">
+                                                <div class=""dl_boni_headline"">День 4</div>
+                                                " + B("boxstate_4_icon") + @"
+                                                <div class=""dl_boni_content dl_boni_content_4"">5 логдисков<br>250 уридиума<br>5 доп. зарядов энергии</div>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id=""dl_boniBox"" onclick=""do_redirect('indexInternal.es?action=internalPilotSheet&amp;tpl=skilltree&amp;hdl=1', false)"">
+                                <div class=""dl_boniState_" + B("boxstate_5") + @""">
+                                        <div class=""dl_boni_4"">
+                                                <div class=""dl_boni_headline"">День 5</div>
+                                                " + B("boxstate_5_icon") + @"
+                                                <div class=""dl_boni_content dl_boni_content_5"">1000 боеприпасов MCB-50<br>3 купона на ремонт<br>5 ракет WIZ-X</div>
+                                        </div>
+                                </div>
+                        </div>
+                        <div id=""dl_accept"">
+                                <div id=""dl_bt_accept""><a href=""/indexInternal.es?action=internalStart&amp;acceptDailyLoginBonus=1"">OK</a></div>
+                        </div>
+                </div>
+        </div>
+";
         }
 
         /// <summary>header('Location: /indexInternal.es.php?action=X') в терминах порта.</summary>
