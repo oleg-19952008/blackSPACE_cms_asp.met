@@ -811,6 +811,216 @@ namespace DarkSpace.Pages
             });
         }
 
+        /// <summary>
+        /// C2: порт PHP-преамбулы internalNewClan_Body.php (строки 1–19 шаблона):
+        /// setId; searchClanList → GetClans("'%lookup%'", '?action=internalNewClan') иначе GetClans(null,…);
+        /// getRange/getCurrentPage/getTotalOfResults/getTotalOfPages; sort через OrderBy (cust_sort-аналог,
+        /// как в HandleClanListVars); плюс redirect-преамбула диспетчера (indexInternal.es.php 208–212).
+        /// Echo-блок списка (<?php … ?> шаблона) выполняется стриминговым хуком в позиции for-цикла.
+        /// </summary>
+        private void HandleNewClanVars(Users users, HttpRequest request)
+        {
+            var clan = new Clan();
+            clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+
+            // indexInternal.es.php строки 210–212: if ($clanid != 0) header('...action=internalClan')
+            long myCid = clan.GetMyClan(PlayerLog.ToLong(users.DataRow["playerID"]));
+            if (myCid != 0) { RedirectInternal("internalClan"); return; }
+
+            // преамбула шаблона строки 2–7: subaction==searchClanList → LIKE-фильтр по $_POST['lookup']
+            // (оригинал передаёт "'%".$_POST['lookup']."%'" — окружающие кавычки/проценты срезаются в GetClans)
+            string subaction = Query(request, "subaction");
+            List<Dictionary<string, string>> clans = subaction == "searchClanList"
+                ? clan.GetClans("'" + Form(request, "lookup") + "'", "?action=internalNewClan")
+                : clan.GetClans(null, "?action=internalNewClan");
+            int range = clan.GetRange();
+            int cuPage = clan.GetCurrentPage();
+            int total = clan.GetTotalOfResults();
+            int tPage = (int)clan.GetTotalOfPages();
+
+            // if (isset($_GET['sort'])) usort($clans, 'cust_sort') — strtolower-компаратор оригинала
+            string sort = request.Query["sort"];
+            if (!string.IsNullOrEmpty(sort))
+            {
+                clans = clans.OrderBy(c =>
+                {
+                    string v; return c.TryGetValue(sort, out v) ? (v ?? "").ToLowerInvariant() : "";
+                }).ToList();
+            }
+
+            // for ($i = $start; $i < $end; $i++) из шаблона (строки 224–246)
+            int start, end;
+            if (total != 0)
+            {
+                if (cuPage == 1)
+                {
+                    start = 0;
+                    end = total < range ? total : range;
+                }
+                else
+                {
+                    start = (cuPage - 1) * range;
+                    end = cuPage != tPage ? cuPage * range : total;
+                }
+            }
+            else { start = 0; end = 0; }
+
+            // echo-блок списка: строится сразу (он живёт внутри одного <?php ?>-блока шаблона,
+            // который RenderStreaming пропускает целиком) — хук подменит этот блок на items.
+            var items = new StringBuilder();
+            for (int i = start; i < end && i < clans.Count; i++)
+            {
+                var c = clans[i];
+                string Get(string k) { string v; return c.TryGetValue(k, out v) ? (v ?? "") : ""; }
+                // if($clans[$i]['recruiting']==1)…elseif…else из echo-блока (строки 243–256)
+                string re, ro;
+                switch (Get("recruiting"))
+                {
+                    case "1": re = "recruiting"; ro = "Recruiting"; break;
+                    case "0": re = "notRecruiting"; ro = "Closed"; break;
+                    case "2": re = "recruiting"; ro = "Fully elite"; break;
+                    default: re = "recruiting"; ro = ""; break;
+                }
+                // strpos(members,'|') !== false ? count(explode('|',members)) : 1
+                string members = Get("members");
+                int num = members.IndexOf('|') >= 0 ? members.Split('|').Length : 1;
+                string aff = Get("company").ToUpperInvariant();   // strtoupper($clans[$i]['company'])
+                items.Append("<li class=\"clan_item\">\n")
+                     .Append("                                                    <span class=\"clanname\">\n")
+                     .Append("                                                        <a href=\"indexInternal.es?action=internalNewClanDetails&clanId=")
+                     .Append(HtmlAttr(Get("clanID"))).Append("\" class=\"clanlink\" title=\"")
+                     .Append(HtmlAttr(Get("clanName"))).Append("\">\n")
+                     .Append("                                                            ").Append(HtmlEncode(Get("clanName"))).Append("\n")
+                     .Append("                                                        </a>\n")
+                     .Append("                                                    </span>\n")
+                     .Append("                                                    <span class=\"ranking\">").Append(HtmlEncode(Get("tagName"))).Append("</span>\n")
+                     .Append("                                                    <span class=\"members\">").Append(num.ToString(CultureInfo.InvariantCulture)).Append("</span>\n")
+                     .Append("                                                    <span class=\"ranking\">").Append(HtmlEncode(Get("rank"))).Append("</span>\n")
+                     .Append("                                                    <span class=\"affiliation\">").Append(HtmlEncode(aff)).Append("</span>\n")
+                     .Append("                                                    <span class=\"status ").Append(re).Append("\">\n")
+                     .Append("                                                        ").Append(ro).Append("\n")
+                     .Append("                                                    </span>\n")
+                     .Append("                                                </li>");
+            }
+            if (total == 0)
+                items.Append("<li class=\"no_items even\">This search produced no results.</li>");
+
+            Func<IDictionary<string, string>, IDictionary<string, string>> beforeBody = ctx =>
+            {
+                ctx["PAGINATE"] = clan.Paginate();          // <?php echo $clan->paginate(); ?>
+                ctx["CUPAGE"] = cuPage.ToString(CultureInfo.InvariantCulture);
+                return null;                                 // доп. токены уже записаны прямо в ctx
+            };
+
+            Func<string, string> bodyHook = seg =>
+                seg.Contains("if ($total != 0)") && seg.Contains("for ($i = $start; $i < $end; $i++)")
+                    ? items.ToString()
+                    : null;
+
+            Write(PhpTemplateRenderer.RenderShell(_users, "internalNewClan_Body", "/css/cdn/internalNewClan.css",
+                  beforeBody, vars: null, logMessage: null, logType: null, bodyHook: bodyHook));
+        }
+
+        /// <summary>
+        /// C2: порт PHP-преамбулы internalNewClanDetails_Body.php (строки 1–33 шаблона) +
+        /// диспетчерских строк 190–197 (redirect при своём клане, foundClan по POST).
+        /// Условный рендер «clan page / found template» (if(isset($_GET['clanId']))) сделан
+        /// стриминговым хуком по сегментам между <?php ?>-блоками шаблона.
+        /// </summary>
+        private void HandleNewClanDetailsVars(Users users, HttpRequest request)
+        {
+            var clan = new Clan();
+            clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+
+            // indexInternal.es.php строки 191–193: свой клан → internalClan
+            long myCid = clan.GetMyClan(PlayerLog.ToLong(users.DataRow["playerID"]));
+            if (myCid != 0) { RedirectInternal("internalClan"); return; }
+
+            // строки 194–196: if (isset($_POST['clanName']) && isset($_POST['clanTag'])) foundClan($_POST, factionId)
+            if (!string.IsNullOrEmpty(Form(request, "clanName")) && !string.IsNullOrEmpty(Form(request, "clanTag")))
+            {
+                clan.FoundClan(FormDict(request, "clanName", "clanTag", "clanDescription"), Str(users, "factionId"));
+            }
+
+            // преамбула шаблона строки 2–4: subaction==joinClan → $clan->join($_POST)
+            if (Query(request, "subaction") == "joinClan")
+            {
+                clan.Join(FormDict(request, "clanId", "applicationText"));
+            }
+
+            // строки 5–33: clanId → getClan/getPending + таблица $re/$ro
+            string clanIdRaw = Query(request, "clanId");
+            bool hasClan = !string.IsNullOrEmpty(clanIdRaw);
+            Dictionary<string, string> cla0 = null;
+            string re = "", ro = "";
+            if (hasClan)
+            {
+                long cid; long.TryParse(clanIdRaw, out cid);
+                var cla = clan.GetClan(cid);
+                bool p = clan.GetPending(cid);
+                cla0 = cla.Count > 0 ? cla[0] : null;
+                if (cla0 == null) hasClan = false;
+                else
+                {
+                    string recruiting = GetOr(cla0, "recruiting");
+                    if (recruiting == "1") { re = p ? "Pending" : "recruiting"; ro = "Recruiting"; }
+                    else if (recruiting == "0") { re = "notRecruiting"; ro = "Closed"; }
+                    else if (recruiting == "2") { re = p ? "Pending" : "recruiting"; ro = "Fully elite"; }
+                    else { re = p ? "Pending" : "recruiting"; ro = ""; }
+                }
+            }
+
+            string V(string key)
+            {
+                if (cla0 == null) return "";
+                string v; return cla0.TryGetValue(key, out v) ? (v ?? "") : "";
+            }
+
+            // Хук позиционирует вывод по сегментам шаблона: сегменты внутри if-веток подменяются
+            // маркерными заглушками/реальным HTML, чистый HTML проходит как есть (null).
+            Func<string, string> hook = seg =>
+            {
+                if (seg.Contains("<!-- start internal clan2 -->") && seg.Contains("class=\"clanDetails\""))
+                    return hasClan ? seg : "";                       // if-ветка «clan page» целиком
+                if (seg.Contains("<!-- start clan found template -->"))
+                    return hasClan ? "" : seg;                       // else-ветка «found» целиком
+                if (seg.Contains("<?php echo $cla[0]['clanName']; ?>"))
+                {
+                    // инлайн-echo внутри if-ветки: заменяем PHP-фрагменты значениями
+                    string s = seg;
+                    s = s.Replace("<?php echo $cla[0]['clanName']; ?>", HtmlEncode(V("clanName")));
+                    s = s.Replace("<?php echo $cla[0]['tagName']; ?>", HtmlEncode(V("tagName")));
+                    s = s.Replace("<?php echo $clan->GetClanLeader($cla[0]['leader']); ?>",
+                                  HtmlEncode(clan.GetClanLeader(PlayerLog.ToLong(V("leader")))));
+                    s = s.Replace("<?php echo $cla[0]['memberCount']; ?>", HtmlEncode(V("memberCount")));
+                    s = s.Replace("<?php echo $cla[0]['rank']; ?>", HtmlEncode(V("rank")));
+                    s = s.Replace("<?php echo strtoupper($cla[0]['company']); ?>",
+                                  HtmlEncode(V("company").ToUpperInvariant()));
+                    s = s.Replace("<?php echo $cla[0]['clandescription']?>", V("clandescription"));
+                    s = s.Replace("<?php echo $cla[0]['clanID']; ?>", HtmlEncode(V("clanID")));
+                    return s;
+                }
+                if (seg.Contains("if($re==\"notRecruiting\"):\n                                                        echo '<textarea"))
+                {
+                    string title = re == "notRecruiting" ? "Closed for recruiting. "
+                                 : (re == "Pending" ? "Your application to this Clan is pending."
+                                 : "Enter in your application text.");
+                    return "<textarea id=\"applicationText\" name=\"applicationText\" title=\"" + HtmlAttr(title) + "\"></textarea>";
+                }
+                if (seg.Contains("button name=\"submit\" type=\"submit\" class=\"clanInactive\""))
+                    return (re == "notRecruiting" || re == "Pending") ? seg : "";
+                if (seg.Contains("button name=\"submit\" type=\"submit\" class=\"clanSubmit\"")
+                    && seg.Contains("message_success"))
+                    return (re == "notRecruiting" || re == "Pending") ? "" : seg;
+                return null;                                          // verbatim-HTML
+            };
+
+            Write(PhpTemplateRenderer.RenderShell(_users, "internalNewClanDetails_Body",
+                  "http://127.0.0.1/css/cdn/internalNewClanDetails.css",
+                  beforeBody: ctx => { ctx["RO"] = HtmlEncode(ro); return null; },
+                  vars: null, logMessage: null, logType: null, bodyHook: hook));
+        }
+
         /// <summary>fetch_assoc()['col'] — первая строка/колонка или null (PHP warning-паритет: 0).</summary>
         private static void FirstCell(MySqlConnection con, string sql, long pid, Action<string> assign)
         {

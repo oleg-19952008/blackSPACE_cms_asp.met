@@ -227,6 +227,60 @@ namespace DarkSpace
             return sb.ToString();
         }
 
+        /// <summary>
+        /// RenderShell + потоковый Body-рендер (фаза C2, internalNewClanDetails): тот же
+        /// require-цепочка GLOBALS, но вместо RenderBody вызывается RenderStreaming с hook —
+        /// условные PHP-сегменты шаблона фильтруются в позиции оригинала.
+        /// </summary>
+        public static string RenderShell(Users users, string bodyTemplate, string cssHref,
+                                         Func<IDictionary<string, string>, IDictionary<string, string>> beforeBody,
+                                         IDictionary<string, string> vars,
+                                         string logMessage, string logType,
+                                         Func<string, string> bodyHook)
+        {
+            var ctx = new Dictionary<string, string>(StringComparer.Ordinal);
+            long pid = users != null && users.DataRow != null ? PlayerLog.ToLong(users.DataRow["playerID"]) : 0;
+            long fid = users != null && users.DataRow != null ? PlayerLog.ToLong(users.DataRow["factionId"]) : 0;
+            ctx["PLAYERID"] = pid.ToString(CultureInfo.InvariantCulture);
+            ctx["FACTIONNAME"] = fid == 1 ? "mmo" : (fid == 2 ? "eic" : "vru");
+            ctx["SESSIONID"] = CurrentSession != null ? SessionManager.SessionId(CurrentSession) ?? "" : "";
+            ctx["RND_SID"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(
+                new Random().Next(10000, 100000000).ToString(CultureInfo.InvariantCulture)));
+            ctx["TIME"] = UnixNow().ToString(CultureInfo.InvariantCulture);
+            ctx["DYNHOST"] = AppConfig.DynHost;
+            ctx["SERVER"] = AppConfig.Server;
+            ctx["HOST"] = AppConfig.Host;
+            if (vars == null || !vars.ContainsKey("HELP_NEWS_INCLUDE"))
+                ctx["HELP_NEWS_INCLUDE"] = FillFragment("internalHelpLayer", ctx) + FillFragment("internalNews", ctx);
+            if (vars == null || !vars.ContainsKey("HEADER_INTERN_INCLUDE"))
+                ctx["HEADER_INTERN_INCLUDE"] = FillFragment("internalHeaderIntern", ctx);
+            if (vars == null || !vars.ContainsKey("CREDITS_INCLUDE"))
+                ctx["CREDITS_INCLUDE"] = FillFragment("credits", ctx);
+            if (vars != null) foreach (var kv in vars) ctx[kv.Key] = kv.Value ?? "";
+            if (logMessage != null) { ctx["LOG_MESSAGE"] = logMessage; ctx["LOG_TYPE"] = logType ?? ""; }
+
+            var sb = new StringBuilder();
+            AppendFragment(sb, "internalDoc.php", ctx);
+            sb.Append("<link rel=\"stylesheet\" media=\"all\" href=\"")
+              .Append(System.Net.WebUtility.HtmlEncode(cssHref ?? "")).Append("\" />\n");
+            AppendFragment(sb, "internalDocEnd.php", ctx);
+            AppendFragment(sb, "sajax.php", ctx);
+            AppendFragment(sb, "xajax.php", ctx);
+            AppendFragment(sb, "headerEndJS.php", ctx);
+            AppendFragment(sb, "internalMenu.php", ctx);
+            AppendFragment(sb, "internalHeader.php", ctx);
+            foreach (var frag in ExtraHeaderFragments)
+                AppendFragment(sb, frag, ctx);
+            if (beforeBody != null)
+            {
+                var extra = beforeBody(ctx);
+                if (extra != null) foreach (var kv in extra) ctx[kv.Key] = kv.Value ?? "";
+            }
+            sb.Append(RenderStreaming(users, bodyTemplate, ctx, bodyHook));
+            AppendFragment(sb, "ads.php", ctx);
+            return sb.ToString();
+        }
+
         public static string LoadRaw(string root, string safeName)
         {
             if (!Regex.IsMatch(safeName ?? "", @"^[A-Za-z0-9_-]+$")) return null; // path-traversal guard
