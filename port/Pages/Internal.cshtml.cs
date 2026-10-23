@@ -56,6 +56,11 @@ namespace DarkSpace.Pages
             session.SetString("premium", users.DataRow != null
                 ? PlayerLog.ToLong(users.DataRow["premium"]).ToString(CultureInfo.InvariantCulture) : "0");
 
+            // B2 plumbing: PhpTemplateRenderer.RenderShell берёт $_SESSION['server1']['user']['sessionId']
+            // и DataRow текущего пользователя из статических хуков — выставляем перед диспетчером.
+            PhpTemplateRenderer.CurrentSession = session;
+            _users = users;
+
             var unity = new Unity();
             if (unity.CheckIpBan(Unity.GetClientIp()))
             {
@@ -65,20 +70,16 @@ namespace DarkSpace.Pages
 
             var @base = new Base();
             @base.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"])); // $base->setId(...)
-            if (@base.CheckBan())
+            if (@base.CheckBan())   // indexInternal.es.php строки 30–32
             {
                 return Flush(Redirect("/?calmdown=99"));
             }
             unity.ApplyRankList(PlayerLog.ToLong(users.DataRow["playerID"]));    // $unity->applyRankList(...)
             unity.ApplyRankListNpc(PlayerLog.ToLong(users.DataRow["playerID"])); // $unity->applyRankListNpc(...)
 
-            // Minimal internal-start shell: enough for smoke-testing the auth chain.
-            Write("<div class=\"login\"><h2>Dark Space — internal</h2>" +
-                  "<p>User ID: " + HtmlEncode(userId.ToString()) + "</p>" +
-                  "<p><a href=\"/GameAPI.ashx\">Game API</a> | <a href=\"/\">Logout page</a></p></div>");
-
             // Action dispatch (port of indexInternal.es.php dispatcher, phase B).
             HandleAction(users, request);
+            if (!_ended) HandleTailBranches(users, request); // ветки 561–732 после else-блока auction
 
             return Flush(null);
         }
@@ -657,7 +658,7 @@ namespace DarkSpace.Pages
             PendingRedirect = "/Internal?action=" + Uri.EscapeDataString(action);
         }
 
-        private Users _users; // для Shell(): DataRow текущего пользователя
+        private Users _users; // для Shell(): DataRow текущего пользователя (выставляется в Process())
 
         private static string Query(HttpRequest r, string key) { return r.Query[key]; }
 
@@ -702,23 +703,8 @@ namespace DarkSpace.Pages
         /// <summary>Цель редиректа, выставленная вместо Response.Redirect(url, true).</summary>
         public string PendingRedirect { get; private set; }
 
-        /// <summary>Каркас страницы INTERNAL как в require GLOBALS 'internalDoc.php' + css-link +
-        /// sajax/xajax/headerEndJS/internalMenu/internalHeader + FILES 'INDEXINTERNAL/&lt;body&gt;_Body.php'.
-        /// Шаблоны GLOBALS/INDEXINTERNAL — фаза C (PORTING-PLAN): здесь отдаём статический
-        /// HTML-каркас из templates/INDEXINTERNAL/&lt;body&gt;.html (если есть) либо
-        /// минимальную оболочку с заголовком действия.</summary>
-        private void RenderInternalPage(string bodyName, string cssHref)
-        {
-            Write("<link rel=\"stylesheet\" media=\"all\" href=\"" + HtmlAttr(cssHref) + "\" />");
-            string html = LoadTemplate(bodyName);
-            if (html != null)
-            {
-                Write(html);
-                return;
-            }
-            Write("<div id=\"" + bodyName + "Panel\"><h3>" + HtmlEncode(bodyName) + "</h3>" +
-                  "<p>Template pending phase C (templates/INDEXINTERNAL/" + HtmlEncode(bodyName) + ".html).</p></div>");
-        }
+        /// <summary>Каркас legacy-рендера заменён на PhpTemplateRenderer.RenderShell (фаза B2);
+        /// LoadTemplate остался для оверлейных шаблоновHallofFame (см. HandleInternalHallofFame).</summary>
 
         private static string LoadTemplate(string bodyName)
         {
