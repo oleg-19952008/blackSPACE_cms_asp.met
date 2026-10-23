@@ -71,6 +71,21 @@ namespace DarkSpace
                                          IDictionary<string, string> vars = null,
                                          string logMessage = null, string logType = null)
         {
+            return RenderShell(users, bodyTemplate, cssHref, beforeBody: null,
+                               vars: vars, logMessage: logMessage, logType: logType);
+        }
+
+        /// <summary>
+        /// Overload с preambulo-колбэком: выполняется ПОСЛЕ require GLOBALS (menu/header),
+        /// ПЕРЕД Body-рендером — точно в позиции positionального require/echo внутри
+        /// Body-шаблона оригинала (например internalClan_Body.php строки 1–40).
+        /// Колбэк возвращает доп. ctx-токены (могут быть null — тогда только побочный вывод).
+        /// </summary>
+        public static string RenderShell(Users users, string bodyTemplate, string cssHref,
+                                         Func<IDictionary<string, string>, IDictionary<string, string>> beforeBody,
+                                         IDictionary<string, string> vars = null,
+                                         string logMessage = null, string logType = null)
+        {
             var ctx = new Dictionary<string, string>(StringComparer.Ordinal);
             long pid = users != null && users.DataRow != null ? PlayerLog.ToLong(users.DataRow["playerID"]) : 0;
             long fid = users != null && users.DataRow != null ? PlayerLog.ToLong(users.DataRow["factionId"]) : 0;
@@ -111,6 +126,11 @@ namespace DarkSpace
             AppendFragment(sb, "internalHeader.php", ctx);
             foreach (var frag in ExtraHeaderFragments)
                 AppendFragment(sb, frag, ctx);
+            if (beforeBody != null)
+            {
+                var extra = beforeBody(ctx);
+                if (extra != null) foreach (var kv in extra) ctx[kv.Key] = kv.Value ?? "";
+            }
             sb.Append(RenderBody(users, bodyTemplate, ctx));
             AppendFragment(sb, "ads.php", ctx);   // ads.php пустой в оригинале — no-op
             return sb.ToString();
@@ -126,6 +146,18 @@ namespace DarkSpace
                        + System.Net.WebUtility.HtmlEncode(bodyTemplate)
                        + "</h3><p>Template pending phase C (templates/INDEXINTERNAL/"
                        + System.Net.WebUtility.HtmlEncode(bodyTemplate) + ".html).</p></div>";
+            }
+            // Phase C: positionальные require GLOBALS внутри Body-шаблонов. Если ветка не
+            // задала токены явно (internalStart/PilotSheet задают своими vars), подставляем
+            // дефолты из ctx — тот же механизм, что в RenderShell.
+            if (ctx != null)
+            {
+                if (!ctx.ContainsKey("HELP_NEWS_INCLUDE"))
+                    ctx["HELP_NEWS_INCLUDE"] = FillFragment("internalHelpLayer", ctx) + FillFragment("internalNews", ctx);
+                if (!ctx.ContainsKey("HEADER_INTERN_INCLUDE"))
+                    ctx["HEADER_INTERN_INCLUDE"] = FillFragment("internalHeaderIntern", ctx);
+                if (!ctx.ContainsKey("CREDITS_INCLUDE"))
+                    ctx["CREDITS_INCLUDE"] = FillFragment("credits", ctx);
             }
             return Fill(raw, ctx);
         }
