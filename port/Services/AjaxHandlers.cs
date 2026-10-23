@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 
 namespace DarkSpace
 {
@@ -239,7 +241,7 @@ namespace DarkSpace
                 if (inCLS2 != "_inactive")
                     sb.Append("                        <a class=\"but_build_instant_a\" onfocus=\"this.blur()\" href=\"indexInternal.es?action=internalNanoTechFactory&subaction=buildBuff&buff=" + s + "\">\n");
                 sb.Append("                            <strong class=\"buildlink" + inCLS + "\">PRODUCE</strong><br />\n");
-                sb.Append("                            " + factory.ConvertSeconds(ParseLong(GetOr(reso, "producetime"))) + "\n");
+                sb.Append("                            " + Factory.ConvertSeconds(ParseLong(GetOr(reso, "producetime"))) + "\n");
                 if (inCLS2 != "_inactive") sb.Append("                        </a>\n");
                 sb.Append("                    </div>\n</div>\n");
             }
@@ -276,15 +278,26 @@ namespace DarkSpace
         /// </summary>
         public static async Task HandleSajax(HttpContext ctx)
         {
-            var form = ctx.Request.Method == HttpMethods.Post
-                ? await ctx.Request.ReadFormAsync()
-                : ctx.Request.Query;
+            Dictionary<string, string> form;
+            List<string> repeatedArgs;
+            if (ctx.Request.Method == HttpMethods.Post)
+            {
+                var f = await ctx.Request.ReadFormAsync();
+                form = f.ToDictionary(k => k.Key, k => k.Value.ToString(), StringComparer.OrdinalIgnoreCase);
+                repeatedArgs = ReadRepeated(f, "rsargs");
+            }
+            else
+            {
+                var q = ctx.Request.Query;
+                form = q.ToDictionary(k => k.Key, k => k.Value.ToString(), StringComparer.OrdinalIgnoreCase);
+                repeatedArgs = ReadRepeated(q, "rsargs");
+            }
 
-            string rs = form["rs"];
+            form.TryGetValue("rs", out string rs);
             if (rs == "searchUser")
             {
-                List<string> args = ReadRepeated(form, "rsargs");
-                if (args.Count == 0) args = ReadRepeated(form, "rsargs[]");
+                List<string> args = repeatedArgs;
+                if (args.Count == 0) args = ReadRepeated(ctx.Request.Query, "rsargs[]");
                 var clan = new Clan();
                 string json = clan.ClanVoid(Arg(args, 0) ?? "");
                 await WritePlain(ctx, "+:var res = " + json + "; res;");
@@ -306,6 +319,15 @@ namespace DarkSpace
         private static async Task WritePlain(HttpContext ctx, string text)
         {
             await ctx.Response.WriteAsync(text);
+        }
+
+        private static List<string> ReadRepeated(IQueryCollection form, string key)
+        {
+            var list = new List<string>();
+            StringValues values;
+            if (form.TryGetValue(key, out values))
+                foreach (var v in values) list.Add(v);
+            return list;
         }
 
         private static List<string> ReadRepeated(IFormCollection form, string key)
