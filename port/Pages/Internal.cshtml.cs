@@ -84,25 +84,27 @@ namespace DarkSpace.Pages
         }
 
         /// <summary>
-        /// Диспетчер по action/subaction как в indexInternal.es.php.
-        /// Пока портированы ветки internalCompanyChoose (B-кусок 1, строки 36–64),
-        /// internalSkylab (кусок A2.8) и заглушки фазы B для остальных действий;
-        /// прочие действия добавляются кусками фазы B по PORTING-PLAN.md.
+        /// Диспетчер по action/subaction/tpl как в indexInternal.es.php (строки 34–732).
+        /// Порядок if/elseif оригинала сохранён; каждая ветка = require-цепочка GLOBALS
+        /// + Body-шаблон через PhpTemplateRenderer.RenderShell (фаза B2).
         /// </summary>
         private void HandleAction(Users users, HttpRequest request)
         {
             // PHP: if (isset($_POST['action'])) $_GET['action'] = $_POST['action'];
-            string action = request.Query["action"];
-            if (string.IsNullOrEmpty(action) && request.HasFormContentType)
-                action = request.Form["action"];
+            string action = FirstNonEmpty(Query(request, "action"), Form(request, "action"));
             if (string.IsNullOrEmpty(action)) return;
 
-            // Порядок if/elseif оригинала: internalCompanyChoose проверяется первым и
-            // отдельно от factionId-gate (строки 36–65).
-            if (action == "internalCompanyChoose")
+            string tpl = request.Query["tpl"];
+
+            // Порядок оригинала: сначала action-ветки (внутренний switch), затем elseif-цепочка
+            // 'internalHandelClosed'/'internalDock'/'internalMapRevolution'/'burnme', идущая
+            // после else-блока internalAuction (см. строки 561–732).
+            switch (action)
             {
-                HandleInternalCompanyChoose(users, request);
-                return;
+                // ---- B1: internalCompanyChoose (строки 36–65) — отдельно от factionId-gate ----
+                case "internalCompanyChoose":
+                    HandleInternalCompanyChoose(users, request);
+                    return;
             }
 
             // PHP: elseif ($Users->DataRow['factionId'] === '0') → редирект на выбор фракции
@@ -114,39 +116,588 @@ namespace DarkSpace.Pages
                 return;
             }
 
+            // ---- B3: строки 66–160 ----
             switch (action)
             {
-                case "internalSkylab":
-                    HandleInternalSkylab(users, request);
-                    break;
-
-                // ---- B3 (PORTING-PLAN.md): indexInternal.es.php lines 66–160 ----
                 case "internalStart":
-                    RenderInternalPage("internalStart", "/css/cdn/internalStart.css");
-                    break;
+                    Shell("internalStart_Body", "/css/cdn/internalStart.css");
+                    return;
                 case "internalGalaxyGates":
-                    // В оригинале ветка internalGalaxyGates продублирована (строки 78–89 и
-                    // 116–126) — недостижимый второй copy-port не нужен: поведение идентично.
-                    RenderInternalPage("internalGalaxyGates", "/css/cdn/internalGalaxyGates.css");
-                    break;
+                    // В оригинале ветка продублирована (78–89 и 116–126) — поведение идентично.
+                    Shell("internalGalaxyGates_Body", "/css/cdn/internalGalaxyGates.css");
+                    return;
                 case "internalJPA":
-                    RenderInternalPage("internalJPA", "/css/cdn/internalGalaxyGates.css");
-                    break;
+                    Shell("internalJPA_Body", "/css/cdn/internalGalaxyGates.css");
+                    return;
                 case "internalJPA-list":
-                    RenderInternalPage("internalJPA-list", "/css/cdn/internalGalaxyGates.css");
-                    break;
+                    Shell("internalJPA-list_Body", "/css/cdn/internalGalaxyGates.css");
+                    return;
                 case "internalPayment":
-                    RenderInternalPage("internalPayment", "/css/cdn/internalPayment.css");
-                    break;
+                    Shell("internalPayment_Body", "/css/cdn/internalPayment.css");
+                    return;
                 case "internalHallofFame":
                     HandleInternalHallofFame(users, request);
-                    break;
+                    return;
+            }
 
-                // TODO (фаза B): internalBalance (B4), internalHistory (B5),
-                // internalDock* (B6/B10), internalAuction (B7), internalBoard/Messaging (B8),
-                // internalUserDataChange (B9), Shop/inventory (B10).
+            // ---- B4: Balance/Evoucher (161–188) ----
+            if (action == "internalBalance")
+            {
+                Shell("internalBalance_Body", "/css/cdn/internalBalance.css");
+                return;
+            }
+            if (action == "internalEvoucher")
+            {
+                string logMessage = null, logType = null;
+                string redeem = Form(request, "redeem"), evoucher = Form(request, "evoucher");
+                if (!string.IsNullOrEmpty(redeem) && !string.IsNullOrEmpty(evoucher))
+                {
+                    var vouch = new Voucher();
+                    vouch.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+                    var re = vouch.RedeemVoucher(evoucher);
+                    logMessage = GetOr(re, "log_message");   // $log_message = $re['log_message']
+                    logType = GetOr(re, "type");
+                }
+                Shell("internalEvoucher_Body", "/css/cdn/internalEvoucher.css", logMessage: logMessage, logType: logType);
+                return;
+            }
+
+            // ---- B5: Clan-группа (189–297) ----
+            if (action == "internalNewClanDetails")
+            {
+                var clan = new Clan();
+                clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+                long clanid = clan.GetMyClan(PlayerLog.ToLong(users.DataRow["playerID"]));
+                if (clanid != 0) { RedirectInternal("internalClan"); return; }
+                string clanName = Form(request, "clanName"), clanTag = Form(request, "clanTag");
+                if (clanName != null && clanTag != null)
+                {
+                    // foundClan возвращает строку ошибки либо null при успехе (PHP echo-quirk сохранён в A1)
+                    Write(clan.FoundClan(FormDict(request, "clanName", "clanTag", "clanDesc", "clanMotto"),
+                                        Str(users, "factionId")));
+                }
+                Shell("internalNewClanDetails_Body", "http://127.0.0.1/css/cdn/internalNewClanDetails.css");
+                return;
+            }
+            if (action == "internalNewClan")
+            {
+                var clan = new Clan();
+                clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+                long clanid = clan.GetMyClan(PlayerLog.ToLong(users.DataRow["playerID"]));
+                if (clanid != 0) { RedirectInternal("internalClan"); return; }
+                Shell("internalNewClan_Body", "/css/cdn/internalNewClan.css");
+                return;
+            }
+            if (tpl == "internalClanChangeFirm" && action != "internalClan")
+            {
+                // Оригинальный elseif проверяет ТОЛЬКО $_GET['tpl'] (строки 211–227): срабатывает
+                // для любого запроса с tpl=internalClanChangeFirm, кроме занятых action выше.
+                string changefirm = request.Query["changefirm"];
+                string logMessage = null, logType = null;
+                if (!string.IsNullOrEmpty(changefirm) && (changefirm == "1" || changefirm == "2" || changefirm == "3"))
+                {
+                    var clan = new Clan();
+                    clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+                    var re = clan.ChangeFirm(changefirm);
+                    logMessage = GetOr(re, "log_message");
+                    logType = GetOr(re, "type");
+                }
+                Shell("internalClanChangeFirm_Body", "/css/cdn/internalClan.css", logMessage: logMessage, logType: logType);
+                return;
+            }
+            if (action == "internalClan")
+            {
+                HandleInternalClan(users, request, tpl);
+                return;
+            }
+            if (action == "internalClanList")
+            {
+                Shell("internalClanList_Body", "/css/cdn/internalClan.css");
+                return;
+            }
+
+            // ---- B6: Messaging/PilotSheet/UserDataChange/ItemUpgradeSystem (298–362) ----
+            if (action == "internalMessaging")
+            {
+                Shell("internalMessaging_Body", "/css/cdn/internalMessaging.css");
+                return;
+            }
+            if (action == "internalPilotSheet")
+            {
+                if (HandlePilotSheetChangeUsername(users, request)) return; // PHP exit внутри ветки
+                Shell("internalPilotSheet_Body", "/css/cdn/internalPilotSheet.css");
+                return;
+            }
+            if (action == "internalUserDataChange")
+            {
+                Shell("internalUserDataChange_Body", "/css/cdn/darkorbit.css");
+                return;
+            }
+            if (action == "internalItemUpgradeSystem")
+            {
+                Shell("internalItemUpgradeSystem_Body", "/css/cdn/internalItemUpgradeSystem.css");
+                return;
+            }
+
+            // ---- B7: Skylab / Board / NanoTechFactory (363–454) ----
+            if (action == "internalSkylab")
+            {
+                HandleInternalSkylab(users, request);
+                return;
+            }
+            if (action == "internalBoard")
+            {
+                // subaction-блок оригинала пуст (строки 400–402) — nothing to port.
+                Shell("internalBoard", "/css/cdn/internalAuction.css"); // require .../internalBoard.php (без _Body)
+                return;
+            }
+            if (action == "internalNanoTechFactory")
+            {
+                HandleInternalNanoTechFactory(users, request);
+                return;
+            }
+
+            // ---- B8: External/History/Promo/Logout (455–502) ----
+            if (action == "externalPassword")
+            {
+                Shell("externalPassword_Body", "/css/cdn/do_password.css");
+                return;
+            }
+            if (action == "internalPaymentProxy")
+            {
+                // Строки 466–469: $jos собирается, header() закомментирован — никакого вывода
+                // и ads.php в этой ветке нет. Порт сохранён без side-effect'ов.
+                return;
+            }
+            if (action == "externalLogout")
+            {
+                Shell("externalLogout_Body", "/css/cdn/logout.css");
+                return;
+            }
+            if (action == "internalHistory")
+            {
+                Shell("internalHistory_Body", "/css/cdn/internalHistory.css");
+                return;
+            }
+            if (action == "internalPaymentPartnerPromotion")
+            {
+                Shell("internalPaymentPartnerPromotion", "/css/cdn/darkorbit.css"); // файл без суффикса _Body
+                return;
+            }
+
+            // ---- B9: Auction (503–571) ----
+            if (action == "internalAuction")
+            {
+                HandleInternalAuction(users, request);
+                return;
             }
         }
+
+        /// <summary>Ветки после else-блока auction (561–732): проверются только если action не совпал выше.</summary>
+        private bool HandleTailBranches(Users users, HttpRequest request)
+        {
+            string action = FirstNonEmpty(Query(request, "action"), Form(request, "action"));
+            string tpl = request.Query["tpl"];
+            if (!string.IsNullOrEmpty(action)) return false; // одна из action-веток уже отработана выше
+
+            if (tpl == "internalHandelClosed")
+            {
+                // НЕ портировать: internalHandelClosed_Body.php помечен мёртвым (C-исключения).
+                Shell("internalHandelClosed_Body", "/css/cdn/internalHandel.css");
+                return true;
+            }
+            if (action == "internalDock")
+            {
+                HandleInternalDock(tpl);
+                return true;
+            }
+            if (action == "internalMapRevolution")
+            {
+                HandleInternalMapRevolution(users);
+                return true;
+            }
+            if (action == "burnme")
+            {
+                // require FILES . 'INDEXINTERNAL/burnme.php' — серверный скрипт, не HTML-оболочка.
+                Write(PhpTemplateRenderer.RenderBody(users, "burnme", null));
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>indexInternal.es.php строки 241–286 (action=internalClan, включая tpl-подветки).</summary>
+        private void HandleInternalClan(Users users, HttpRequest request, string tpl)
+        {
+            var clan = new Clan();
+            clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+            long clanid = clan.GetMyClan(PlayerLog.ToLong(users.DataRow["playerID"]));
+            if (clanid == 0) { RedirectInternal("internalNewClan"); return; }
+
+            // shell рендерится ДО внутреннего tpl-require в PHP (menu/header идут раньше body)
+            string logMessage = null, logType = null;
+            if (tpl == "internalClanMember")
+            {
+                long pid = PlayerLog.ToLong(users.DataRow["playerID"]);
+                clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), pid);
+                var clanInfo = clan.GetClan(clanid);
+                string subAction = Form(request, "subAction");
+                if (subAction == "applyAccept")
+                {
+                    long applyID; long.TryParse(Form(request, "applyID"), out applyID);
+                    clan.ApplyMember(clanid, applyID);
+                }
+                else if (subAction == "deleteMember")
+                {
+                    long removeUserID; long.TryParse(Form(request, "removeUserID"), out removeUserID);
+                    if (clanInfo.Count > 0 && pid == PlayerLog.ToLong(Rank.Get(clanInfo[0], "leader")))
+                        clan.DeleteMember(clanid, removeUserID);
+                    else if (pid == removeUserID)
+                        clan.DeleteMember(clanid, pid);
+                    // пустая else-ветка оригинала — ничего не делает
+                }
+                else if (subAction == "deleteClan")
+                {
+                    clan.DeleteClan(clanid);
+                }
+                var applicants = clan.GetApplicants(clanInfo.Count > 0 ? PlayerLog.ToLong(Rank.Get(clanInfo[0], "clanID")) : clanid);
+                var members = clan.GetMembers(clanInfo.Count > 0 ? Rank.Get(clanInfo[0], "members") : "");
+                GC.KeepAlive(applicants); GC.KeepAlive(members); // переменные уходят в Body-шаблон (фаза C)
+                if (clan.GetMyClan(pid) == 0) { RedirectInternal("internalNewClan"); return; }
+                Shell("internalClanMember_Body", "/css/cdn/internalClan.css", logMessage: logMessage, logType: logType);
+                return;
+            }
+            if (tpl == "internalClanDiplomacy")
+            {
+                Shell("internalClanDiplomacy_Body", "/css/cdn/internalClan.css", logMessage: logMessage, logType: logType);
+                return;
+            }
+            if (tpl == "internalClanAdministrate")
+            {
+                Shell("internalClanAdministrate_Body", "/css/cdn/internalClan.css", logMessage: logMessage, logType: logType);
+                return;
+            }
+            Shell("internalClan_Body", "/css/cdn/internalClan.css", logMessage: logMessage, logType: logType);
+        }
+
+        /// <summary>
+        /// indexInternal.es.php строки 407–454 (action=internalNanoTechFactory): subaction'ы
+        /// обрабатываются ДО require-цепочки; результаты уходят шаблонам как $log_message/$type.
+        /// </summary>
+        private void HandleInternalNanoTechFactory(Users users, HttpRequest request)
+        {
+            string logMessage = null, logType = null;
+            string subaction = request.Query["subaction"];
+            long uid = PlayerLog.ToLong(users.DataRow["ID"]);
+            long pid = PlayerLog.ToLong(users.DataRow["playerID"]);
+
+            if (subaction == "deleteAllBuffs")
+            {
+                var factory = new Factory();
+                factory.SetId(uid, pid);
+                int slot; int.TryParse(request.Query["slot"], out slot);
+                factory.DeleteTech(slot);
+            }
+            else if (subaction == "expandHall")
+            {
+                var factory = new Factory();
+                factory.SetId(uid, pid);
+                int facilityID; int.TryParse(request.Query["facilityID"], out facilityID);
+                var re = factory.ExpandHall(facilityID);
+                logMessage = GetOr(re, "log_message"); logType = GetOr(re, "type");
+            }
+            else if (subaction == "buildBuff")
+            {
+                var factory = new Factory();
+                factory.SetId(uid, pid);
+                string buff = request.Query["buff"];
+                if (!string.IsNullOrEmpty(buff))
+                {
+                    bool? instant = string.IsNullOrEmpty(request.Query["instant"]) ? (bool?)null : true;
+                    var re = factory.ProduceStart(factory.GetPrices(buff), buff, instant);
+                    logMessage = GetOr(re, "log_message"); logType = GetOr(re, "type");
+                }
+            }
+            else if (subaction == "cancelProductin")
+            {
+                var factory = new Factory();
+                factory.SetId(uid, pid);
+                string buff = request.Query["buff"];
+                if (!string.IsNullOrEmpty(buff))
+                {
+                    int slot; int.TryParse(request.Query["slot"], out slot);
+                    var re = factory.CancelProduction(buff, slot);
+                    logMessage = GetOr(re, "log_message"); logType = GetOr(re, "type");
+                }
+            }
+            else if (subaction == "buynow")
+            {
+                var factory = new Factory();
+                factory.SetId(uid, pid);
+                string buff = request.Query["buff"];
+                if (!string.IsNullOrEmpty(buff))
+                {
+                    var re = factory.BuyNow(buff);
+                    logMessage = GetOr(re, "log_message"); logType = GetOr(re, "type");
+                }
+            }
+            Shell("internalNanoTechFactory_Body", "/css/cdn/internalNanoTechFactory.css",
+                  logMessage: logMessage, logType: logType);
+        }
+
+        /// <summary>
+        /// indexInternal.es.php строки 309–340: AJAX-ish JSON-ответы changeUsername с выходом
+        /// до оболочки (PHP exit). Возвращает true, если ветка обработана (response завершён).
+        /// </summary>
+        private bool HandlePilotSheetChangeUsername(Users users, HttpRequest request)
+        {
+            string subAction = Form(request, "subAction");
+            if (subAction != "changeUsername") return false;
+
+            string userName = Form(request, "userName");
+            string current = Str(users, "Name");
+            if (userName != null && userName != current)
+            {
+                if (userName.Length < 3)
+                    return JsonExit("{\"status\":\"ERROR\",\"message\":\"This Pilot name most be at-least 3 Characters\"}");
+                if (userName.Length > 40)
+                    return JsonExit("{\"status\":\"ERROR\",\"message\":\"This Pilot name may not be over 40 character.\"}");
+                if (Regex.IsMatch(userName, @"[/`!@#$%&*()_\-+=\{\}\[\]|;:" + "\"" + @"<>,\.?\\" + "']"))
+                    return JsonExit("{\"status\":\"ERROR\",\"message\":\"This Pilot name can not be used.\"}");
+
+                var unity = new Unity();
+                unity.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+                // mysqli_real_escape_string + trim -> параметризованный запрос в Unity.ChangeName
+                string name = userName.Trim();
+                return JsonExit(unity.ChangeName(name));
+            }
+            return JsonExit("{\"status\":\"ERROR\",\"message\":\"This Pilot name is already in use.\"}");
+        }
+
+        /// <summary>echo $json; exit;</summary>
+        private bool JsonExit(string json)
+        {
+            Response.ContentType = "application/json";
+            Write(json);
+            _ended = true;
+            return true;
+        }
+
+        /// <summary>indexInternal.es.php строки 503–571 (action=internalAuction).</summary>
+        private void HandleInternalAuction(Users users, HttpRequest request)
+        {
+            long uid = PlayerLog.ToLong(users.DataRow["ID"]);
+            long pid = PlayerLog.ToLong(users.DataRow["playerID"]);
+            var unity = new Unity();
+            unity.SetId(uid, pid);
+
+            if (PlayerLog.ToLong(unity.Everisign(uid)) == 1 || Str(users, "rank") == "21")
+            {
+                string logMessage = null, logType = null;
+                string subAction = Form(request, "subAction");
+                if (subAction == "bid")
+                {
+                    string pause = HttpContext.Session.GetString("pauseAuction");
+                    if (!string.IsNullOrEmpty(pause) && !Unity.Cpt(pause))
+                    {
+                        logMessage = "You are not allowed to bid that many times in a row.";
+                        logType = "error";
+                    }
+                    else if (Form(request, "auctionType") == "hour")
+                    {
+                        // $_SESSION['pauseAuction'] = time() + 10
+                        HttpContext.Session.SetString("pauseAuction",
+                            ((long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds + 10)
+                            .ToString(CultureInfo.InvariantCulture));
+                        string itemId = Form(request, "itemId") ?? "";
+                        string[] sl = itemId.Split('_');
+                        long sl2; long.TryParse(sl.Length > 2 ? sl[2] : "", out sl2);
+                        string credits = Form(request, "credits") ?? "";
+                        bool badBid = IsNegativeOrNonReal(credits);
+                        if (sl2 > 100 && sl2 < 200)
+                        {
+                            if (badBid) { logMessage = "Bid can only contain real bids"; logType = "error"; }
+                            else
+                            {
+                                var auc = new Auction();
+                                var arg = auc.NextCloseTimeDay();
+                                int hour = GetInt(arg, "hour"), min = GetInt(arg, "min"), sec = GetInt(arg, "sec");
+                                if (hour == 0 && min == 0 && sec < 10)
+                                { logMessage = "I am sorry the auction is disabled for the first 10 seconds."; logType = "error"; }
+                                else if (hour == 23 && min == 59 && sec > 50)
+                                { logMessage = "I am sorry the auction is disabled for the last 10 seconds."; logType = "error"; }
+                                else
+                                {
+                                    auc.SetId(uid, pid);
+                                    var re = auc.SetDayBid(FormDict(request, "itemId", "credits", "auctionType"));
+                                    logMessage = GetOr(re, "log_message"); logType = GetOr(re, "type");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (badBid) { logMessage = "Bid can only contain real bids"; logType = "error"; }
+                            else
+                            {
+                                var auc = new Auction();
+                                auc.SetId(uid, pid);
+                                var re = auc.SetHourBid(FormDict(request, "itemId", "credits", "auctionType"));
+                                logMessage = GetOr(re, "log_message"); logType = GetOr(re, "type");
+                            }
+                        }
+                    }
+                }
+                Shell("internalAuction_Body", "/css/cdn/internalAuction.css",
+                      logMessage: logMessage, logType: logType);
+                return;
+            }
+
+            // else: письмо подтверждения e-mail + редирект (как в PHP, включая '.net'-quirk ссылки)
+            var enc = new Encryption(AppConfig.Get("EncryptionKey", ""));
+            string jos = "{\"userid\":" + uid.ToString(CultureInfo.InvariantCulture)
+                         + ",\"email\":\"" + Str(users, "Email") + "\"}";
+            string verificationcaode = Uri.EscapeDataString(enc.Encrypt(jos));
+            UnityMailer.MailSystem(
+                new Dictionary<string, string> {
+                    { "mailfrom", "no-reply@DarkSpace.net" },
+                    { "template", "confirmemail" },
+                    { "subject", "Dark Space Email Confirmation" } },
+                new Dictionary<string, string> {
+                    { "username", Str(users, "Name") },
+                    { "link", "http://127.0.0.1.net/emailconfirmation/?s=" + verificationcaode },
+                    { "reasonforemail", "Email Verification" },
+                    { "author", "Best Regards <br /> Dark Space Staff Team" },
+                    { "year", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture) } },
+                new List<string> { Str(users, "Email") });
+            _ended = true;
+            PendingRedirect = AppConfig.Server + "/emailconfirmation/?calmdown=21";
+        }
+
+        /// <summary>PHP: $credits &lt; 0 || strpos('-') !== FALSE || strpos('.') !== FALSE</summary>
+        private static bool IsNegativeOrNonReal(string credits)
+        {
+            double d;
+            bool numeric = double.TryParse(credits, NumberStyles.Any, CultureInfo.InvariantCulture, out d);
+            if (numeric && d < 0) return true;
+            return credits.Contains("-") || credits.Contains(".");
+        }
+
+        /// <summary>indexInternal.es.php строки 572–717: все tpl-подветки Dock используют один css.</summary>
+        private void HandleInternalDock(string tpl)
+        {
+            const string css = "/css/cdn/internalDock.css";
+            switch (tpl)
+            {
+                case "internalDockEquipment": Shell("internalDockEquipment_Body", css); return;
+                case "internalDockShips": Shell("internalDockShips_Body", css); return;
+                case "internalDockLaser": Shell("internalDockLaser_Body", css); return;      // дубль ветки 668–678 недостижим
+                case "internalDockPetProtocols": Shell("internalDockPetProtocols_Body", css); return;
+                case "internalDockAmmo": Shell("internalDockAmmo_Body", css); return;
+                case "internalDockBooster": Shell("internalDockBooster_Body", css); return;
+                case "internalDockDrones": Shell("internalDockDrones_Body", css); return;
+                case "internalDockGenerator": Shell("internalDockGenerator_Body", css); return;
+                case "internalDockShipModel": Shell("internalDockShipModel_Body", css); return;
+                case "internalDockPetGear": Shell("internalDockPetGear_Body", css); return;
+                case "internalDockSpecials": Shell("internalDockSpecials_Body", css); return; // в оригинале ads.php после specials пропущен
+                default: Shell("internalDock_Body", css); return;                              // else-ветка без ads.php
+            }
+        }
+
+        /// <summary>indexInternal.es.php строки 718–726 (action=internalMapRevolution).</summary>
+        private void HandleInternalMapRevolution(Users users)
+        {
+            long uid = PlayerLog.ToLong(users.DataRow["ID"]);
+            long pid = PlayerLog.ToLong(users.DataRow["playerID"]);
+            var unity = new Unity();
+            unity.SetId(uid, pid);
+            if (PlayerLog.ToLong(unity.Everisign(uid)) == 1)
+            {
+                // partial <html><head><body> + jquery + screen.js, sleep(2), then the map template
+                Write("<html> <head> <body><script src=\"http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js\"></script>"
+                      + "   <script type=\"text/javascript\" src=\"js/screen.js\"></script>");
+                System.Threading.Thread.Sleep(2000); // PHP sleep(2)
+                Write(PhpTemplateRenderer.RenderBody(users, "internalMapRevolution", null));
+            }
+            else
+            {
+                var enc = new Encryption(AppConfig.Get("EncryptionKey", ""));
+                string jos = "{\"userid\":" + uid.ToString(CultureInfo.InvariantCulture)
+                             + ",\"email\":\"" + Str(users, "Email") + "\"}";
+                string verificationcaode = Uri.EscapeDataString(enc.Encrypt(jos));
+                UnityMailer.MailSystem(
+                    new Dictionary<string, string> {
+                        { "mailfrom", "no-reply@DarkSpace.net" },
+                        { "template", "confirmemail" },
+                        { "subject", "Dark Space Email Confirmation" } },
+                    new Dictionary<string, string> {
+                        { "username", Str(users, "Name") },
+                        { "link", "http://127.0.0.1/emailconfirmation/?s=" + verificationcaode },
+                        { "reasonforemail", "Email Verification" },
+                        { "author", "Best Regards <br /> Dark Space Staff Team" },
+                        { "year", DateTime.Now.Year.ToString(CultureInfo.InvariantCulture) } },
+                    new List<string> { Str(users, "Email") });
+                _ended = true;
+                PendingRedirect = AppConfig.Server + "/emailconfirmation/?calmdown=21";
+            }
+        }
+
+        // -------------------------------------------------- shell / plumbing
+
+        /// <summary>require-цепочка GLOBALS + Body + ads.php (B2) — тонкая обёртка над PhpTemplateRenderer.</summary>
+        private void Shell(string bodyTemplate, string cssHref,
+                           IDictionary<string, string> vars = null,
+                           string logMessage = null, string logType = null)
+        {
+            Write(PhpTemplateRenderer.RenderShell(_users, bodyTemplate, cssHref, vars, logMessage, logType));
+        }
+
+        /// <summary>header('Location: /indexInternal.es.php?action=X') в терминах порта.</summary>
+        private void RedirectInternal(string action)
+        {
+            _ended = true;
+            PendingRedirect = "/Internal?action=" + Uri.EscapeDataString(action);
+        }
+
+        private Users _users; // для Shell(): DataRow текущего пользователя
+
+        private static string Query(HttpRequest r, string key) { return r.Query[key]; }
+
+        private static string Form(HttpRequest r, string key)
+        {
+            if (!r.HasFormContentType) return null;
+            StringValues v;
+            return r.Form.TryGetValue(key, out v) ? v.ToString() : null;
+        }
+
+        private static string FirstNonEmpty(params string[] xs)
+        {
+            foreach (var x in xs) if (!string.IsNullOrEmpty(x)) return x;
+            return null;
+        }
+
+        private static Dictionary<string, string> FormDict(HttpRequest r, params string[] keys)
+        {
+            var d = new Dictionary<string, string>();
+            foreach (var k in keys) { var v = Form(r, k); if (v != null) d[k] = v; }
+            return d;
+        }
+
+        private static string GetOr(IDictionary<string, string> d, string k)
+        {
+            string v; return d != null && d.TryGetValue(k, out v) ? v : null;
+        }
+
+        private static int GetInt(IDictionary<string, int> d, string k)
+        {
+            int v; return d != null && d.TryGetValue(k, out v) ? v : 0;
+        }
+
+        private static string Str(Users users, string col)
+        {
+            if (users == null || users.DataRow == null) return "";
+            object o;
+            return users.DataRow.TryGetValue(col, out o) ? Convert.ToString(o, CultureInfo.InvariantCulture) ?? "" : "";
+        }
+
 
         /// <summary>Цель редиректа, выставленная вместо Response.Redirect(url, true).</summary>
         public string PendingRedirect { get; private set; }

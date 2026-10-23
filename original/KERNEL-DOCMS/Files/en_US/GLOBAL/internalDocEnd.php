@@ -61,7 +61,7 @@
     <script type="text/javascript" src="/resources/js/feedBackForm.js?__cv=d4794cdb842f3dc3bb69e66be59f2900"></script>
     <script type="text/javascript" src="/resources/js/main.js?__cv=e3bb7837d40d29d16b88bf1a5ab3b000"></script>
   <script language="javascript">
-      var dosid="<?php echo( $rnd_sid =base64_encode( rand(10000,100000000)));?>";
+      var dosid="{{RND_SID}}";
 	  Main.Initialize('1', 'dosid='+dosid);
         showFedbackFormFlag = ''; //use in functions.js to switch on the feedbackForm
     </script>
@@ -325,7 +325,7 @@ xajax_loadClanInfo = function() { return xajax.request( { xjxfun: 'loadClanInfo'
 /* ]]> */
 </script>
 
-<!-- EventStream ServerAdapter getJavascriptPageTag --><script language="javascript">window.BpEventStream=window.BpEventStream||{"time":new Date().getTime(),"context":{"pid":1,"uid":<?php echo $Users->DataRow['playerID']; ?>,"tid":"1ff249faeee6df5e994ed35b645c390a","iid":"736100b3897155909bef52031131b396","sid":dosid,"ctime":<?php echo time(); ?>}};</script><script language="javascript" src="//<?php echo DynHost; ?>/eventstream/eventstream.js?ts=4688594"></script>
+<!-- EventStream ServerAdapter getJavascriptPageTag --><script language="javascript">window.BpEventStream=window.BpEventStream||{"time":new Date().getTime(),"context":{"pid":1,"uid":{{PLAYERID}},"tid":"1ff249faeee6df5e994ed35b645c390a","iid":"736100b3897155909bef52031131b396","sid":dosid,"ctime":{{TIME}}}};</script><script language="javascript" src="//{{DYNHOST}}/eventstream/eventstream.js?ts=4688594"></script>
 
     <script src="/js/function.js?__cv=e7f24de8b700c88712d84ca5b2c25500" type="text/javascript"></script>
     <script src="/js/base.js?__cv=f1646ae7c48eb2db2d2f8e30321ce300" type="text/javascript"></script>
@@ -415,6 +415,6 @@ xajax_loadClanInfo = function() { return xajax.request( { xjxfun: 'loadClanInfo'
  height: 100%; /* Высота страницы */    /* Параметры фона */ 
  background-size: cover; /* Фон занимает всю доступную площадь */ 
     
-background-image: url(do_img/global/bg_standard_<?php echo ($Users->DataRow['factionId'] === '1') ? 'mmo' : (($Users->DataRow['factionId'] === '2') ? 'eic' : 'vru'); ?>.jpg) ;
+background-image: url(do_img/global/bg_standard_{{FACTIONNAME}}.jpg) ;
 }
 </style>

@@ -1,15 +1,5 @@
-<?php
-$rank = $base->GetRank($Users->DataRow['ID'], $Users->DataRow['playerID']);
-
-
-
- ?>
-
-
-
-
     <script language="javascript">
-    var SID='dosid=<?php echo $_SESSION['server1']['user']['sessionId'];?>';
+    var SID='dosid={{SESSIONID}}';
     var rid = '612978f44ea799efd1ee2374445cdae4';
     var errorMsg = 'Please turn off your pop-up blocker!';
     var windowSpacemap = null;
