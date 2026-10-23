@@ -14,4 +14,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
+  <!-- Legacy templates are loaded via AppEnvironment.MapPath (AppDomain.BaseDirectory),
+       i.e. from the output folder, not WebRootPath — copy them next to the assembly. -->
+  <ItemGroup>
+    <Content Include="wwwroot\templates\**\*.*" CopyToOutputDirectory="PreserveNewest" LinkBase="templates-copy" Visible="false" />
+    <None Include="wwwroot\templates\**\*.*" CopyToOutputDirectory="PreserveNewest" LinkBase="" />
+  </ItemGroup>
+
 </Project>

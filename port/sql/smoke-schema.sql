@@ -451,9 +451,13 @@ CREATE TABLE IF NOT EXISTS npc_kills (
 -- POST /indexInternal.es.php (login) и затем делает
 -- UPDATE users SET sessionId='<реальный sid>' WHERE ID=1;
 -- ------------------------------------------------------------
+-- pwHash = AES-128-ECB(key '5eqD0fpzf9JzaKWP', zero-padded) of login password
+-- 'smokepass1' with a random 16-byte IV prefix, base64 — same wire format as
+-- Encryption.php / Index.cshtml.cs DoLogin. Login for smoke tests:
+--   POST / with loginForm_default_username=SmokePilot, loginForm_default_password=smokepass1
 INSERT INTO users (ID, Email, Name, pwHash, Servers, sessionId, regDate, verified)
-VALUES (1, 'smoke@test.local', 'SmokePilot', '', '1', 'smoke-session-0001', UNIX_TIMESTAMP(), 1)
-ON DUPLICATE KEY UPDATE sessionId='smoke-session-0001';
+VALUES (1, 'smoke@test.local', 'SmokePilot', 'muEyJ/N+li8H80+PVlikTHh3w5mJnQ04tAVkGznYqSE=', '1', NULL, UNIX_TIMESTAMP(), 1)
+ON DUPLICATE KEY UPDATE pwHash='muEyJ/N+li8H80+PVlikTHh3w5mJnQ04tAVkGznYqSE=';
 
 INSERT INTO server_1_players (playerID, userID, uri, credits, honor, level, exp, rank, factionId, mapId, x, y, shipId, GGspins, dbonus, health, clanId)
 VALUES (1, 1, 500000, 1000000, 50000, 5, 0, 1, 1, 1, 0, 0, 1, 3, 0, 1000, 0)

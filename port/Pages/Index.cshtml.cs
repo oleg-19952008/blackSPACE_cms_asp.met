@@ -189,7 +189,7 @@ namespace DarkSpace.Pages
                             upd.ExecuteNonQuery();
                         }
 
-                        SessionManager.SetLogin(session, sessionId, row.ToStr("Email"),
+                        SessionManager.SetLogin(session, sessionId, row.ToStr("Name"),
                             row.ToInt64("verified") != 0);
 
                         // DB::pmc($row['ID'], "User logged in from ip: ...", "logins")
