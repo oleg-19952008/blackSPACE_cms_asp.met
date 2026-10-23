@@ -85,6 +85,16 @@ namespace DarkSpace
             ctx["DYNHOST"] = AppConfig.DynHost;
             ctx["SERVER"] = AppConfig.Server;
             ctx["HOST"] = AppConfig.Host;
+            // Phase C: positionальные require GLOBALS внутри Body-шаблонов переносятся в
+            // токены {{HELP_NEWS_INCLUDE}} / {{HEADER_INTERN_INCLUDE}} / {{CREDITS_INCLUDE}}.
+            // По умолчанию задаются здесь, чтобы любой Shell()-рендер был полным; ветки с
+            // собственными PHP-преамбулами (internalStart/PilotSheet) перезаписывают их своими vars.
+            if (vars == null || !vars.ContainsKey("HELP_NEWS_INCLUDE"))
+                ctx["HELP_NEWS_INCLUDE"] = FillFragment("internalHelpLayer", ctx) + FillFragment("internalNews", ctx);
+            if (vars == null || !vars.ContainsKey("HEADER_INTERN_INCLUDE"))
+                ctx["HEADER_INTERN_INCLUDE"] = FillFragment("internalHeaderIntern", ctx);
+            if (vars == null || !vars.ContainsKey("CREDITS_INCLUDE"))
+                ctx["CREDITS_INCLUDE"] = FillFragment("credits", ctx);
             if (vars != null) foreach (var kv in vars) ctx[kv.Key] = kv.Value ?? "";
             if (logMessage != null) { ctx["LOG_MESSAGE"] = logMessage; ctx["LOG_TYPE"] = logType ?? ""; }
 
@@ -136,6 +146,13 @@ namespace DarkSpace
             string raw = LoadRaw(GlobalsRoot, Path.GetFileNameWithoutExtension(fileName));
             if (raw == null) return; // отсутствие фрагмента = пустой require (warning-free parity)
             sb.Append(Fill(raw, ctx));
+        }
+
+        /// <summary>Fill GLOBALS-фрагмента теми же vars, что и Body-шаблон (phase C includes).</summary>
+        public static string FillFragment(string name, IDictionary<string, string> vars)
+        {
+            string raw = LoadRaw(GlobalsRoot, name);
+            return raw == null ? "" : Fill(raw, vars);
         }
 
         public static string LoadRaw(string root, string safeName)
