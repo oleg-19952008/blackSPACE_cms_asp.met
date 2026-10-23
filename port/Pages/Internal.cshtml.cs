@@ -129,10 +129,10 @@ namespace DarkSpace.Pages
                     Shell("internalGalaxyGates_Body", "/css/cdn/internalGalaxyGates.css");
                     return;
                 case "internalJPA":
-                    Shell("internalJPA_Body", "/css/cdn/internalGalaxyGates.css");
+                    HandleJpaVars(users);   // фаза C: mysqli-преамбула internalJPA_Body.php
                     return;
                 case "internalJPA-list":
-                    Shell("internalJPA-list_Body", "/css/cdn/internalGalaxyGates.css");
+                    HandleJpaListVars();    // фаза C: SELECT * FROM jpa из internalJPA-list_Body.php
                     return;
                 case "internalPayment":
                     Shell("internalPayment_Body", "/css/cdn/internalPayment.css");
@@ -214,7 +214,7 @@ namespace DarkSpace.Pages
             }
             if (action == "internalClanList")
             {
-                Shell("internalClanList_Body", "/css/cdn/internalClan.css");
+                HandleClanListVars(users, request);   // фаза C: PHP-преамбула internalClanList_Body.php
                 return;
             }
 
@@ -273,12 +273,14 @@ namespace DarkSpace.Pages
             }
             if (action == "externalLogout")
             {
-                Shell("externalLogout_Body", "/css/cdn/logout.css");
+                // session_destroy() из преамбулы externalLogout_Body.php — полная очистка сессии
+                HttpContext.Session.Clear();
+                Write("<html>\n<script type=\"text/javascript\">\nwindow.location.href = \"http://127.0.0.1/\";\nalert(\"Вы Вышли из игры !\");</script>\n</html>");
                 return;
             }
             if (action == "internalHistory")
             {
-                Shell("internalHistory_Body", "/css/cdn/internalHistory.css");
+                HandleHistoryVars(users);   // фаза C: $log->setId + getLog из преамбулы шаблона
                 return;
             }
             if (action == "internalPaymentPartnerPromotion")
@@ -650,6 +652,189 @@ namespace DarkSpace.Pages
                            string logMessage = null, string logType = null)
         {
             Write(PhpTemplateRenderer.RenderShell(_users, bodyTemplate, cssHref, vars, logMessage, logType));
+        }
+
+        /// <summary>
+        /// C2: порт PHP-преамбулы internalClanList_Body.php (строки 1–15 шаблона):
+        /// setId/getClans/getRange/getCurrentPage/getTotalOfResults/getTotalOfPages + cust_sort,
+        /// плюс echo-блок строк списка кланов.
+        /// </summary>
+        private void HandleClanListVars(Users users, HttpRequest request)
+        {
+            var clan = new Clan();
+            clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+            var clans = clan.GetClans(null, "?action=internalClanList&tpl=internalClanList");
+            int range = clan.GetRange();
+            int cuPage = clan.GetCurrentPage();
+            int total = clan.GetTotalOfResults();
+            int tPage = (int)clan.GetTotalOfPages();
+
+            // if (isset($_GET['sort'])) usort($clans, 'cust_sort') — strtolower-компаратор оригинала
+            string sort = request.Query["sort"];
+            if (!string.IsNullOrEmpty(sort))
+            {
+                clans = clans.OrderBy(c =>
+                {
+                    string v; return c.TryGetValue(sort, out v) ? (v ?? "").ToLowerInvariant() : "";
+                }).ToList();
+            }
+
+            // for ($i = $start; $i < $end; $i++) из шаблона
+            int start, end;
+            if (total != 0)
+            {
+                if (cuPage == 1)
+                {
+                    start = 0;
+                    end = total < range ? total : range;
+                }
+                else
+                {
+                    start = (cuPage - 1) * range;
+                    end = cuPage != tPage ? cuPage * range : total;
+                }
+            }
+            else { start = 0; end = 0; }
+
+            var sb = new StringBuilder();
+            for (int i = start; i < end && i < clans.Count; i++)
+            {
+                var c = clans[i];
+                string Get(string k) { string v; return c.TryGetValue(k, out v) ? (v ?? "") : ""; }
+                // $re/$ro в оригинале вычисляются, но в echo не попадают — опущены как dead code.
+                // strpos($clans[$i]['members'],'|') / $aff — тоже вычисляются и не используются в echo.
+                sb.Append("<tr>\n")
+                  .Append("        <td><a href=\"javascript:void(0);\" onclick=\"getClaninfo(11033)\">[")
+                  .Append(HtmlEncode(Get("tagName"))).Append("]</a></td>\n")
+                  .Append("        <td><a href=\"javascript:void(0);\" onclick=\"getClaninfo(11033)\">")
+                  .Append(HtmlEncode(Get("clanName"))).Append("</a></td>\n")
+                  .Append("      </tr>");
+            }
+            if (total == 0)
+                sb.Append("<tr>\n        <td><a href=\"javascript:void(0);\" onclick=\"getClaninfo(11033)\"></a></td>\n        <td><a href=\"javascript:void(0);\" onclick=\"getClaninfo(11033)\">There are no clans on the list</a></td>\n      </tr>");
+
+            Shell("internalClanList_Body", "/css/cdn/internalClan.css", new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "PAGINATE", clan.Paginate("clanlist_navi") },   // <?php echo $clan->paginate('clanlist_navi'); ?>
+                { "CLAN_ROWS", sb.ToString() },
+            });
+        }
+
+        /// <summary>C2: порт преамбулы internalHistory_Body.php ($log->setId + $log->getLog + foreach).</summary>
+        private void HandleHistoryVars(Users users)
+        {
+            var log = new PlayerLog();
+            log.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+            var history = log.GetLog();
+            var sb = new StringBuilder();
+            foreach (var v in history)
+            {
+                // echo '<tr>...$v['addDate']...trenner.gif...$v['descrip']...</tr><tr>...trennerw...</tr>'
+                sb.Append("<tr>\n")
+                  .Append("                        <td>").Append(v.ContainsKey("addDate") ? v["addDate"] : "").Append("</td>\n")
+                  .Append("                        <td style=\"background-image:url(./do_img/global/payment/trenner.gif)\"><img src=\"./do_img/global/s.gif\" width=\"2\" height=\"2\"></td>\n")
+                  .Append("                        <td>").Append(v.ContainsKey("descrip") ? v["descrip"] : "").Append("</td>\n")
+                  .Append("                    </tr>\n")
+                  .Append("                    <tr>\n")
+                  .Append("                        <td colspan=\"3\"><img src=\"./do_img/global/payment/trennerw.gif\" width=\"446\" height=\"2\"></td>\n")
+                  .Append("                    </tr>");
+            }
+            Shell("internalHistory_Body", "/css/cdn/internalHistory.css", new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "HISTORY_ROWS", sb.ToString() },
+            });
+        }
+
+        /// <summary>
+        /// C2: порт mysqli-преамбулы internalJPA_Body.php (строки 141–191): jackpot-баланс
+        /// и условные поля формы по id/war из таблицы jpa. Запросы параметризованы вместо
+        /// интерполяции '$pid' (иначе SQL-injection паритетом с оригиналом).
+        /// </summary>
+        private void HandleJpaVars(Users users)
+        {
+            long pid = PlayerLog.ToLong(users.DataRow["playerID"]);
+            double jackpot = 0; bool hasJackpotRow = false;
+            long uid = 0, uidw = 0;
+            using (var con = DB.GetInstance())
+            {
+                using (var cmd = new MySqlCommand("SELECT `jackpot` FROM `server_1_players` WHERE `userID` = @pid", con))
+                {
+                    cmd.Parameters.AddWithValue("@pid", pid);
+                    using (var rd = cmd.ExecuteReader())
+                        while (rd.Read()) { hasJackpotRow = true; jackpot = Convert.ToDouble(rd[0]); }
+                }
+                FirstCell(con, "SELECT `id` FROM `jpa` WHERE `user_id` = @pid", pid, v => uid = PlayerLog.ToLong(v));
+                FirstCell(con, "SELECT `war` FROM `jpa` WHERE `user_id` = @pid", pid, v => uidw = PlayerLog.ToLong(v));
+            }
+
+            var bal = new StringBuilder();
+            if (hasJackpotRow)
+            {
+                bal.Append("У вас: ").Append(jackpot.ToString(CultureInfo.InvariantCulture)).Append(" EUR <br>");
+                bal.Append("Для участия необходимо 2000.00 EUR <br><br>");
+                if (jackpot < 2000.00)
+                    bal.Append("<span class='red'>Для участия не хватает: ")
+                       .Append((2000.00 - jackpot).ToString(CultureInfo.InvariantCulture)).Append(" EUR</span>");
+                else
+                    bal.Append("<span class='green'>Вы можете принять участие!</span>\n                                                        ");
+            }
+
+            string formFields = uid != 0
+                ? "<input type=\"text\" name=\"clanName\" value=\"\" maxlength=\"50\" title=\"Ваш уникальный ID: " + uid + "\" disabled=\"\"/><br/>\n"
+                  + "                                                <input type=\"text\" name=\"clanTag\" value=\"\" maxlength=\"7\" title=\"Ваш соперник: ID " + uidw + "\" disabled=\"\"/><br/>"
+                : "<input type=\"text\" name=\"clanName\" value=\"\" maxlength=\"50\" title=\"Вы не зарегистрированы\" disabled=\"\"/><br/>\n"
+                  + "                                                <input type=\"text\" name=\"clanTag\" value=\"\" maxlength=\"7\" title=\"Вы не зарегистрированы\" disabled=\"\"/><br/>";
+
+            Shell("internalJPA_Body", "/css/cdn/internalGalaxyGates.css", new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "JPA_BALANCE", bal.ToString() },
+                { "JPA_FORM_FIELDS", formFields },
+            });
+        }
+
+        /// <summary>C2: порт mysqli-блока internalJPA-list_Body.php (SELECT * FROM jpa → &lt;li&gt;-элементы).</summary>
+        private void HandleJpaListVars()
+        {
+            var sb = new StringBuilder();
+            using (var con = DB.GetInstance())
+            {
+                using (var cmd = new MySqlCommand("SELECT * FROM `jpa`", con))
+                using (var rd = cmd.ExecuteReader())
+                {
+                    var cols = Enumerable.Range(0, rd.FieldCount).Select(rd.GetName).ToArray();
+                    while (rd.Read())
+                    {
+                        string Cell(string name)
+                        {
+                            int ix = Array.IndexOf(cols, name);
+                            return ix < 0 || rd.IsDBNull(ix) ? "" : Convert.ToString(rd.GetValue(ix), CultureInfo.InvariantCulture);
+                        }
+                        sb.Append("<li class=\"clan_item\">\n")
+                          .Append("                                                    <span class=\"clanname\">").Append(Cell("id")).Append("</span>\n")
+                          .Append("                                                    <span class=\"ranking\"></span>\n")
+                          .Append("                                                    <span class=\"members\">").Append(Cell("war")).Append("</span>\n")
+                          .Append("                                                    <span class=\"ranking\"></span>\n")
+                          .Append("                                                    <span class=\"affiliation\">").Append(Cell("time")).Append("</span>\n")
+                          .Append("                                                    <span class=\"status \"></span>\n")
+                          .Append("                                                </li>");
+                    }
+                }
+            }
+            Shell("internalJPA-list_Body", "/css/cdn/internalGalaxyGates.css", new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "JPA_LIST_ITEMS", sb.ToString() },
+            });
+        }
+
+        /// <summary>fetch_assoc()['col'] — первая строка/колонка или null (PHP warning-паритет: 0).</summary>
+        private static void FirstCell(MySqlConnection con, string sql, long pid, Action<string> assign)
+        {
+            using (var cmd = new MySqlCommand(sql, con))
+            {
+                cmd.Parameters.AddWithValue("@pid", pid);
+                object o = cmd.ExecuteScalar();
+                if (o != null && o != DBNull.Value) assign(Convert.ToString(o, CultureInfo.InvariantCulture));
+            }
         }
 
         /// <summary>
