@@ -13,12 +13,19 @@
 - 🔶 — портировано частично / требует доделки
 
 Отправная точка (обновлено 2026-10-23, проверено по факту в репозитории):
-- Диспетчер `Pages/Internal.cshtml.cs` (~600 строк): портированы B1-бутстрап и 7 из ~44 action
-  (internalCompanyChoose+factionChoose, internalSkylab со всеми subaction, Start/Gates/JPA/Payment —
-  render-заглушки, internalHallofFame с реальной логикой Rank); остальные ветки — заглушки;
-- ✅ созданы и заполнены `Models/Clan.cs` (865), `Skylab.cs` (1325), `Inventory.cs` (2165),
+- Диспетчер `Pages/Internal.cshtml.cs` (**1136 строк**): переведены с заглушек на реальную логику +
+  единый рендер через `PhpTemplateRenderer.RenderShell` **все ~45 ветвей action** оригинала
+  (`internalStart…internalDock*`, Clan-группа c подветками Administrate/ChangeFirm/Diplomacy/Member,
+  Skylab/Board/NanoTechFactory, Auction, Balance/Evoucher, Messaging/PilotSheet/UserDataChange/
+  ItemUpgradeSystem, External/History/Promo, Dock + MapRevolution/burnme; `internalHandelClosed` —
+  корректно помечен мёртвым и не рендерится); в файле осталось 2 TODO — оба фаза C
+  (шаблоны CompanyChoose_Body, internalSkylab_Body);
+- ✅ B2 выполнена: `Services/PhpTemplateRenderer.cs` (163 стр.) — `RenderShell`/`RenderBody`;
+  GLOBALS-фрагменты перенесены в `templates/legacy/en_US/GLOBAL/` (ads, headerEndJS, internalDoc,
+  internalDocEnd, internalHeader, internalMenu, sajax, xajax — 8 файлов); ad-hoc `RenderInternalPage` удалён;
+- ✅ созданы и заполнены `Models/Clan.cs` (870), `Skylab.cs` (1325), `Inventory.cs` (2165),
   `Shop.cs` (736), `Rank.cs` (685) + `RankPager.cs` (154), `GalaxyGate.cs` (668), `Ships.cs` (54);
-- ✅ A7.3: xajax/sajax хендлеры — `Services/XajaxResponse.cs` (72) + `Services/AjaxHandlers.cs` (363),
+- ✅ A7.3: xajax/sajax хендлеры — `Services/XajaxResponse.cs` (72) + `Services/AjaxHandlers.cs` (385),
   зарегистрированы в Program.cs (`POST /xajaxAPI.php`, `/Ajax/xajax`, `/sajaxAPI.php`, `/Ajax/sajax`);
 - портированы также: Core, DB, Encryption, SessionManager, Users, AppConfig, TemplateManager,
   Unity(685), Auction(642), Factory(545), Base(515), DailyBonus, Voucher, Hangar, Signup, News,
@@ -31,7 +38,7 @@
 Диспетчер `indexInternal.es.php` вызывает эти классы напрямую; без них ветки
 `action` не собрать. Большие классы режем по связным группам методов.
 
-### A1. `Class.clan.php` (757 стр.) → `Models/Clan.cs` (865 стр.) — ✅ (остатки сверить)
+### A1. `Class.clan.php` (757 стр.) → `Models/Clan.cs` (870 стр.) — ✅ (остатки сверить)
 | Кусок | Методы (строки оригинала) | Статус |
 |---|---|---|
 | A1.1 Каркас + деньги/поиск | `__construct`, `setId`, `money`, `getUser`, `clanVoid`, `getClans`, `getMyClan`, `GetClanLeader`, `getClanName`, `getClanTag`, `getType` | ✅ |
@@ -84,7 +91,7 @@ A6.1 каркас/гейты, A6.2 спиннер/мультипликаторы
 
 ---
 
-## Фаза B — Диспетчер internal 🔶 (~25%: 7 из ~44 action)
+## Фаза B — Диспетчер internal 🔶 (~85% кода: все ~45 ветвей action реализованы; приёмка веток ждёт шаблоны C)
 
 Порт `indexInternal.es.php` (732 стр.) живёт в `Pages/Internal.cshtml(.cs)`.
 Зависит от фазы A (минимум A1, A2; остальное — по мере подключения веток).
@@ -98,21 +105,22 @@ A6.1 каркас/гейты, A6.2 спиннер/мультипликаторы
 ### B2. Механизм рендеринга оболочки — ✅
 PHP повторяет один и тот же набор require на каждой ветке:
 `internalDoc.php → internalDocEnd.php → sajax.php → xajax.php → headerEndJS.php → internalMenu.php → internalHeader.php → <Body-шаблон> → ads.php`.
-В C# — единый `RenderShell(string bodyTemplate, IDictionary<string,string> vars)` в
-`TemplateManager`/новом `PhpTemplateRenderer.cs`: парсинг HTML-оболочки + токен-подстановка тела.
-Сейчас вместо него — ad-hoc `RenderInternalPage(...)` с legacy-заготовками в `wwwroot` (3 TODO).
-Порт шаблонных GLOBALS-фрагментов (`internalDoc*`, `internalMenu`, `internalHeader`,
-`sajax/xajax`, итого ~1100 стр., см. `Files/en_US/GLOBAL/`) — внутри этого куска, по одному файлу за коммит.
-(xajax/sajax серверная часть уже готова — A7.3; клиентские bootstrap-скрипты подключаются здесь.)
+В C# — единый `PhpTemplateRenderer.RenderShell(users, bodyTemplate, cssHref, vars, logMessage, logType)`
+(`Services/PhpTemplateRenderer.cs`, 163 стр.): парсинг HTML-оболочки + токен-подстановка тела;
+все ветки B3–B10 вызывают его через общий helper в `Internal.cshtml.cs`.
+Ad-hoc `RenderInternalPage(...)` с legacy-заготовками в `wwwroot` удалён.
+Порт шаблонных GLOBALS-фрагментов выполнен: `templates/legacy/en_US/GLOBAL/` — ads, headerEndJS,
+internalDoc, internalDocEnd, internalHeader, internalMenu, sajax, xajax (8 файлов).
+(xajax/sajax серверная часть — A7.3; клиентские bootstrap-скрипты подключаются здесь же.)
 
 ### B3–B10. Ветки `action` — по группе связанных экшенов
 | Кусок | Экшены (строки оригинала) | Зависимости | Статус |
 |---|---|---|---|
-| B3 Start/Gates/JPA/Payment/HoF | `internalStart` (66–77), `internalGalaxyGates` (78–89, 116–126), `internalJPA`, `internalJPA-list` (90–115), `internalPayment` (127–137), `internalHallofFame`+view (138–160) | Rank ✅, GalaxyGate ✅ | 🔶 HallofFame — реальная логика; Start/Gates/JPA/Payment — render-заглушки (ждут C1/C-шаблоны) |
+| B3 Start/Gates/JPA/Payment/HoF | `internalStart` (66–77), `internalGalaxyGates` (78–89, 116–126), `internalJPA`, `internalJPA-list` (90–115), `internalPayment` (127–137), `internalHallofFame`+view (138–160) | Rank ✅, GalaxyGate ✅ | 🔶 все ветки через RenderShell + логика; Body-шаблоны ждут C1/C6 |
 | B4 Balance/Evoucher | `internalBalance` (161–171), `internalEvoucher` (172–188) | Voucher ✅ | 🔶 логика есть, ждёт C-шаблоны |
-| B5 Clan-группа | `internalNewClanDetails` (189–206), `internalNewClan` (207–240), `internalClan` (241–286), `internalClanList` (287–297) | Clan ✅ | 🔶 логика есть, ждёт C-шаблоны |
+| B5 Clan-группа | `internalNewClanDetails` (189–206), `internalNewClan` (207–240), `internalClan` (241–286), `internalClanList` (287–297) + подветки Administrate/ChangeFirm/Diplomacy/Member | Clan ✅ | 🔶 логика есть, ждёт C-шаблоны |
 | B6 Messaging/PilotSheet/UserData/Upgrade | `internalMessaging` (298–308), `internalPilotSheet` (309–340), `internalUserDataChange` (341–351), `internalItemUpgradeSystem` (352–362) | Base ✅, Inventory ✅ (+ Users.changeUsername — остаток A) | 🔶 логика есть, ждёт C-шаблоны |
-| B7 Skylab/Board/NanoTechFactory | `internalSkylab`+subactions (363–391), `internalBoard`+subaction (392–406), `internalNanoTechFactory`+subactions (407–454) | Skylab ✅, Factory ✅ | 🔶 internalSkylab — реализован (без шаблона Body, C4); Board/NanoTechFactory — ⬜ (AJAX-часть NTF готова: A7.3) |
+| B7 Skylab/Board/NanoTechFactory | `internalSkylab`+subactions (363–391), `internalBoard`+subaction (392–406), `internalNanoTechFactory`+subactions (407–454) | Skylab ✅, Factory ✅ | 🔶 все три реализованы через RenderShell (Body-шаблоны — C4/C6); AJAX-часть NTF готова: A7.3 |
 | B8 External/History/Promo/Logout | `externalPassword` (455–465), `internalPaymentProxy` (466–469), `externalLogout` (470–480), `internalHistory` (481–491), `internalPaymentPartnerPromotion` (492–502) | Unity ✅ | 🔶 логика есть, ждёт C-шаблоны |
 | B9 Auction | `internalAuction` (503–571) | Auction ✅ | 🔶 логика есть, ждёт C-шаблоны |
 | B10 Dock + MapRevolution + burnme | `internalDock` (572–717, под-экшены ship/ammo/laser/drone/generator/booster/special/equipment/model), `internalMapRevolution` (718–726), `burnme` (727–732) | Shop ✅, Inventory ✅, Hangar ✅ | 🔶 логика есть, ждёт C-шаблоны |
@@ -120,14 +128,20 @@ PHP повторяет один и тот же набор require на кажд�
 ### B11. Routing и завершение — 🔶
 - Legacy URL `indexInternal.es.php?action=X` → страница `/Internal` — реализовано в `Program.cs` ✅;
 - smoke-тест всех action через HTTP-запросы на staging — 🔶 (схема `port/sql/smoke-schema.sql` + тестовый пользователь/сессия — см. ниже);
-- сборка в CI (`dotnet build port/CoreCore.csproj`) — ✅ (.NET 8 SDK, 0 ошибок; фикс Clan.GetPager: чтение формы только при `request.HasFormContentType`, хелперы `AppEnvironment.GetFormValue/GetQueryValue`).
+- сборка в CI (`dotnet build port/CoreCore.csproj`) — ✅ (.NET 8 SDK, 0 ошибок, 13 предупреждений —
+  CS0168/CS0169/CS0649/CS0414 неиспользуемые поля в Inventory/Skylab/Factory + SYSLIB0021 AesManaged
+  в Encryption; фикс Clan.GetPager: чтение формы только при `request.HasFormContentType`,
+  хелперы `AppEnvironment.GetFormValue/GetQueryValue`).
 
 ---
 
-## Фаза C — Шаблоны Body ⬜ (не начата)
+## Фаза C — Шаблоны Body ⬜ (не начата — главное узкое место на сегодня)
 
-Рендерятся диспетчером; идут за своими ветками B. Каталог `templates/INDEXINTERNAL/` в порту не создан.
-Каждый файл = один кусок (HTML+PHP-вставки → `.html`-шаблон с токенами `{...}` + кодоген в `PhpTemplateRenderer`):
+Рендерятся диспетчером через `PhpTemplateRenderer.RenderShell`; идут за своими ветками B.
+Каталог `templates/legacy/en_US/INDEXINTERNAL/` в порту не создан (есть только GLOBAL и INDEX).
+Body-рендер сейчас — заглушка «Template pending phase C» (`PhpTemplateRenderer.cs:108`); без неё ветки B3–B10 нельзя закрыть
+по критериям приёмки. Каждый файл = один кусок (HTML+PHP-вставки → `.html`-шаблон с токенами `{...}`
++ кодоген в `PhpTemplateRenderer`):
 
 | Приоритет | Шаблон (`FILES/INDEXINTERNAL/`) | Строк | Привязка |
 |---|---|---|---|
@@ -144,10 +158,14 @@ PHP повторяет один и тот же набор require на кажд�
 ## Порядок выполнения (сжатый roadmap)
 
 1. ~~A1 (Clan) → A2 (Skylab) → A3–A6~~ — выполнены (остатки: Users.change*, pretty_time, Clan remainder)
-2. ~~B1~~ + **B2 (RenderShell/PhpTemplateRenderer)** — следующий приоритет; заглушки нераскрытых action → 404 как в PHP-else
-3. B3–B10 строго по готовности их классов (все классы A уже готовы → узкое место — B2 и шаблоны C)
-4. C-шаблоны синхронно с каждой B-веткой (ветка считается готовой только с рендером)
-5. ~~A7 (xajax/sajax handlers)~~ ✅ после B7 подключить клиентские bootstrap в оболочку (B2); B11 (smoke) в конце
+2. ~~B1 + B2 (RenderShell/PhpTemplateRenderer + GLOBALS-фрагменты)~~ — ✅ выполнены
+3. ~~B3–B10 логика веток~~ — ✅ все ~45 ветвей реализованы через RenderShell; закрытие веток
+   (статус ✅) возможно только вместе с их Body-шаблонами из фазы C
+4. **C-шаблоны — текущий приоритет №1** (C1 internalStart_Body → C4 internalSkylab_Body →
+   C5 Dock → C3/C6 остальное); ветка B считается готовой только с рендером; доделать 2 TODO
+   в `Internal.cshtml.cs` (CompanyChoose_Body, internalSkylab_Body)
+5. ~~A7 (xajax/sajax handlers)~~ ✅; клиентские bootstrap в оболочке — ✅ (B2); осталось: остаток A
+   (Users.changeUsername/checkName/ChangeNow для B6, Skylab.pretty_time для C4) и B11 smoke-прогон всех action
 6. MIGRATION.md / README.md: обновлять статусы Часть 2/3 по факту merge каждого куска
 
 Критерии приёмки куска: компиляция в CI (`dotnet build port/CoreCore.csproj`) + parity-тест метода против PHP
