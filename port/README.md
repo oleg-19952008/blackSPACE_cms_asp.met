@@ -18,8 +18,8 @@
   (`internalStart…internalDock*`, Clan-группа c подветками Administrate/ChangeFirm/Diplomacy/Member,
   Skylab/Board/NanoTechFactory, Auction, Balance/Evoucher, Messaging/PilotSheet/UserDataChange/
   ItemUpgradeSystem, External/History/Promo, Dock + MapRevolution/burnme; `internalHandelClosed` —
-  корректно помечен мёртвым и не рендерится); в файле осталось 2 TODO — оба фаза C
-  (шаблоны CompanyChoose_Body, internalSkylab_Body);
+  корректно помечен мёртвым и не рендерится); в файле остался 1 TODO — фаза C
+  (шаблон internalSkylab_Body; CompanyChoose_Header/_Body перенесены — C2 ✅);
 - ✅ B2 выполнена: `Services/PhpTemplateRenderer.cs` (163 стр.) — `RenderShell`/`RenderBody`;
   GLOBALS-фрагменты перенесены в `templates/legacy/en_US/GLOBAL/` (ads, headerEndJS, internalDoc,
   internalDocEnd, internalHeader, internalMenu, sajax, xajax — 8 файлов); ad-hoc `RenderInternalPage` удалён;
@@ -147,11 +147,12 @@ internalDoc, internalDocEnd, internalHeader, internalMenu, sajax, xajax (8 фа�
 | Приоритет | Шаблон (`FILES/INDEXINTERNAL/`) | Строк | Привязка | Статус |
 |---|---|---|---|---|
 | C1 | `internalStart_Body.php` | 685 | B3 | ✅ перенесён (`internalStart_Body.html`, 439 стр., 28 токенов; + GLOBALS internalHelpLayer/internalNews/internalHeaderIntern) |
-| C2 | `CompanyChoose_Header/_Body.php` | ~200 | B1 | ⬜ |
-| C3 | `internalClan_Body.php`, `internalNewClan_Body.php`, `internalNewClanDetails_Body.php`, `internalClanList_Body.php` | ~1900 | B5 | ⬜ |
+| C2 | `CompanyChoose_Header/_Body.php` | ~200 | B1 | ✅ перенесены verbatim (`CompanyChoose_Header.html` — favicon → `{{DYNHOST}}`; `CompanyChoose_Body.html` — чистый HTML+JS, без токенов); ветка `HandleInternalCompanyChoose` рендерит Header → GLOBALS xajax+internalHeader (ctx: PLAYERID/FACTIONNAME/SESSIONID/DYNHOST) → Body → `echo '</html>'` по порядку require оригинала (стр. 59–63); smoke-заглушка удалена |
+| C2b | `externalLogout_Body.php` | 7 | B8 | ✅ verbatim-перенос; `session_destroy()` → `HttpContext.Session.Clear()` в ветке диспетчера (рендерится напрямую, без Shell — как в оригинале) |
+| C3 | `internalClan_Body.php`, `internalNewClan_Body.php`, `internalNewClanDetails_Body.php`, ~~`internalClanList_Body.php`~~ ✅ | ~1900 | B5 | 🔶 ClanList ✅ (`internalClanList_Body.html` + `HandleClanListVars`: setId/getClans/paginate('clanlist_navi')/cust_sort по `?sort=`/start-end цикл); остальные ⬜ |
 | C4 | `internalSkylab_Body.php` | 1601 | B7 (резать по таб-секциям: overview/modules/resources/upgrades; зависит от остатка A — Skylab.pretty_time) | ⬜ |
 | C5 | `internalDock_Body.php` + `internalDock{Ships,Ammo,Laser,Drones,Generator,Booster,Specials,Equipment,ShipModel,PetGear,PetProtocols}_Body.php` | ~7000 суммарно | B10, по одному файлу за коммит | ⬜ |
-| C6 | `internalAuction_Body.php`, `internalBoard.php`, ~~`internalPilotSheet_Body.php`~~ ✅, `internalMessaging_Body.php`, `internalBalance_Body.php`, `internalEvoucher_Body.php`, `internalHistory_Body.php`, `internalPayment*_Body.php`, `internalHallofFame_*` (5 файлов), `internalGalaxyGates_Body.php`, `internalJPA*_Body.php`, `internalNanoTechFactory_Body.php`, `internalClanAdministrate/ChangeFirm/Diplomacy/Member_Body.php`, `internalUserDataChange_Body.php`, `internalItemUpgradeSystem_Body.php` | 300–970 каждый | соответствующие B3–B9 | 🔶 PilotSheet ✅ (`internalPilotSheet_Body.html`, 889 стр.; `HandlePilotSheetVars` — порт преамбулы GetRank/getMyRanking/getMyClan + STATION/CLAN_NAME/MYRANKING/EMAIL; credits.php вырезан — нет в наборе GLOBALS); остальные ⬜ |
+| C6 | `internalAuction_Body.php`, `internalBoard.php`, ~~`internalPilotSheet_Body.php`~~ ✅, `internalMessaging_Body.php`, `internalBalance_Body.php`, `internalEvoucher_Body.php`, ~~`internalHistory_Body.php`~~ ✅, `internalPayment*_Body.php`, `internalHallofFame_*` (5 файлов), `internalGalaxyGates_Body.php`, ~~`internalJPA*_Body.php`~~ ✅, `internalNanoTechFactory_Body.php`, `internalClanAdministrate/ChangeFirm/Diplomacy/Member_Body.php`, `internalUserDataChange_Body.php`, `internalItemUpgradeSystem_Body.php` | 300–970 каждый | соответствующие B3–B9 | 🔶 PilotSheet ✅ (`internalPilotSheet_Body.html`, 889 стр.; `HandlePilotSheetVars` — порт преамбулы GetRank/getMyRanking/getMyClan + STATION/CLAN_NAME/MYRANKING/EMAIL; credits.php вырезан — нет в наборе GLOBALS); History ✅ (`internalHistory_Body.html` + `HandleHistoryVars`: PlayerLog.SetId/GetLog → `{{HISTORY_ROWS}}`); JPA+JPA-list ✅ (`internalJPA_Body.html`/`internalJPA-list_Body.html` + `HandleJpaVars`/`HandleJpaListVars`: mysqli jackpot/id/war-запросы параметризованы → `{{JPA_BALANCE}}`/`{{JPA_FORM_FIELDS}}`/`{{JPA_LIST_ITEMS}}`); остальные ⬜ |
 | C-исключения | `internalHandelClosed_Body.php` (6758 — закрытый раздел, не портировать), `_NE_ISPOLZUETSJA/**`, файлы с суффиксами `— копия`, `- Copy`, `_old`, `internaltest.php`, `internalMaptest.php`, `internalDockEquipment_Bod2y.php`, `internalDockLaser_Body2.php`, `internalGalaxyGates_Body1.php` | — | удалить из плана |
 
 ---

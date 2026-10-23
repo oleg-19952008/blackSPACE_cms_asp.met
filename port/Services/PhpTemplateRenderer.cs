@@ -71,6 +71,21 @@ namespace DarkSpace
                                          IDictionary<string, string> vars = null,
                                          string logMessage = null, string logType = null)
         {
+            return RenderShell(users, bodyTemplate, cssHref, beforeBody: null,
+                               vars: vars, logMessage: logMessage, logType: logType);
+        }
+
+        /// <summary>
+        /// Overload с preambulo-колбэком: выполняется ПОСЛЕ require GLOBALS (menu/header),
+        /// ПЕРЕД Body-рендером — точно в позиции positionального require/echo внутри
+        /// Body-шаблона оригинала (например internalClan_Body.php строки 1–40).
+        /// Колбэк возвращает доп. ctx-токены (могут быть null — тогда только побочный вывод).
+        /// </summary>
+        public static string RenderShell(Users users, string bodyTemplate, string cssHref,
+                                         Func<IDictionary<string, string>, IDictionary<string, string>> beforeBody,
+                                         IDictionary<string, string> vars = null,
+                                         string logMessage = null, string logType = null)
+        {
             var ctx = new Dictionary<string, string>(StringComparer.Ordinal);
             long pid = users != null && users.DataRow != null ? PlayerLog.ToLong(users.DataRow["playerID"]) : 0;
             long fid = users != null && users.DataRow != null ? PlayerLog.ToLong(users.DataRow["factionId"]) : 0;
@@ -85,6 +100,16 @@ namespace DarkSpace
             ctx["DYNHOST"] = AppConfig.DynHost;
             ctx["SERVER"] = AppConfig.Server;
             ctx["HOST"] = AppConfig.Host;
+            // Phase C: positionальные require GLOBALS внутри Body-шаблонов переносятся в
+            // токены {{HELP_NEWS_INCLUDE}} / {{HEADER_INTERN_INCLUDE}} / {{CREDITS_INCLUDE}}.
+            // По умолчанию задаются здесь, чтобы любой Shell()-рендер был полным; ветки с
+            // собственными PHP-преамбулами (internalStart/PilotSheet) перезаписывают их своими vars.
+            if (vars == null || !vars.ContainsKey("HELP_NEWS_INCLUDE"))
+                ctx["HELP_NEWS_INCLUDE"] = FillFragment("internalHelpLayer", ctx) + FillFragment("internalNews", ctx);
+            if (vars == null || !vars.ContainsKey("HEADER_INTERN_INCLUDE"))
+                ctx["HEADER_INTERN_INCLUDE"] = FillFragment("internalHeaderIntern", ctx);
+            if (vars == null || !vars.ContainsKey("CREDITS_INCLUDE"))
+                ctx["CREDITS_INCLUDE"] = FillFragment("credits", ctx);
             if (vars != null) foreach (var kv in vars) ctx[kv.Key] = kv.Value ?? "";
             if (logMessage != null) { ctx["LOG_MESSAGE"] = logMessage; ctx["LOG_TYPE"] = logType ?? ""; }
 
@@ -101,6 +126,11 @@ namespace DarkSpace
             AppendFragment(sb, "internalHeader.php", ctx);
             foreach (var frag in ExtraHeaderFragments)
                 AppendFragment(sb, frag, ctx);
+            if (beforeBody != null)
+            {
+                var extra = beforeBody(ctx);
+                if (extra != null) foreach (var kv in extra) ctx[kv.Key] = kv.Value ?? "";
+            }
             sb.Append(RenderBody(users, bodyTemplate, ctx));
             AppendFragment(sb, "ads.php", ctx);   // ads.php пустой в оригинале — no-op
             return sb.ToString();
@@ -116,6 +146,18 @@ namespace DarkSpace
                        + System.Net.WebUtility.HtmlEncode(bodyTemplate)
                        + "</h3><p>Template pending phase C (templates/INDEXINTERNAL/"
                        + System.Net.WebUtility.HtmlEncode(bodyTemplate) + ".html).</p></div>";
+            }
+            // Phase C: positionальные require GLOBALS внутри Body-шаблонов. Если ветка не
+            // задала токены явно (internalStart/PilotSheet задают своими vars), подставляем
+            // дефолты из ctx — тот же механизм, что в RenderShell.
+            if (ctx != null)
+            {
+                if (!ctx.ContainsKey("HELP_NEWS_INCLUDE"))
+                    ctx["HELP_NEWS_INCLUDE"] = FillFragment("internalHelpLayer", ctx) + FillFragment("internalNews", ctx);
+                if (!ctx.ContainsKey("HEADER_INTERN_INCLUDE"))
+                    ctx["HEADER_INTERN_INCLUDE"] = FillFragment("internalHeaderIntern", ctx);
+                if (!ctx.ContainsKey("CREDITS_INCLUDE"))
+                    ctx["CREDITS_INCLUDE"] = FillFragment("credits", ctx);
             }
             return Fill(raw, ctx);
         }
@@ -136,6 +178,107 @@ namespace DarkSpace
             string raw = LoadRaw(GlobalsRoot, Path.GetFileNameWithoutExtension(fileName));
             if (raw == null) return; // отсутствие фрагмента = пустой require (warning-free parity)
             sb.Append(Fill(raw, ctx));
+        }
+
+        /// <summary>Fill GLOBALS-фрагмента теми же vars, что и Body-шаблон (phase C includes).</summary>
+        public static string FillFragment(string name, IDictionary<string, string> vars)
+        {
+            string raw = LoadRaw(GlobalsRoot, name);
+            return raw == null ? "" : Fill(raw, vars);
+        }
+
+        /// <summary>
+        /// Потоковый рендер Body-шаблона с сохранением позиции PHP-преамбулы (фаза C):
+        /// raw читается посимвольно; блоки &lt;?php ... ?&gt; пропускаются как в исходном PHP
+        /// (их логика уже выполнена в beforeBody), а перед каждым следующим за ними HTML-сегментом
+        /// вызывается hook(seg) — он возвращает строку, которой сегмент будет заменён
+        /// (null = вывести сегмент как есть). Это даёт точную позицию for/foreach-повторов
+        /// оригинала (internalNewClan_Body и др.) без ручных токенов повторов.
+        /// Вне блоков {{TOKEN}} заполняются из ctx тем же Fill().
+        /// </summary>
+        public static string RenderStreaming(Users users, string bodyTemplate, IDictionary<string, string> ctx,
+                                             Func<string, string> hook)
+        {
+            string raw = LoadRaw(IndexInternalRoot, bodyTemplate);
+            if (raw == null) return RenderBody(users, bodyTemplate, ctx); // smoke-заглушка
+            var sb = new StringBuilder();
+            int i = 0, n = raw.Length;
+            while (i < n)
+            {
+                int open = raw.IndexOf("<?php", i, StringComparison.Ordinal);
+                if (open < 0)
+                {
+                    string seg = raw.Substring(i);
+                    if (hook != null) { string r = hook(seg); if (r != null) { sb.Append(r); continue; } }
+                    sb.Append(Fill(seg, ctx));
+                    break;
+                }
+                if (open > i)
+                {
+                    string seg = raw.Substring(i, open - i);
+                    string rep = hook != null ? hook(seg) : null;
+                    sb.Append(rep != null ? rep : Fill(seg, ctx));
+                }
+                int close = raw.IndexOf("?>", open + 5, StringComparison.Ordinal);
+                if (close < 0) break;          // незакрытый блок — остаток выбрасываем (как PHP parse error → вывод пуст)
+                i = close + 2;
+                if (i < n && raw[i] == '\n') i++; // PHP съедает один перевод строки после ?>
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// RenderShell + потоковый Body-рендер (фаза C2, internalNewClanDetails): тот же
+        /// require-цепочка GLOBALS, но вместо RenderBody вызывается RenderStreaming с hook —
+        /// условные PHP-сегменты шаблона фильтруются в позиции оригинала.
+        /// </summary>
+        public static string RenderShell(Users users, string bodyTemplate, string cssHref,
+                                         Func<IDictionary<string, string>, IDictionary<string, string>> beforeBody,
+                                         IDictionary<string, string> vars,
+                                         string logMessage, string logType,
+                                         Func<string, string> bodyHook)
+        {
+            var ctx = new Dictionary<string, string>(StringComparer.Ordinal);
+            long pid = users != null && users.DataRow != null ? PlayerLog.ToLong(users.DataRow["playerID"]) : 0;
+            long fid = users != null && users.DataRow != null ? PlayerLog.ToLong(users.DataRow["factionId"]) : 0;
+            ctx["PLAYERID"] = pid.ToString(CultureInfo.InvariantCulture);
+            ctx["FACTIONNAME"] = fid == 1 ? "mmo" : (fid == 2 ? "eic" : "vru");
+            ctx["SESSIONID"] = CurrentSession != null ? SessionManager.SessionId(CurrentSession) ?? "" : "";
+            ctx["RND_SID"] = Convert.ToBase64String(Encoding.UTF8.GetBytes(
+                new Random().Next(10000, 100000000).ToString(CultureInfo.InvariantCulture)));
+            ctx["TIME"] = UnixNow().ToString(CultureInfo.InvariantCulture);
+            ctx["DYNHOST"] = AppConfig.DynHost;
+            ctx["SERVER"] = AppConfig.Server;
+            ctx["HOST"] = AppConfig.Host;
+            if (vars == null || !vars.ContainsKey("HELP_NEWS_INCLUDE"))
+                ctx["HELP_NEWS_INCLUDE"] = FillFragment("internalHelpLayer", ctx) + FillFragment("internalNews", ctx);
+            if (vars == null || !vars.ContainsKey("HEADER_INTERN_INCLUDE"))
+                ctx["HEADER_INTERN_INCLUDE"] = FillFragment("internalHeaderIntern", ctx);
+            if (vars == null || !vars.ContainsKey("CREDITS_INCLUDE"))
+                ctx["CREDITS_INCLUDE"] = FillFragment("credits", ctx);
+            if (vars != null) foreach (var kv in vars) ctx[kv.Key] = kv.Value ?? "";
+            if (logMessage != null) { ctx["LOG_MESSAGE"] = logMessage; ctx["LOG_TYPE"] = logType ?? ""; }
+
+            var sb = new StringBuilder();
+            AppendFragment(sb, "internalDoc.php", ctx);
+            sb.Append("<link rel=\"stylesheet\" media=\"all\" href=\"")
+              .Append(System.Net.WebUtility.HtmlEncode(cssHref ?? "")).Append("\" />\n");
+            AppendFragment(sb, "internalDocEnd.php", ctx);
+            AppendFragment(sb, "sajax.php", ctx);
+            AppendFragment(sb, "xajax.php", ctx);
+            AppendFragment(sb, "headerEndJS.php", ctx);
+            AppendFragment(sb, "internalMenu.php", ctx);
+            AppendFragment(sb, "internalHeader.php", ctx);
+            foreach (var frag in ExtraHeaderFragments)
+                AppendFragment(sb, frag, ctx);
+            if (beforeBody != null)
+            {
+                var extra = beforeBody(ctx);
+                if (extra != null) foreach (var kv in extra) ctx[kv.Key] = kv.Value ?? "";
+            }
+            sb.Append(RenderStreaming(users, bodyTemplate, ctx, bodyHook));
+            AppendFragment(sb, "ads.php", ctx);
+            return sb.ToString();
         }
 
         public static string LoadRaw(string root, string safeName)
