@@ -43,13 +43,18 @@ namespace DarkSpace
         public Clan()
         {
             GetPager();
-            var q = AppEnvironment.Current != null ? AppEnvironment.Current.Request?.Query : null;
-            var fo = AppEnvironment.Current != null ? AppEnvironment.Current.Request?.Form : null;
-            string p = q != null && q.ContainsKey("page") ? q["page"].ToString()
-                     : (fo != null && fo.ContainsKey("page") ? fo["page"].ToString() : null);
+            string p = PageParam();
             long pl;
             _page = (p != null && long.TryParse(p, NumberStyles.Any, CultureInfo.InvariantCulture, out pl))
                 ? (int)pl : 1;
+        }
+
+        /// <summary>?page= из query, затем из POST-формы (безопасно: форма читается только при form-content-type).</summary>
+        private static string PageParam()
+        {
+            var env = AppEnvironment.Current;
+            if (env == null) return null;
+            return env.GetQueryValue("page") ?? env.GetFormValue("page");
         }
 
         /// <summary>clan::setId($uid,$pid) — also refreshes balances via money().</summary>
@@ -699,10 +704,7 @@ namespace DarkSpace
         /// <summary>clan::getPager() — paginator from ?page= (0 when absent/non-numeric).</summary>
         public void GetPager()
         {
-            var q = AppEnvironment.Current != null ? AppEnvironment.Current.Request?.Query : null;
-            var fo = AppEnvironment.Current != null ? AppEnvironment.Current.Request?.Form : null;
-            string p = q != null && q.ContainsKey("page") ? q["page"].ToString()
-                     : (fo != null && fo.ContainsKey("page") ? fo["page"].ToString() : null);
+            string p = PageParam();
             long pl;
             _paginator = (p != null && long.TryParse(p, NumberStyles.Any, CultureInfo.InvariantCulture, out pl))
                 ? (int)pl : 0;
@@ -727,10 +729,13 @@ namespace DarkSpace
             var navReturn = "";
 
             string so = "";
-            var all = AppEnvironment.Current != null ? AppEnvironment.Current.Request?.Query : null;
-            var allForm = AppEnvironment.Current != null ? AppEnvironment.Current.Request?.Form : null;
-            string sortv = all != null && all.ContainsKey("sort") ? all["sort"].ToString() : (allForm != null && allForm.ContainsKey("sort") ? allForm["sort"].ToString() : null);
-            string dirv = all != null && all.ContainsKey("direction") ? all["direction"].ToString() : (allForm != null && allForm.ContainsKey("direction") ? allForm["direction"].ToString() : null);
+            string sortv = null, dirv = null;
+            var envP = AppEnvironment.Current;
+            if (envP != null)
+            {
+                sortv = envP.GetQueryValue("sort") ?? envP.GetFormValue("sort");
+                dirv = envP.GetQueryValue("direction") ?? envP.GetFormValue("direction");
+            }
             if (sortv != null && dirv != null)
                 so = "&sort=" + System.Net.WebUtility.UrlEncode(sortv) + "&direction=" + System.Net.WebUtility.UrlEncode(dirv);
 

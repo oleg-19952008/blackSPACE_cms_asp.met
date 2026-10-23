@@ -29,6 +29,26 @@ namespace DarkSpace
         /// <summary>Эквивалент HttpSessionState (Session[] -> Session.GetString/SetString).</summary>
         public ISession Session => Context?.Session;
 
+        /// <summary>
+        /// Безопасное чтение значения из POST-формы текущего запроса: возвращает null,
+        /// если запроса нет, контент не form-data или ключ отсутствует.
+        /// (Обращение к Request.Form без HasFormContentType бросает InvalidOperationException.)
+        /// </summary>
+        public string GetFormValue(string key)
+        {
+            var r = Request;
+            if (r == null || !r.HasFormContentType) return null;
+            return r.Form.TryGetValue(key, out var v) ? v.ToString() : null;
+        }
+
+        /// <summary>Безопасное чтение значения из query-строки текущего запроса.</summary>
+        public string GetQueryValue(string key)
+        {
+            var r = Request;
+            if (r == null) return null;
+            return r.Query.TryGetValue(key, out var v) ? v.ToString() : null;
+        }
+
         /// <summary>Эквивалент Request.ServerVariables["SERVER_NAME"].</summary>
         public string ServerName => Context != null && Context.Request.Host.HasValue
             ? Context.Request.Host.Host
