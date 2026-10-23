@@ -76,6 +76,13 @@ namespace DarkSpace
             app.Map("/ajax/nanoTechfactory/techShop.php", TechShopEndpoint.Handle);
             app.Map("/Ajax/TechShop", TechShopEndpoint.Handle);
 
+            // A7.3: xajax/sajax API endpoints (was /xajaxAPI.php + /sajaxAPI.php,
+            // client bootstraps GLOBAL/xajax.php & GLOBAL/sajax.php)
+            app.MapPost("/xajaxAPI.php", AjaxHandlers.HandleXajax);
+            app.MapPost("/Ajax/xajax", AjaxHandlers.HandleXajax);
+            app.Map("/sajaxAPI.php", AjaxHandlers.HandleSajax);
+            app.Map("/Ajax/sajax", AjaxHandlers.HandleSajax);
+
             app.Run();
         }
     }
