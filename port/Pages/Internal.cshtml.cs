@@ -167,27 +167,12 @@ namespace DarkSpace.Pages
             // ---- B5: Clan-группа (189–297) ----
             if (action == "internalNewClanDetails")
             {
-                var clan = new Clan();
-                clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
-                long clanid = clan.GetMyClan(PlayerLog.ToLong(users.DataRow["playerID"]));
-                if (clanid != 0) { RedirectInternal("internalClan"); return; }
-                string clanName = Form(request, "clanName"), clanTag = Form(request, "clanTag");
-                if (clanName != null && clanTag != null)
-                {
-                    // foundClan возвращает строку ошибки либо null при успехе (PHP echo-quirk сохранён в A1)
-                    Write(clan.FoundClan(FormDict(request, "clanName", "clanTag", "clanDesc", "clanMotto"),
-                                        Str(users, "factionId")));
-                }
-                Shell("internalNewClanDetails_Body", "http://127.0.0.1/css/cdn/internalNewClanDetails.css");
+                HandleNewClanDetailsVars(users, request);   // фаза C: преамбула internalNewClanDetails_Body.php
                 return;
             }
             if (action == "internalNewClan")
             {
-                var clan = new Clan();
-                clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
-                long clanid = clan.GetMyClan(PlayerLog.ToLong(users.DataRow["playerID"]));
-                if (clanid != 0) { RedirectInternal("internalClan"); return; }
-                Shell("internalNewClan_Body", "/css/cdn/internalNewClan.css");
+                HandleNewClanVars(users, request);   // фаза C: преамбула internalNewClan_Body.php
                 return;
             }
             if (tpl == "internalClanChangeFirm" && action != "internalClan")

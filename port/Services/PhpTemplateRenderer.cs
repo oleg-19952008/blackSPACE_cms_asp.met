@@ -187,6 +187,46 @@ namespace DarkSpace
             return raw == null ? "" : Fill(raw, vars);
         }
 
+        /// <summary>
+        /// Потоковый рендер Body-шаблона с сохранением позиции PHP-преамбулы (фаза C):
+        /// raw читается посимвольно; блоки &lt;?php ... ?&gt; пропускаются как в исходном PHP
+        /// (их логика уже выполнена в beforeBody), а перед каждым следующим за ними HTML-сегментом
+        /// вызывается hook(seg) — он возвращает строку, которой сегмент будет заменён
+        /// (null = вывести сегмент как есть). Это даёт точную позицию for/foreach-повторов
+        /// оригинала (internalNewClan_Body и др.) без ручных токенов повторов.
+        /// Вне блоков {{TOKEN}} заполняются из ctx тем же Fill().
+        /// </summary>
+        public static string RenderStreaming(Users users, string bodyTemplate, IDictionary<string, string> ctx,
+                                             Func<string, string> hook)
+        {
+            string raw = LoadRaw(IndexInternalRoot, bodyTemplate);
+            if (raw == null) return RenderBody(users, bodyTemplate, ctx); // smoke-заглушка
+            var sb = new StringBuilder();
+            int i = 0, n = raw.Length;
+            while (i < n)
+            {
+                int open = raw.IndexOf("<?php", i, StringComparison.Ordinal);
+                if (open < 0)
+                {
+                    string seg = raw.Substring(i);
+                    if (hook != null) { string r = hook(seg); if (r != null) { sb.Append(r); continue; } }
+                    sb.Append(Fill(seg, ctx));
+                    break;
+                }
+                if (open > i)
+                {
+                    string seg = raw.Substring(i, open - i);
+                    string rep = hook != null ? hook(seg) : null;
+                    sb.Append(rep != null ? rep : Fill(seg, ctx));
+                }
+                int close = raw.IndexOf("?>", open + 5, StringComparison.Ordinal);
+                if (close < 0) break;          // незакрытый блок — остаток выбрасываем (как PHP parse error → вывод пуст)
+                i = close + 2;
+                if (i < n && raw[i] == '\n') i++; // PHP съедает один перевод строки после ?>
+            }
+            return sb.ToString();
+        }
+
         public static string LoadRaw(string root, string safeName)
         {
             if (!Regex.IsMatch(safeName ?? "", @"^[A-Za-z0-9_-]+$")) return null; // path-traversal guard
