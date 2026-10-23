@@ -1434,8 +1434,8 @@ namespace DarkSpace.Pages
         /// <summary>
         /// Port of indexInternal.es.php lines 36–64 (action=internalCompanyChoose).
         /// subaction=factionChoose persists faction/map/coords and echoes the redirect URL;
-        /// otherwise the CompanyChoose header/body would be rendered (фаза C — шаблоны),
-        /// here a minimal HTML form shell is emitted instead.
+        /// otherwise renders CompanyChoose_Header + xajax/internalHeader GLOBALS +
+        /// CompanyChoose_Body verbatim templates (фаза C2) + echo '</html>'.
         /// </summary>
         private void HandleInternalCompanyChoose(Users users, HttpRequest request)
         {
@@ -1474,15 +1474,26 @@ namespace DarkSpace.Pages
                 return;
             }
 
-            // require CompanyChoose_Header.php / xajax.php / internalHeader.php / CompanyChoose_Body.php
-            // TODO (фаза C): шаблон CompanyChoose_Body через TemplateManager. Smoke-оболочка:
-            Write("<div id=\"companyChoosePanel\">" +
-                  "<h3>Choose your company</h3>" +
-                  "<ul>" +
-                  "<li><a href=\"/Internal?action=internalCompanyChoose&amp;subaction=factionChoose&amp;factionID=1\">MMO</a></li>" +
-                  "<li><a href=\"/Internal?action=internalCompanyChoose&amp;subaction=factionChoose&amp;factionID=2\">EIC</a></li>" +
-                  "<li><a href=\"/Internal?action=internalCompanyChoose&amp;subaction=factionChoose&amp;factionID=3\">VRU</a></li>" +
-                  "</ul></div>");
+            // Phase C2: require FILES.'INDEXINTERNAL/CompanyChoose_Header.php' (verbatim,
+            // favicon 127.0.0.1 -> {{DYNHOST}}) — открывает <head>, css-ссылка уже внутри шаблона.
+            Write(PhpTemplateRenderer.FillFragment("CompanyChoose_Header", null));
+            // GLOBALS/xajax.php + GLOBALS/internalHeader.php (openMiniMap и т.д.) — те же
+            // фрагменты, что использует RenderShell; заполняем общими токенами ctx.
+            var ctx = new Dictionary<string, string>(StringComparer.Ordinal);
+            long pid2 = PlayerLog.ToLong(users.DataRow["playerID"]);
+            ctx["PLAYERID"] = pid2.ToString(CultureInfo.InvariantCulture);
+            ctx["FACTIONNAME"] = "mmo"; // factionId === '0' на этой ветке; дефолт страницы выбора
+            ctx["SESSIONID"] = PhpTemplateRenderer.CurrentSession != null
+                ? SessionManager.SessionId(PhpTemplateRenderer.CurrentSession) ?? "" : "";
+            ctx["DYNHOST"] = AppConfig.DynHost;
+            ctx["SERVER"] = AppConfig.Server;
+            ctx["HOST"] = AppConfig.Host;
+            Write(PhpTemplateRenderer.FillFragment("xajax", ctx));
+            Write(PhpTemplateRenderer.FillFragment("internalHeader", ctx));
+            // require FILES.'INDEXINTERNAL/CompanyChoose_Body.php' (verbatim HTML+JS) ...
+            Write(PhpTemplateRenderer.RenderBody(users, "CompanyChoose_Body", ctx));
+            // ... затем echo '</html>'; (закрывает <head>/<body> из Header-шаблона).
+            Write("</html>");
         }
 
         /// <summary>One-shot parameterized UPDATE (factionChoose writes server_1_players).</summary>
