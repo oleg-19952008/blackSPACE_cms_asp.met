@@ -1,8 +1,0 @@
-<?php
-session_destroy();
-?>
-<html>
-<script type="text/javascript">
-window.location.href = "http://127.0.0.1/";
-alert("Вы Вышли из игры !");</script>
-</html>
