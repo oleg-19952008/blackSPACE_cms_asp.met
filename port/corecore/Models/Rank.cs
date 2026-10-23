@@ -607,7 +607,7 @@ namespace DarkSpace
             }
         }
 
-        internal static string Get(IDictionary<string, string> d, string key)
+        public static string Get(IDictionary<string, string> d, string key)
         {
             string v;
             return d != null && d.TryGetValue(key, out v) ? v : null;

@@ -1,0 +1,10 @@
+@page
+@model DarkSpace.Pages.IndexModel
+@{
+    // index.php / default.aspx parity: response is the raw concatenation of the
+    // legacy INDEX/header.php + INDEX/body.php templates (TemplateManager),
+    // so suppress the Razor layout entirely.
+    Layout = null;
+}
+@Html.Raw(Model.HeaderHtml)
+@Html.Raw(Model.BodyHtml)

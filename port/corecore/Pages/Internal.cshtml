@@ -1,0 +1,8 @@
+@page
+@model DarkSpace.Pages.InternalModel
+@{
+    // indexInternal.es.php parity: the PHP script echoed raw HTML fragments
+    // (css <link>, tables, panels) directly — no global layout. Suppress it.
+    Layout = null;
+}
+@Html.Raw(Model.OutputHtml)

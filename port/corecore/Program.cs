@@ -28,6 +28,7 @@ namespace DarkSpace
 
             builder.Services.AddRazorPages(o => o.RootDirectory = "/Pages");
             builder.Services.AddDistributedMemoryCache();          // session storage (was InProc SessionState)
+            builder.Services.AddSession();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddSingleton<AppEnvironment>();        // ambient context (was HttpContext.Current)
 
@@ -37,9 +38,14 @@ namespace DarkSpace
             app.UseRouting();
             app.UseSession(new SessionOptions
             {
-                CookieName = "ASPSESSIONIDQSCBTRQT",               // legacy PHP session cookie name parity
                 IdleTimeout = TimeSpan.FromMinutes(20),             // was sessionState timeout="20"
-                Cookie = new CookieBuilder { HttpOnly = true, SameSite = SameSiteMode.Lax }
+                Cookie = new CookieBuilder
+                {
+                    Name = "ASPSESSIONIDQSCBTRQT",                 // legacy PHP session cookie name parity
+                    HttpOnly = true,
+                    IsEssential = true,
+                    SameSite = SameSiteMode.Lax
+                }
             });
             app.UseMiddleware<AppEnvironmentMiddleware>();          // sets AppEnvironment.Current.Context
 
@@ -52,29 +58,15 @@ namespace DarkSpace
 
             // --- URL rewrite rules from web.config (.php/.es.php legacy paths) ---
             app.MapFallbackToPage("/Index");
-            app.MapGet("/indexInternal.es.php", ctx => ctx.Response.Redirect("/Internal" + ctx.Request.QueryString));
-            app.MapPost("/indexInternal.es.php", ctx => ctx.Response.Redirect("/Internal" + ctx.Request.QueryString));
-            app.Map("/indexInternal.es.php", (HttpContext ctx) => ctx.Response.Redirect("/Internal" + ctx.Request.QueryString));
+            app.Map("/indexInternal.es.php", (HttpContext ctx) =>
+            {
+                ctx.Response.Redirect("/Internal" + ctx.Request.QueryString);
+                return System.Threading.Tasks.Task.CompletedTask;
+            });
 
             // api.ashx (XML-RPC IXR_Server) — IHttpHandler -> endpoint
-            app.MapPost("/api", async (HttpContext ctx) =>
-            {
-                var server = new IxrServer();
-                server.Register(new System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, Func<object[], object>>>
-                {
-                    new System.Collections.Generic.KeyValuePair<string, Func<object[], object>>("api.oce", ApiEndpoints.OrderComplete),
-                });
-                await server.ServeRequest(ctx);
-            });
-            app.MapPost("/api.ashx", async (HttpContext ctx) =>
-            {
-                var server = new IxrServer();
-                server.Register(new System.Collections.Generic.List<System.Collections.Generic.KeyValuePair<string, Func<object[], object>>>
-                {
-                    new System.Collections.Generic.KeyValuePair<string, Func<object[], object>>("api.oce", ApiEndpoints.OrderComplete),
-                });
-                await server.ServeRequest(ctx);
-            });
+            app.MapPost("/api", ApiEndpoints.ServeAsync);
+            app.MapPost("/api.ashx", ApiEndpoints.ServeAsync);
 
             // GameAPI.ashx — IHttpHandler -> endpoint
             app.Map("/GameAPI", GameAPIEndpoint.Handle);
