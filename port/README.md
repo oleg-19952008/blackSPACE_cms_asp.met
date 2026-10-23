@@ -13,16 +13,21 @@
 - 🔶 — портировано частично / требует доделки
 
 Отправная точка (обновлено 2026-10-23, проверено по факту в репозитории):
-- Диспетчер `Pages/Internal.cshtml.cs` (**1136 строк**): переведены с заглушек на реальную логику +
-  единый рендер через `PhpTemplateRenderer.RenderShell` **все ~45 ветвей action** оригинала
+- Диспетчер `Pages/Internal.cshtml.cs` (**1808 строк**): переведены с заглушек на реальную логику +
+  единый рендер через `PhpTemplateRenderer.RenderShell`/`RenderStreaming` **все ~45 ветвей action** оригинала
   (`internalStart…internalDock*`, Clan-группа c подветками Administrate/ChangeFirm/Diplomacy/Member,
   Skylab/Board/NanoTechFactory, Auction, Balance/Evoucher, Messaging/PilotSheet/UserDataChange/
   ItemUpgradeSystem, External/History/Promo, Dock + MapRevolution/burnme; `internalHandelClosed` —
-  корректно помечен мёртвым и не рендерится); в файле осталось 2 TODO — оба фаза C
-  (шаблоны CompanyChoose_Body, internalSkylab_Body);
-- ✅ B2 выполнена: `Services/PhpTemplateRenderer.cs` (163 стр.) — `RenderShell`/`RenderBody`;
-  GLOBALS-фрагменты перенесены в `templates/legacy/en_US/GLOBAL/` (ads, headerEndJS, internalDoc,
-  internalDocEnd, internalHeader, internalMenu, sajax, xajax — 8 файлов); ad-hoc `RenderInternalPage` удалён;
+  корректно помечен мёртвым и не рендерится); в файле остался 1 TODO — фаза C
+  (шаблон internalSkylab_Body; CompanyChoose_Header/_Body перенесены — C2 ✅; Clan-группа C3:
+  NewClan/NewClanDetails с преамбулами `HandleNewClanVars`/`HandleNewClanDetailsVars` через
+  RenderStreaming+bodyHook, ClanList/Member/Administrate — шаблоны перенесены);
+- ✅ B2 выполнена: `Services/PhpTemplateRenderer.cs` (315 стр.) — `RenderShell` (+ overload'ы с
+  `beforeBody`-колбэком и `bodyHook`)/`RenderBody`/`RenderStreaming` (потоковый рендер сегментов для
+  PHP-циклов)/`FillFragment`; GLOBALS-фрагменты перенесены в `templates/legacy/en_US/GLOBAL/`
+  (ads, credits, headerEndJS, internalDoc, internalDocEnd, internalHeader, internalHeaderIntern,
+  internalHelpLayer, internalMenu, internalNews, sajax, xajax — 12 файлов); автоподстановка include-токенов
+  `{{HELP_NEWS_INCLUDE}}`/`{{HEADER_INTERN_INCLUDE}}`/`{{CREDITS_INCLUDE}}`; ad-hoc `RenderInternalPage` удалён;
 - ✅ созданы и заполнены `Models/Clan.cs` (870), `Skylab.cs` (1325), `Inventory.cs` (2165),
   `Shop.cs` (736), `Rank.cs` (685) + `RankPager.cs` (154), `GalaxyGate.cs` (668), `Ships.cs` (54);
 - ✅ A7.3: xajax/sajax хендлеры — `Services/XajaxResponse.cs` (72) + `Services/AjaxHandlers.cs` (385),
@@ -106,52 +111,58 @@ A6.1 каркас/гейты, A6.2 спиннер/мультипликаторы
 PHP повторяет один и тот же набор require на каждой ветке:
 `internalDoc.php → internalDocEnd.php → sajax.php → xajax.php → headerEndJS.php → internalMenu.php → internalHeader.php → <Body-шаблон> → ads.php`.
 В C# — единый `PhpTemplateRenderer.RenderShell(users, bodyTemplate, cssHref, vars, logMessage, logType)`
-(`Services/PhpTemplateRenderer.cs`, 163 стр.): парсинг HTML-оболочки + токен-подстановка тела;
-все ветки B3–B10 вызывают его через общий helper в `Internal.cshtml.cs`.
+(`Services/PhpTemplateRenderer.cs`, 315 стр.): парсинг HTML-оболочки + токен-подстановка тела;
+overload'ы с `beforeBody` (контекст до рендера Body) и `bodyHook` (позаточечная подмена сегментов при
+`RenderStreaming` — для PHP-циклов вида `while(...) echo ...`); все ветки B3–B10 вызывают его через общий
+helper `Shell(...)` в `Internal.cshtml.cs`.
 Ad-hoc `RenderInternalPage(...)` с legacy-заготовками в `wwwroot` удалён.
-Порт шаблонных GLOBALS-фрагментов выполнен: `templates/legacy/en_US/GLOBAL/` — ads, headerEndJS,
-internalDoc, internalDocEnd, internalHeader, internalMenu, sajax, xajax (8 файлов).
+Порт шаблонных GLOBALS-фрагментов выполнен: `templates/legacy/en_US/GLOBAL/` — ads, credits, headerEndJS,
+internalDoc, internalDocEnd, internalHeader, internalHeaderIntern, internalHelpLayer, internalMenu,
+internalNews, sajax, xajax (12 файлов).
 (xajax/sajax серверная часть — A7.3; клиентские bootstrap-скрипты подключаются здесь же.)
 
 ### B3–B10. Ветки `action` — по группе связанных экшенов
 | Кусок | Экшены (строки оригинала) | Зависимости | Статус |
 |---|---|---|---|
-| B3 Start/Gates/JPA/Payment/HoF | `internalStart` (66–77), `internalGalaxyGates` (78–89, 116–126), `internalJPA`, `internalJPA-list` (90–115), `internalPayment` (127–137), `internalHallofFame`+view (138–160) | Rank ✅, GalaxyGate ✅ | 🔶 все ветки через RenderShell + логика; Body-шаблоны ждут C1/C6 |
+| B3 Start/Gates/JPA/Payment/HoF | `internalStart` (66–77), `internalGalaxyGates` (78–89, 116–126), `internalJPA`, `internalJPA-list` (90–115), `internalPayment` (127–137), `internalHallofFame`+view (138–160) | Rank ✅, GalaxyGate ✅ | 🔶 Start ✅ (C1), JPA/JPA-list ✅ (шаблоны + преамбулы); Body-шаблоны GalaxyGates/Payment/HoF ждут C6 |
 | B4 Balance/Evoucher | `internalBalance` (161–171), `internalEvoucher` (172–188) | Voucher ✅ | 🔶 логика есть, ждёт C-шаблоны |
-| B5 Clan-группа | `internalNewClanDetails` (189–206), `internalNewClan` (207–240), `internalClan` (241–286), `internalClanList` (287–297) + подветки Administrate/ChangeFirm/Diplomacy/Member | Clan ✅ | 🔶 логика есть, ждёт C-шаблоны |
-| B6 Messaging/PilotSheet/UserData/Upgrade | `internalMessaging` (298–308), `internalPilotSheet` (309–340), `internalUserDataChange` (341–351), `internalItemUpgradeSystem` (352–362) | Base ✅, Inventory ✅ (+ Users.changeUsername — остаток A) | 🔶 логика есть, ждёт C-шаблоны |
+| B5 Clan-группа | `internalNewClanDetails` (189–206), `internalNewClan` (207–240), `internalClan` (241–286), `internalClanList` (287–297) + подветки Administrate/ChangeFirm/Diplomacy/Member | Clan ✅ | 🔶 NewClan/NewClanDetails/ClanList ✅ (шаблоны + преамбулы `HandleNewClanVars`/`HandleNewClanDetailsVars`/`HandleClanListVars`); Member/Administrate — шаблоны перенесены, рендер через Shell (преамбулы-циклы по applicants/members — доделать); ChangeFirm/Diplomacy/internalClan_Body ⬜ |
+| B6 Messaging/PilotSheet/UserData/Upgrade | `internalMessaging` (298–308), `internalPilotSheet` (309–340), `internalUserDataChange` (341–351), `internalItemUpgradeSystem` (352–362) | Base ✅, Inventory ✅ (+ Users.changeUsername — остаток A) | 🔶 PilotSheet ✅ (шаблон + преамбула); остальные логика есть, ждут C-шаблоны |
 | B7 Skylab/Board/NanoTechFactory | `internalSkylab`+subactions (363–391), `internalBoard`+subaction (392–406), `internalNanoTechFactory`+subactions (407–454) | Skylab ✅, Factory ✅ | 🔶 все три реализованы через RenderShell (Body-шаблоны — C4/C6); AJAX-часть NTF готова: A7.3 |
-| B8 External/History/Promo/Logout | `externalPassword` (455–465), `internalPaymentProxy` (466–469), `externalLogout` (470–480), `internalHistory` (481–491), `internalPaymentPartnerPromotion` (492–502) | Unity ✅ | 🔶 логика есть, ждёт C-шаблоны |
+| B8 External/History/Promo/Logout | `externalPassword` (455–465), `internalPaymentProxy` (466–469), `externalLogout` (470–480), `internalHistory` (481–491), `internalPaymentPartnerPromotion` (492–502) | Unity ✅ | 🔶 History/externalLogout ✅ (шаблоны + преамбулы); Password/Promo — логика есть, ждут C-шаблоны |
 | B9 Auction | `internalAuction` (503–571) | Auction ✅ | 🔶 логика есть, ждёт C-шаблоны |
 | B10 Dock + MapRevolution + burnme | `internalDock` (572–717, под-экшены ship/ammo/laser/drone/generator/booster/special/equipment/model), `internalMapRevolution` (718–726), `burnme` (727–732) | Shop ✅, Inventory ✅, Hangar ✅ | 🔶 логика есть, ждёт C-шаблоны |
 
 ### B11. Routing и завершение — 🔶
 - Legacy URL `indexInternal.es.php?action=X` → страница `/Internal` — реализовано в `Program.cs` ✅;
 - smoke-тест всех action через HTTP-запросы на staging — 🔶 (схема `port/sql/smoke-schema.sql` + тестовый пользователь/сессия — см. ниже);
-- сборка в CI (`dotnet build port/CoreCore.csproj`) — ✅ (.NET 8 SDK, 0 ошибок, 13 предупреждений —
-  CS0168/CS0169/CS0649/CS0414 неиспользуемые поля в Inventory/Skylab/Factory + SYSLIB0021 AesManaged
-  в Encryption; фикс Clan.GetPager: чтение формы только при `request.HasFormContentType`,
-  хелперы `AppEnvironment.GetFormValue/GetQueryValue`).
+- сборка в CI (`dotnet build port/CoreCore.csproj`) — ✅ (.NET 8 SDK, чистая пересборка после всех
+  изменений фазы C: **0 ошибок, 13 предупреждений** — CS0162 unreachable в ApiEndpoints,
+  CS0649/CS0169/CS0414 неиспользуемые поля в Inventory/Skylab/Factory, SYSLIB0021 AesManaged в Encryption).
 
 ---
 
-## Фаза C — Шаблоны Body 🔶 (начата: C1 + PilotSheet из C6 перенесены; схема подтверждена)
+## Фаза C — Шаблоны Body 🔶 (продолжается: перенесено 13 из ~44 рабочих шаблонов; схема подтверждена)
 
-Рендерятся диспетчером через `PhpTemplateRenderer.RenderShell`; идут за своими ветками B.
-Каталог `templates/legacy/en_US/INDEXINTERNAL/` создан; схема подтверждена на C1: чистый HTML-шаблон
+Рендерятся диспетчером через `PhpTemplateRenderer.RenderShell`/`RenderStreaming`; идут за своими ветками B.
+Каталог `templates/legacy/en_US/INDEXINTERNAL/` (13 файлов); схема подтверждена: чистый HTML-шаблон
 (verbatim из оригинала, PHP-вставки → токены `{{TOKEN}}`, positionальные require GLOBALS → токены
-`{{HELP_NEWS_INCLUDE}}`/`{{HEADER_INTERN_INCLUDE}}`, заполняются через `FillFragment`) + токен-префиксы
-в C# (`HandleInternalStart` и пр.). Остальные Body-рендеры — заглушка «Template pending phase C»
-(`PhpTemplateRenderer.cs:108`).
+`{{HELP_NEWS_INCLUDE}}`/`{{HEADER_INTERN_INCLUDE}}`/`{{CREDITS_INCLUDE}}`, подставляются автоматически в
+RenderShell) + токен-префиксы и преамбулы в C# (`HandleInternalStart`, `HandleClanListVars`,
+`HandleNewClanVars`, `HandleNewClanDetailsVars`, `HandleHistoryVars`, `HandleJpaVars` и пр.).
+PHP-циклы echo-блоков реализуются через `RenderStreaming` с `bodyHook` (подмена сегментов по маркерам).
+Заглушка «Template pending phase C» (`PhpTemplateRenderer.cs:147`) остаётся только для ещё не перенесённых
+шаблонов.
 
 | Приоритет | Шаблон (`FILES/INDEXINTERNAL/`) | Строк | Привязка | Статус |
 |---|---|---|---|---|
 | C1 | `internalStart_Body.php` | 685 | B3 | ✅ перенесён (`internalStart_Body.html`, 439 стр., 28 токенов; + GLOBALS internalHelpLayer/internalNews/internalHeaderIntern) |
-| C2 | `CompanyChoose_Header/_Body.php` | ~200 | B1 | ⬜ |
-| C3 | `internalClan_Body.php`, `internalNewClan_Body.php`, `internalNewClanDetails_Body.php`, `internalClanList_Body.php` | ~1900 | B5 | ⬜ |
+| C2 | `CompanyChoose_Header/_Body.php` | ~200 | B1 | ✅ перенесены verbatim (`CompanyChoose_Header.html` — favicon → `{{DYNHOST}}`; `CompanyChoose_Body.html` — чистый HTML+JS, без токенов); ветка `HandleInternalCompanyChoose` рендерит Header → GLOBALS xajax+internalHeader (ctx: PLAYERID/FACTIONNAME/SESSIONID/DYNHOST) → Body → `echo '</html>'` по порядку require оригинала (стр. 59–63); smoke-заглушка удалена |
+| C2b | `externalLogout_Body.php` | 7 | B8 | ✅ verbatim-перенос; `session_destroy()` → `HttpContext.Session.Clear()` в ветке диспетчера (рендерится напрямую, без Shell — как в оригинале) |
+| C3 | `internalClan_Body.php`, ~~`internalNewClan_Body.php`~~ ✅, ~~`internalNewClanDetails_Body.php`~~ ✅, ~~`internalClanList_Body.php`~~ ✅, ~~`internalClanMember_Body.php`~~ ✅, ~~`internalClanAdministrate_Body.php`~~ ✅ | ~1900 | B5 | 🔶 ClanList ✅ (`internalClanList_Body.html` + `HandleClanListVars`: setId/getClans/paginate('clanlist_navi')/cust_sort по `?sort=`/start-end цикл); NewClan ✅ (`internalNewClan_Body.html` + `HandleNewClanVars`: searchClanList → GetClans LIKE, sort OrderBy, RenderStreaming-цикл `<li class="clan_item">`, {{PAGINATE}}/{{CUPAGE}}); NewClanDetails ✅ (`internalNewClanDetails_Body.html` + `HandleNewClanDetailsVars`: joinClan → Join, GetClan/GetPending, таблица $re/$ro, conditional-рендер «clan details»/«found template» через bodyHook, {{RO}}); Member/Administrate — `.html` перенесены (токены {{I}}/{{CLANID}}; include-токены авто), циклы applicants/members в преамбулах — доделать; internalClan_Body ⬜ |
 | C4 | `internalSkylab_Body.php` | 1601 | B7 (резать по таб-секциям: overview/modules/resources/upgrades; зависит от остатка A — Skylab.pretty_time) | ⬜ |
 | C5 | `internalDock_Body.php` + `internalDock{Ships,Ammo,Laser,Drones,Generator,Booster,Specials,Equipment,ShipModel,PetGear,PetProtocols}_Body.php` | ~7000 суммарно | B10, по одному файлу за коммит | ⬜ |
-| C6 | `internalAuction_Body.php`, `internalBoard.php`, ~~`internalPilotSheet_Body.php`~~ ✅, `internalMessaging_Body.php`, `internalBalance_Body.php`, `internalEvoucher_Body.php`, `internalHistory_Body.php`, `internalPayment*_Body.php`, `internalHallofFame_*` (5 файлов), `internalGalaxyGates_Body.php`, `internalJPA*_Body.php`, `internalNanoTechFactory_Body.php`, `internalClanAdministrate/ChangeFirm/Diplomacy/Member_Body.php`, `internalUserDataChange_Body.php`, `internalItemUpgradeSystem_Body.php` | 300–970 каждый | соответствующие B3–B9 | 🔶 PilotSheet ✅ (`internalPilotSheet_Body.html`, 889 стр.; `HandlePilotSheetVars` — порт преамбулы GetRank/getMyRanking/getMyClan + STATION/CLAN_NAME/MYRANKING/EMAIL; credits.php вырезан — нет в наборе GLOBALS); остальные ⬜ |
+| C6 | `internalAuction_Body.php`, `internalBoard.php`, ~~`internalPilotSheet_Body.php`~~ ✅, `internalMessaging_Body.php`, `internalBalance_Body.php`, `internalEvoucher_Body.php`, ~~`internalHistory_Body.php`~~ ✅, `internalPayment*_Body.php`, `internalHallofFame_*` (5 файлов), `internalGalaxyGates_Body.php`, ~~`internalJPA*_Body.php`~~ ✅, `internalNanoTechFactory_Body.php`, ~~`internalClanAdministrate/Member_Body.php`~~ ✅ (см. C3), `internalClanChangeFirm/Diplomacy_Body.php`, `internalUserDataChange_Body.php`, `internalItemUpgradeSystem_Body.php` | 300–970 каждый | соответствующие B3–B9 | 🔶 PilotSheet ✅ (`internalPilotSheet_Body.html`, 889 стр.; `HandlePilotSheetVars` — порт преамбулы GetRank/getMyRanking/getMyClan + STATION/CLAN_NAME/MYRANKING/EMAIL; credits.php → GLOBALS-фрагмент `credits.php`, авто-токен {{CREDITS_INCLUDE}}); History ✅ (`internalHistory_Body.html` + `HandleHistoryVars`: PlayerLog.SetId/GetLog → `{{HISTORY_ROWS}}`); JPA+JPA-list ✅ (`internalJPA_Body.html`/`internalJPA-list_Body.html` + `HandleJpaVars`/`HandleJpaListVars`: mysqli jackpot/id/war-запросы параметризованы → `{{JPA_BALANCE}}`/`{{JPA_FORM_FIELDS}}`/`{{JPA_LIST_ITEMS}}`); остальные ⬜ |
 | C-исключения | `internalHandelClosed_Body.php` (6758 — закрытый раздел, не портировать), `_NE_ISPOLZUETSJA/**`, файлы с суффиксами `— копия`, `- Copy`, `_old`, `internaltest.php`, `internalMaptest.php`, `internalDockEquipment_Bod2y.php`, `internalDockLaser_Body2.php`, `internalGalaxyGates_Body1.php` | — | удалить из плана |
 
 ---
@@ -162,9 +173,11 @@ internalDoc, internalDocEnd, internalHeader, internalMenu, sajax, xajax (8 фа�
 2. ~~B1 + B2 (RenderShell/PhpTemplateRenderer + GLOBALS-фрагменты)~~ — ✅ выполнены
 3. ~~B3–B10 логика веток~~ — ✅ все ~45 ветвей реализованы через RenderShell; закрытие веток
    (статус ✅) возможно только вместе с их Body-шаблонами из фазы C
-4. **C-шаблоны — текущий приоритет №1** (~~C1 internalStart_Body~~ ✅, ~~internalPilotSheet_Body~~ ✅ →
-   далее C4 internalSkylab_Body → C5 Dock → C3/C6 остальное); ветка B считается готовой только с рендером;
-   доделать 2 TODO в `Internal.cshtml.cs` (CompanyChoose_Body, internalSkylab_Body)
+4. **C-шаблоны — текущий приоритет №1** (~~C1 internalStart_Body~~ ✅, ~~internalPilotSheet_Body~~ ✅,
+   ~~C2 CompanyChoose~~ ✅, ~~externalLogout~~ ✅, ~~ClanList/History/JPA/JPA-list~~ ✅,
+   ~~NewClan/NewClanDetails (+Member/Administrate шаблоны)~~ ✅ → далее C4 internalSkylab_Body →
+   C5 Dock → C3/C6 остальное); ветка B считается готовой только с рендером;
+   остался 1 TODO в `Internal.cshtml.cs` (стр. 1763 — internalSkylab_Body)
 5. ~~A7 (xajax/sajax handlers)~~ ✅; клиентские bootstrap в оболочке — ✅ (B2); осталось: остаток A
    (Users.changeUsername/checkName/ChangeNow для B6, Skylab.pretty_time для C4) и B11 smoke-прогон всех action
 6. MIGRATION.md / README.md: обновлять статусы Часть 2/3 по факту merge каждого куска

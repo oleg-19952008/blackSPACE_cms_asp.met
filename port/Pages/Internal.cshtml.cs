@@ -129,10 +129,10 @@ namespace DarkSpace.Pages
                     Shell("internalGalaxyGates_Body", "/css/cdn/internalGalaxyGates.css");
                     return;
                 case "internalJPA":
-                    Shell("internalJPA_Body", "/css/cdn/internalGalaxyGates.css");
+                    HandleJpaVars(users);   // фаза C: mysqli-преамбула internalJPA_Body.php
                     return;
                 case "internalJPA-list":
-                    Shell("internalJPA-list_Body", "/css/cdn/internalGalaxyGates.css");
+                    HandleJpaListVars();    // фаза C: SELECT * FROM jpa из internalJPA-list_Body.php
                     return;
                 case "internalPayment":
                     Shell("internalPayment_Body", "/css/cdn/internalPayment.css");
@@ -167,27 +167,12 @@ namespace DarkSpace.Pages
             // ---- B5: Clan-группа (189–297) ----
             if (action == "internalNewClanDetails")
             {
-                var clan = new Clan();
-                clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
-                long clanid = clan.GetMyClan(PlayerLog.ToLong(users.DataRow["playerID"]));
-                if (clanid != 0) { RedirectInternal("internalClan"); return; }
-                string clanName = Form(request, "clanName"), clanTag = Form(request, "clanTag");
-                if (clanName != null && clanTag != null)
-                {
-                    // foundClan возвращает строку ошибки либо null при успехе (PHP echo-quirk сохранён в A1)
-                    Write(clan.FoundClan(FormDict(request, "clanName", "clanTag", "clanDesc", "clanMotto"),
-                                        Str(users, "factionId")));
-                }
-                Shell("internalNewClanDetails_Body", "http://127.0.0.1/css/cdn/internalNewClanDetails.css");
+                HandleNewClanDetailsVars(users, request);   // фаза C: преамбула internalNewClanDetails_Body.php
                 return;
             }
             if (action == "internalNewClan")
             {
-                var clan = new Clan();
-                clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
-                long clanid = clan.GetMyClan(PlayerLog.ToLong(users.DataRow["playerID"]));
-                if (clanid != 0) { RedirectInternal("internalClan"); return; }
-                Shell("internalNewClan_Body", "/css/cdn/internalNewClan.css");
+                HandleNewClanVars(users, request);   // фаза C: преамбула internalNewClan_Body.php
                 return;
             }
             if (tpl == "internalClanChangeFirm" && action != "internalClan")
@@ -214,7 +199,7 @@ namespace DarkSpace.Pages
             }
             if (action == "internalClanList")
             {
-                Shell("internalClanList_Body", "/css/cdn/internalClan.css");
+                HandleClanListVars(users, request);   // фаза C: PHP-преамбула internalClanList_Body.php
                 return;
             }
 
@@ -273,12 +258,14 @@ namespace DarkSpace.Pages
             }
             if (action == "externalLogout")
             {
-                Shell("externalLogout_Body", "/css/cdn/logout.css");
+                // session_destroy() из преамбулы externalLogout_Body.php — полная очистка сессии
+                HttpContext.Session.Clear();
+                Write("<html>\n<script type=\"text/javascript\">\nwindow.location.href = \"http://127.0.0.1/\";\nalert(\"Вы Вышли из игры !\");</script>\n</html>");
                 return;
             }
             if (action == "internalHistory")
             {
-                Shell("internalHistory_Body", "/css/cdn/internalHistory.css");
+                HandleHistoryVars(users);   // фаза C: $log->setId + getLog из преамбулы шаблона
                 return;
             }
             if (action == "internalPaymentPartnerPromotion")
@@ -650,6 +637,399 @@ namespace DarkSpace.Pages
                            string logMessage = null, string logType = null)
         {
             Write(PhpTemplateRenderer.RenderShell(_users, bodyTemplate, cssHref, vars, logMessage, logType));
+        }
+
+        /// <summary>
+        /// C2: порт PHP-преамбулы internalClanList_Body.php (строки 1–15 шаблона):
+        /// setId/getClans/getRange/getCurrentPage/getTotalOfResults/getTotalOfPages + cust_sort,
+        /// плюс echo-блок строк списка кланов.
+        /// </summary>
+        private void HandleClanListVars(Users users, HttpRequest request)
+        {
+            var clan = new Clan();
+            clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+            var clans = clan.GetClans(null, "?action=internalClanList&tpl=internalClanList");
+            int range = clan.GetRange();
+            int cuPage = clan.GetCurrentPage();
+            int total = clan.GetTotalOfResults();
+            int tPage = (int)clan.GetTotalOfPages();
+
+            // if (isset($_GET['sort'])) usort($clans, 'cust_sort') — strtolower-компаратор оригинала
+            string sort = request.Query["sort"];
+            if (!string.IsNullOrEmpty(sort))
+            {
+                clans = clans.OrderBy(c =>
+                {
+                    string v; return c.TryGetValue(sort, out v) ? (v ?? "").ToLowerInvariant() : "";
+                }).ToList();
+            }
+
+            // for ($i = $start; $i < $end; $i++) из шаблона
+            int start, end;
+            if (total != 0)
+            {
+                if (cuPage == 1)
+                {
+                    start = 0;
+                    end = total < range ? total : range;
+                }
+                else
+                {
+                    start = (cuPage - 1) * range;
+                    end = cuPage != tPage ? cuPage * range : total;
+                }
+            }
+            else { start = 0; end = 0; }
+
+            var sb = new StringBuilder();
+            for (int i = start; i < end && i < clans.Count; i++)
+            {
+                var c = clans[i];
+                string Get(string k) { string v; return c.TryGetValue(k, out v) ? (v ?? "") : ""; }
+                // $re/$ro в оригинале вычисляются, но в echo не попадают — опущены как dead code.
+                // strpos($clans[$i]['members'],'|') / $aff — тоже вычисляются и не используются в echo.
+                sb.Append("<tr>\n")
+                  .Append("        <td><a href=\"javascript:void(0);\" onclick=\"getClaninfo(11033)\">[")
+                  .Append(HtmlEncode(Get("tagName"))).Append("]</a></td>\n")
+                  .Append("        <td><a href=\"javascript:void(0);\" onclick=\"getClaninfo(11033)\">")
+                  .Append(HtmlEncode(Get("clanName"))).Append("</a></td>\n")
+                  .Append("      </tr>");
+            }
+            if (total == 0)
+                sb.Append("<tr>\n        <td><a href=\"javascript:void(0);\" onclick=\"getClaninfo(11033)\"></a></td>\n        <td><a href=\"javascript:void(0);\" onclick=\"getClaninfo(11033)\">There are no clans on the list</a></td>\n      </tr>");
+
+            Shell("internalClanList_Body", "/css/cdn/internalClan.css", new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "PAGINATE", clan.Paginate("clanlist_navi") },   // <?php echo $clan->paginate('clanlist_navi'); ?>
+                { "CLAN_ROWS", sb.ToString() },
+            });
+        }
+
+        /// <summary>C2: порт преамбулы internalHistory_Body.php ($log->setId + $log->getLog + foreach).</summary>
+        private void HandleHistoryVars(Users users)
+        {
+            var log = new PlayerLog();
+            log.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+            var history = log.GetLog();
+            var sb = new StringBuilder();
+            foreach (var v in history)
+            {
+                // echo '<tr>...$v['addDate']...trenner.gif...$v['descrip']...</tr><tr>...trennerw...</tr>'
+                sb.Append("<tr>\n")
+                  .Append("                        <td>").Append(v.ContainsKey("addDate") ? v["addDate"] : "").Append("</td>\n")
+                  .Append("                        <td style=\"background-image:url(./do_img/global/payment/trenner.gif)\"><img src=\"./do_img/global/s.gif\" width=\"2\" height=\"2\"></td>\n")
+                  .Append("                        <td>").Append(v.ContainsKey("descrip") ? v["descrip"] : "").Append("</td>\n")
+                  .Append("                    </tr>\n")
+                  .Append("                    <tr>\n")
+                  .Append("                        <td colspan=\"3\"><img src=\"./do_img/global/payment/trennerw.gif\" width=\"446\" height=\"2\"></td>\n")
+                  .Append("                    </tr>");
+            }
+            Shell("internalHistory_Body", "/css/cdn/internalHistory.css", new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "HISTORY_ROWS", sb.ToString() },
+            });
+        }
+
+        /// <summary>
+        /// C2: порт mysqli-преамбулы internalJPA_Body.php (строки 141–191): jackpot-баланс
+        /// и условные поля формы по id/war из таблицы jpa. Запросы параметризованы вместо
+        /// интерполяции '$pid' (иначе SQL-injection паритетом с оригиналом).
+        /// </summary>
+        private void HandleJpaVars(Users users)
+        {
+            long pid = PlayerLog.ToLong(users.DataRow["playerID"]);
+            double jackpot = 0; bool hasJackpotRow = false;
+            long uid = 0, uidw = 0;
+            using (var con = DB.GetInstance())
+            {
+                using (var cmd = new MySqlCommand("SELECT `jackpot` FROM `server_1_players` WHERE `userID` = @pid", con))
+                {
+                    cmd.Parameters.AddWithValue("@pid", pid);
+                    using (var rd = cmd.ExecuteReader())
+                        while (rd.Read()) { hasJackpotRow = true; jackpot = Convert.ToDouble(rd[0]); }
+                }
+                FirstCell(con, "SELECT `id` FROM `jpa` WHERE `user_id` = @pid", pid, v => uid = PlayerLog.ToLong(v));
+                FirstCell(con, "SELECT `war` FROM `jpa` WHERE `user_id` = @pid", pid, v => uidw = PlayerLog.ToLong(v));
+            }
+
+            var bal = new StringBuilder();
+            if (hasJackpotRow)
+            {
+                bal.Append("У вас: ").Append(jackpot.ToString(CultureInfo.InvariantCulture)).Append(" EUR <br>");
+                bal.Append("Для участия необходимо 2000.00 EUR <br><br>");
+                if (jackpot < 2000.00)
+                    bal.Append("<span class='red'>Для участия не хватает: ")
+                       .Append((2000.00 - jackpot).ToString(CultureInfo.InvariantCulture)).Append(" EUR</span>");
+                else
+                    bal.Append("<span class='green'>Вы можете принять участие!</span>\n                                                        ");
+            }
+
+            string formFields = uid != 0
+                ? "<input type=\"text\" name=\"clanName\" value=\"\" maxlength=\"50\" title=\"Ваш уникальный ID: " + uid + "\" disabled=\"\"/><br/>\n"
+                  + "                                                <input type=\"text\" name=\"clanTag\" value=\"\" maxlength=\"7\" title=\"Ваш соперник: ID " + uidw + "\" disabled=\"\"/><br/>"
+                : "<input type=\"text\" name=\"clanName\" value=\"\" maxlength=\"50\" title=\"Вы не зарегистрированы\" disabled=\"\"/><br/>\n"
+                  + "                                                <input type=\"text\" name=\"clanTag\" value=\"\" maxlength=\"7\" title=\"Вы не зарегистрированы\" disabled=\"\"/><br/>";
+
+            Shell("internalJPA_Body", "/css/cdn/internalGalaxyGates.css", new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "JPA_BALANCE", bal.ToString() },
+                { "JPA_FORM_FIELDS", formFields },
+            });
+        }
+
+        /// <summary>C2: порт mysqli-блока internalJPA-list_Body.php (SELECT * FROM jpa → &lt;li&gt;-элементы).</summary>
+        private void HandleJpaListVars()
+        {
+            var sb = new StringBuilder();
+            using (var con = DB.GetInstance())
+            {
+                using (var cmd = new MySqlCommand("SELECT * FROM `jpa`", con))
+                using (var rd = cmd.ExecuteReader())
+                {
+                    var cols = Enumerable.Range(0, rd.FieldCount).Select(rd.GetName).ToArray();
+                    while (rd.Read())
+                    {
+                        string Cell(string name)
+                        {
+                            int ix = Array.IndexOf(cols, name);
+                            return ix < 0 || rd.IsDBNull(ix) ? "" : Convert.ToString(rd.GetValue(ix), CultureInfo.InvariantCulture);
+                        }
+                        sb.Append("<li class=\"clan_item\">\n")
+                          .Append("                                                    <span class=\"clanname\">").Append(Cell("id")).Append("</span>\n")
+                          .Append("                                                    <span class=\"ranking\"></span>\n")
+                          .Append("                                                    <span class=\"members\">").Append(Cell("war")).Append("</span>\n")
+                          .Append("                                                    <span class=\"ranking\"></span>\n")
+                          .Append("                                                    <span class=\"affiliation\">").Append(Cell("time")).Append("</span>\n")
+                          .Append("                                                    <span class=\"status \"></span>\n")
+                          .Append("                                                </li>");
+                    }
+                }
+            }
+            Shell("internalJPA-list_Body", "/css/cdn/internalGalaxyGates.css", new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                { "JPA_LIST_ITEMS", sb.ToString() },
+            });
+        }
+
+        /// <summary>
+        /// C2: порт PHP-преамбулы internalNewClan_Body.php (строки 1–19 шаблона):
+        /// setId; searchClanList → GetClans("'%lookup%'", '?action=internalNewClan') иначе GetClans(null,…);
+        /// getRange/getCurrentPage/getTotalOfResults/getTotalOfPages; sort через OrderBy (cust_sort-аналог,
+        /// как в HandleClanListVars); плюс redirect-преамбула диспетчера (indexInternal.es.php 208–212).
+        /// Echo-блок списка (<?php … ?> шаблона) выполняется стриминговым хуком в позиции for-цикла.
+        /// </summary>
+        private void HandleNewClanVars(Users users, HttpRequest request)
+        {
+            var clan = new Clan();
+            clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+
+            // indexInternal.es.php строки 210–212: if ($clanid != 0) header('...action=internalClan')
+            long myCid = clan.GetMyClan(PlayerLog.ToLong(users.DataRow["playerID"]));
+            if (myCid != 0) { RedirectInternal("internalClan"); return; }
+
+            // преамбула шаблона строки 2–7: subaction==searchClanList → LIKE-фильтр по $_POST['lookup']
+            // (оригинал передаёт "'%".$_POST['lookup']."%'" — окружающие кавычки/проценты срезаются в GetClans)
+            string subaction = Query(request, "subaction");
+            List<Dictionary<string, string>> clans = subaction == "searchClanList"
+                ? clan.GetClans("'" + Form(request, "lookup") + "'", "?action=internalNewClan")
+                : clan.GetClans(null, "?action=internalNewClan");
+            int range = clan.GetRange();
+            int cuPage = clan.GetCurrentPage();
+            int total = clan.GetTotalOfResults();
+            int tPage = (int)clan.GetTotalOfPages();
+
+            // if (isset($_GET['sort'])) usort($clans, 'cust_sort') — strtolower-компаратор оригинала
+            string sort = request.Query["sort"];
+            if (!string.IsNullOrEmpty(sort))
+            {
+                clans = clans.OrderBy(c =>
+                {
+                    string v; return c.TryGetValue(sort, out v) ? (v ?? "").ToLowerInvariant() : "";
+                }).ToList();
+            }
+
+            // for ($i = $start; $i < $end; $i++) из шаблона (строки 224–246)
+            int start, end;
+            if (total != 0)
+            {
+                if (cuPage == 1)
+                {
+                    start = 0;
+                    end = total < range ? total : range;
+                }
+                else
+                {
+                    start = (cuPage - 1) * range;
+                    end = cuPage != tPage ? cuPage * range : total;
+                }
+            }
+            else { start = 0; end = 0; }
+
+            // echo-блок списка: строится сразу (он живёт внутри одного <?php ?>-блока шаблона,
+            // который RenderStreaming пропускает целиком) — хук подменит этот блок на items.
+            var items = new StringBuilder();
+            for (int i = start; i < end && i < clans.Count; i++)
+            {
+                var c = clans[i];
+                string Get(string k) { string v; return c.TryGetValue(k, out v) ? (v ?? "") : ""; }
+                // if($clans[$i]['recruiting']==1)…elseif…else из echo-блока (строки 243–256)
+                string re, ro;
+                switch (Get("recruiting"))
+                {
+                    case "1": re = "recruiting"; ro = "Recruiting"; break;
+                    case "0": re = "notRecruiting"; ro = "Closed"; break;
+                    case "2": re = "recruiting"; ro = "Fully elite"; break;
+                    default: re = "recruiting"; ro = ""; break;
+                }
+                // strpos(members,'|') !== false ? count(explode('|',members)) : 1
+                string members = Get("members");
+                int num = members.IndexOf('|') >= 0 ? members.Split('|').Length : 1;
+                string aff = Get("company").ToUpperInvariant();   // strtoupper($clans[$i]['company'])
+                items.Append("<li class=\"clan_item\">\n")
+                     .Append("                                                    <span class=\"clanname\">\n")
+                     .Append("                                                        <a href=\"indexInternal.es?action=internalNewClanDetails&clanId=")
+                     .Append(HtmlAttr(Get("clanID"))).Append("\" class=\"clanlink\" title=\"")
+                     .Append(HtmlAttr(Get("clanName"))).Append("\">\n")
+                     .Append("                                                            ").Append(HtmlEncode(Get("clanName"))).Append("\n")
+                     .Append("                                                        </a>\n")
+                     .Append("                                                    </span>\n")
+                     .Append("                                                    <span class=\"ranking\">").Append(HtmlEncode(Get("tagName"))).Append("</span>\n")
+                     .Append("                                                    <span class=\"members\">").Append(num.ToString(CultureInfo.InvariantCulture)).Append("</span>\n")
+                     .Append("                                                    <span class=\"ranking\">").Append(HtmlEncode(Get("rank"))).Append("</span>\n")
+                     .Append("                                                    <span class=\"affiliation\">").Append(HtmlEncode(aff)).Append("</span>\n")
+                     .Append("                                                    <span class=\"status ").Append(re).Append("\">\n")
+                     .Append("                                                        ").Append(ro).Append("\n")
+                     .Append("                                                    </span>\n")
+                     .Append("                                                </li>");
+            }
+            if (total == 0)
+                items.Append("<li class=\"no_items even\">This search produced no results.</li>");
+
+            Func<IDictionary<string, string>, IDictionary<string, string>> beforeBody = ctx =>
+            {
+                ctx["PAGINATE"] = clan.Paginate();          // <?php echo $clan->paginate(); ?>
+                ctx["CUPAGE"] = cuPage.ToString(CultureInfo.InvariantCulture);
+                return null;                                 // доп. токены уже записаны прямо в ctx
+            };
+
+            Func<string, string> bodyHook = seg =>
+                seg.Contains("if ($total != 0)") && seg.Contains("for ($i = $start; $i < $end; $i++)")
+                    ? items.ToString()
+                    : null;
+
+            Write(PhpTemplateRenderer.RenderShell(_users, "internalNewClan_Body", "/css/cdn/internalNewClan.css",
+                  beforeBody, vars: null, logMessage: null, logType: null, bodyHook: bodyHook));
+        }
+
+        /// <summary>
+        /// C2: порт PHP-преамбулы internalNewClanDetails_Body.php (строки 1–33 шаблона) +
+        /// диспетчерских строк 190–197 (redirect при своём клане, foundClan по POST).
+        /// Условный рендер «clan page / found template» (if(isset($_GET['clanId']))) сделан
+        /// стриминговым хуком по сегментам между <?php ?>-блоками шаблона.
+        /// </summary>
+        private void HandleNewClanDetailsVars(Users users, HttpRequest request)
+        {
+            var clan = new Clan();
+            clan.SetId(PlayerLog.ToLong(users.DataRow["ID"]), PlayerLog.ToLong(users.DataRow["playerID"]));
+
+            // indexInternal.es.php строки 191–193: свой клан → internalClan
+            long myCid = clan.GetMyClan(PlayerLog.ToLong(users.DataRow["playerID"]));
+            if (myCid != 0) { RedirectInternal("internalClan"); return; }
+
+            // строки 194–196: if (isset($_POST['clanName']) && isset($_POST['clanTag'])) foundClan($_POST, factionId)
+            if (!string.IsNullOrEmpty(Form(request, "clanName")) && !string.IsNullOrEmpty(Form(request, "clanTag")))
+            {
+                clan.FoundClan(FormDict(request, "clanName", "clanTag", "clanDescription"), Str(users, "factionId"));
+            }
+
+            // преамбула шаблона строки 2–4: subaction==joinClan → $clan->join($_POST)
+            if (Query(request, "subaction") == "joinClan")
+            {
+                clan.Join(FormDict(request, "clanId", "applicationText"));
+            }
+
+            // строки 5–33: clanId → getClan/getPending + таблица $re/$ro
+            string clanIdRaw = Query(request, "clanId");
+            bool hasClan = !string.IsNullOrEmpty(clanIdRaw);
+            Dictionary<string, string> cla0 = null;
+            string re = "", ro = "";
+            if (hasClan)
+            {
+                long cid; long.TryParse(clanIdRaw, out cid);
+                var cla = clan.GetClan(cid);
+                bool p = clan.GetPending(cid);
+                cla0 = cla.Count > 0 ? cla[0] : null;
+                if (cla0 == null) hasClan = false;
+                else
+                {
+                    string recruiting = GetOr(cla0, "recruiting");
+                    if (recruiting == "1") { re = p ? "Pending" : "recruiting"; ro = "Recruiting"; }
+                    else if (recruiting == "0") { re = "notRecruiting"; ro = "Closed"; }
+                    else if (recruiting == "2") { re = p ? "Pending" : "recruiting"; ro = "Fully elite"; }
+                    else { re = p ? "Pending" : "recruiting"; ro = ""; }
+                }
+            }
+
+            string V(string key)
+            {
+                if (cla0 == null) return "";
+                string v; return cla0.TryGetValue(key, out v) ? (v ?? "") : "";
+            }
+
+            // Хук позиционирует вывод по сегментам шаблона: сегменты внутри if-веток подменяются
+            // маркерными заглушками/реальным HTML, чистый HTML проходит как есть (null).
+            Func<string, string> hook = seg =>
+            {
+                if (seg.Contains("<!-- start internal clan2 -->") && seg.Contains("class=\"clanDetails\""))
+                    return hasClan ? seg : "";                       // if-ветка «clan page» целиком
+                if (seg.Contains("<!-- start clan found template -->"))
+                    return hasClan ? "" : seg;                       // else-ветка «found» целиком
+                if (seg.Contains("<?php echo $cla[0]['clanName']; ?>"))
+                {
+                    // инлайн-echo внутри if-ветки: заменяем PHP-фрагменты значениями
+                    string s = seg;
+                    s = s.Replace("<?php echo $cla[0]['clanName']; ?>", HtmlEncode(V("clanName")));
+                    s = s.Replace("<?php echo $cla[0]['tagName']; ?>", HtmlEncode(V("tagName")));
+                    s = s.Replace("<?php echo $clan->GetClanLeader($cla[0]['leader']); ?>",
+                                  HtmlEncode(clan.GetClanLeader(PlayerLog.ToLong(V("leader")))));
+                    s = s.Replace("<?php echo $cla[0]['memberCount']; ?>", HtmlEncode(V("memberCount")));
+                    s = s.Replace("<?php echo $cla[0]['rank']; ?>", HtmlEncode(V("rank")));
+                    s = s.Replace("<?php echo strtoupper($cla[0]['company']); ?>",
+                                  HtmlEncode(V("company").ToUpperInvariant()));
+                    s = s.Replace("<?php echo $cla[0]['clandescription']?>", V("clandescription"));
+                    s = s.Replace("<?php echo $cla[0]['clanID']; ?>", HtmlEncode(V("clanID")));
+                    return s;
+                }
+                if (seg.Contains("if($re==\"notRecruiting\"):\n                                                        echo '<textarea"))
+                {
+                    string title = re == "notRecruiting" ? "Closed for recruiting. "
+                                 : (re == "Pending" ? "Your application to this Clan is pending."
+                                 : "Enter in your application text.");
+                    return "<textarea id=\"applicationText\" name=\"applicationText\" title=\"" + HtmlAttr(title) + "\"></textarea>";
+                }
+                if (seg.Contains("button name=\"submit\" type=\"submit\" class=\"clanInactive\""))
+                    return (re == "notRecruiting" || re == "Pending") ? seg : "";
+                if (seg.Contains("button name=\"submit\" type=\"submit\" class=\"clanSubmit\"")
+                    && seg.Contains("message_success"))
+                    return (re == "notRecruiting" || re == "Pending") ? "" : seg;
+                return null;                                          // verbatim-HTML
+            };
+
+            Write(PhpTemplateRenderer.RenderShell(_users, "internalNewClanDetails_Body",
+                  "http://127.0.0.1/css/cdn/internalNewClanDetails.css",
+                  beforeBody: ctx => { ctx["RO"] = HtmlEncode(ro); return null; },
+                  vars: null, logMessage: null, logType: null, bodyHook: hook));
+        }
+
+        /// <summary>fetch_assoc()['col'] — первая строка/колонка или null (PHP warning-паритет: 0).</summary>
+        private static void FirstCell(MySqlConnection con, string sql, long pid, Action<string> assign)
+        {
+            using (var cmd = new MySqlCommand(sql, con))
+            {
+                cmd.Parameters.AddWithValue("@pid", pid);
+                object o = cmd.ExecuteScalar();
+                if (o != null && o != DBNull.Value) assign(Convert.ToString(o, CultureInfo.InvariantCulture));
+            }
         }
 
         /// <summary>
@@ -1249,8 +1629,8 @@ namespace DarkSpace.Pages
         /// <summary>
         /// Port of indexInternal.es.php lines 36–64 (action=internalCompanyChoose).
         /// subaction=factionChoose persists faction/map/coords and echoes the redirect URL;
-        /// otherwise the CompanyChoose header/body would be rendered (фаза C — шаблоны),
-        /// here a minimal HTML form shell is emitted instead.
+        /// otherwise renders CompanyChoose_Header + xajax/internalHeader GLOBALS +
+        /// CompanyChoose_Body verbatim templates (фаза C2) + echo '</html>'.
         /// </summary>
         private void HandleInternalCompanyChoose(Users users, HttpRequest request)
         {
@@ -1289,15 +1669,26 @@ namespace DarkSpace.Pages
                 return;
             }
 
-            // require CompanyChoose_Header.php / xajax.php / internalHeader.php / CompanyChoose_Body.php
-            // TODO (фаза C): шаблон CompanyChoose_Body через TemplateManager. Smoke-оболочка:
-            Write("<div id=\"companyChoosePanel\">" +
-                  "<h3>Choose your company</h3>" +
-                  "<ul>" +
-                  "<li><a href=\"/Internal?action=internalCompanyChoose&amp;subaction=factionChoose&amp;factionID=1\">MMO</a></li>" +
-                  "<li><a href=\"/Internal?action=internalCompanyChoose&amp;subaction=factionChoose&amp;factionID=2\">EIC</a></li>" +
-                  "<li><a href=\"/Internal?action=internalCompanyChoose&amp;subaction=factionChoose&amp;factionID=3\">VRU</a></li>" +
-                  "</ul></div>");
+            // Phase C2: require FILES.'INDEXINTERNAL/CompanyChoose_Header.php' (verbatim,
+            // favicon 127.0.0.1 -> {{DYNHOST}}) — открывает <head>, css-ссылка уже внутри шаблона.
+            Write(PhpTemplateRenderer.FillFragment("CompanyChoose_Header", null));
+            // GLOBALS/xajax.php + GLOBALS/internalHeader.php (openMiniMap и т.д.) — те же
+            // фрагменты, что использует RenderShell; заполняем общими токенами ctx.
+            var ctx = new Dictionary<string, string>(StringComparer.Ordinal);
+            long pid2 = PlayerLog.ToLong(users.DataRow["playerID"]);
+            ctx["PLAYERID"] = pid2.ToString(CultureInfo.InvariantCulture);
+            ctx["FACTIONNAME"] = "mmo"; // factionId === '0' на этой ветке; дефолт страницы выбора
+            ctx["SESSIONID"] = PhpTemplateRenderer.CurrentSession != null
+                ? SessionManager.SessionId(PhpTemplateRenderer.CurrentSession) ?? "" : "";
+            ctx["DYNHOST"] = AppConfig.DynHost;
+            ctx["SERVER"] = AppConfig.Server;
+            ctx["HOST"] = AppConfig.Host;
+            Write(PhpTemplateRenderer.FillFragment("xajax", ctx));
+            Write(PhpTemplateRenderer.FillFragment("internalHeader", ctx));
+            // require FILES.'INDEXINTERNAL/CompanyChoose_Body.php' (verbatim HTML+JS) ...
+            Write(PhpTemplateRenderer.RenderBody(users, "CompanyChoose_Body", ctx));
+            // ... затем echo '</html>'; (закрывает <head>/<body> из Header-шаблона).
+            Write("</html>");
         }
 
         /// <summary>One-shot parameterized UPDATE (factionChoose writes server_1_players).</summary>
