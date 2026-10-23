@@ -57,6 +57,7 @@ namespace DarkSpace
             });
 
             // --- URL rewrite rules from web.config (.php/.es.php legacy paths) ---
+            app.MapRazorPages();
             app.MapFallbackToPage("/Index");
             app.Map("/indexInternal.es.php", (HttpContext ctx) =>
             {

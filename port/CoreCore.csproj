@@ -15,10 +15,10 @@
   </ItemGroup>
 
   <!-- Legacy templates are loaded via AppEnvironment.MapPath (AppDomain.BaseDirectory),
-       i.e. from the output folder, not WebRootPath — copy them next to the assembly. -->
+       i.e. from the output folder, not WebRootPath — copy them next to the assembly.
+       Single source of truth: templates/legacy/<Lang>/... in the project root. -->
   <ItemGroup>
-    <Content Include="wwwroot\templates\**\*.*" CopyToOutputDirectory="PreserveNewest" LinkBase="templates-copy" Visible="false" />
-    <None Include="wwwroot\templates\**\*.*" CopyToOutputDirectory="PreserveNewest" LinkBase="" />
+    <None Update="templates\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
