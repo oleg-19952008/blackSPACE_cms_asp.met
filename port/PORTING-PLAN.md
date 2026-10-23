@@ -95,7 +95,7 @@ A6.1 каркас/гейты, A6.2 спиннер/мультипликаторы
 - установка `$_SESSION['fact']`;
 - ветка `internalCompanyChoose` + `factionChoose` (UPDATE factionId/mapId/x/y, редиректы) — реализована.
 
-### B2. Механизм рендеринга оболочки — ⬜
+### B2. Механизм рендеринга оболочки — ✅
 PHP повторяет один и тот же набор require на каждой ветке:
 `internalDoc.php → internalDocEnd.php → sajax.php → xajax.php → headerEndJS.php → internalMenu.php → internalHeader.php → <Body-шаблон> → ads.php`.
 В C# — единый `RenderShell(string bodyTemplate, IDictionary<string,string> vars)` в
@@ -109,18 +109,18 @@ PHP повторяет один и тот же набор require на кажд�
 | Кусок | Экшены (строки оригинала) | Зависимости | Статус |
 |---|---|---|---|
 | B3 Start/Gates/JPA/Payment/HoF | `internalStart` (66–77), `internalGalaxyGates` (78–89, 116–126), `internalJPA`, `internalJPA-list` (90–115), `internalPayment` (127–137), `internalHallofFame`+view (138–160) | Rank ✅, GalaxyGate ✅ | 🔶 HallofFame — реальная логика; Start/Gates/JPA/Payment — render-заглушки (ждут C1/C-шаблоны) |
-| B4 Balance/Evoucher | `internalBalance` (161–171), `internalEvoucher` (172–188) | Voucher ✅ | ⬜ |
-| B5 Clan-группа | `internalNewClanDetails` (189–206), `internalNewClan` (207–240), `internalClan` (241–286), `internalClanList` (287–297) | Clan ✅ | ⬜ |
-| B6 Messaging/PilotSheet/UserData/Upgrade | `internalMessaging` (298–308), `internalPilotSheet` (309–340), `internalUserDataChange` (341–351), `internalItemUpgradeSystem` (352–362) | Base ✅, Inventory ✅ (+ Users.changeUsername — остаток A) | ⬜ |
+| B4 Balance/Evoucher | `internalBalance` (161–171), `internalEvoucher` (172–188) | Voucher ✅ | 🔶 логика есть, ждёт C-шаблоны |
+| B5 Clan-группа | `internalNewClanDetails` (189–206), `internalNewClan` (207–240), `internalClan` (241–286), `internalClanList` (287–297) | Clan ✅ | 🔶 логика есть, ждёт C-шаблоны |
+| B6 Messaging/PilotSheet/UserData/Upgrade | `internalMessaging` (298–308), `internalPilotSheet` (309–340), `internalUserDataChange` (341–351), `internalItemUpgradeSystem` (352–362) | Base ✅, Inventory ✅ (+ Users.changeUsername — остаток A) | 🔶 логика есть, ждёт C-шаблоны |
 | B7 Skylab/Board/NanoTechFactory | `internalSkylab`+subactions (363–391), `internalBoard`+subaction (392–406), `internalNanoTechFactory`+subactions (407–454) | Skylab ✅, Factory ✅ | 🔶 internalSkylab — реализован (без шаблона Body, C4); Board/NanoTechFactory — ⬜ (AJAX-часть NTF готова: A7.3) |
-| B8 External/History/Promo/Logout | `externalPassword` (455–465), `internalPaymentProxy` (466–469), `externalLogout` (470–480), `internalHistory` (481–491), `internalPaymentPartnerPromotion` (492–502) | Unity ✅ | ⬜ |
-| B9 Auction | `internalAuction` (503–571) | Auction ✅ | ⬜ |
-| B10 Dock + MapRevolution + burnme | `internalDock` (572–717, под-экшены ship/ammo/laser/drone/generator/booster/special/equipment/model), `internalMapRevolution` (718–726), `burnme` (727–732) | Shop ✅, Inventory ✅, Hangar ✅ | ⬜ |
+| B8 External/History/Promo/Logout | `externalPassword` (455–465), `internalPaymentProxy` (466–469), `externalLogout` (470–480), `internalHistory` (481–491), `internalPaymentPartnerPromotion` (492–502) | Unity ✅ | 🔶 логика есть, ждёт C-шаблоны |
+| B9 Auction | `internalAuction` (503–571) | Auction ✅ | 🔶 логика есть, ждёт C-шаблоны |
+| B10 Dock + MapRevolution + burnme | `internalDock` (572–717, под-экшены ship/ammo/laser/drone/generator/booster/special/equipment/model), `internalMapRevolution` (718–726), `burnme` (727–732) | Shop ✅, Inventory ✅, Hangar ✅ | 🔶 логика есть, ждёт C-шаблоны |
 
 ### B11. Routing и завершение — 🔶
 - Legacy URL `indexInternal.es.php?action=X` → страница `/Internal` — реализовано в `Program.cs` ✅;
-- smoke-тест всех action через HTTP-запросы на staging — ⬜ (ждёт завершения B3–B10);
-- сборка в CI (`dotnet build`) — ни разу не выполнялась (SDK недоступен в dev-контейнере) ⬜.
+- smoke-тест всех action через HTTP-запросы на staging — 🔶 (схема `port/sql/smoke-schema.sql` + тестовый пользователь/сессия — см. ниже);
+- сборка в CI (`dotnet build port/CoreCore.csproj`) — ✅ (.NET 8 SDK, 0 ошибок; фикс Clan.GetPager: чтение формы только при `request.HasFormContentType`, хелперы `AppEnvironment.GetFormValue/GetQueryValue`).
 
 ---
 
