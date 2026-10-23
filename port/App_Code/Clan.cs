@@ -447,7 +447,18 @@ namespace DarkSpace
             return rows.Count != 0;
         }
 
-        /// <summary>clan::getMyNewClan($tag) + regMyClan — bind founder to the freshly inserted clan.</summary>
+        /// <summary>clan::getMyNewClan($tag) — look the freshly inserted clan up by tag,
+        /// then bind the founder to it via regMyClan (A1.2). PHP returned the result of
+        /// regMyClan ($result[0]['clanID'] without an emptiness check); ported as a public
+        /// wrapper over RegMyClanByTag so callers outside the foundClan chain can re-bind
+        /// a player to a clan by its tagName.</summary>
+        public bool GetMyNewClan(string tag)
+        {
+            return RegMyClanByTag(tag);
+        }
+
+        /// <summary>clan::regMyClan($args) — UPDATE players.clanId from row[0]['clanID'].
+        /// Reached through RegMyClanByTag; kept separate for parity with the PHP call graph.</summary>
         private bool RegMyClanByTag(string tag)
         {
             var rows = Query("SELECT * FROM server_1_clan WHERE tagName=@tag", Kv("@tag", tag));

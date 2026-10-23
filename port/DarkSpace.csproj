@@ -90,6 +90,7 @@
     <Compile Include="App_Code\News.cs" />
     <Compile Include="App_Code\PhpMailer.cs" />
     <Compile Include="App_Code\PlayerLog.cs" />
+    <Compile Include="App_Code\Paginator.cs" />
     <Compile Include="App_Code\Rank.cs" />
     <Compile Include="App_Code\RegisterProvisioning.cs" />
     <Compile Include="App_Code\SessionManager.cs" />
